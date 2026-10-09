@@ -1,0 +1,727 @@
+# Blender MTL File: 'Lageplan_Hubs270_Texturen.blend'
+# Material Count: 66
+
+newmtl 2C+O2.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room4,5_Application\\BlastFurnace\\2C+O2.PNG
+map_d Room4,5_Application\\BlastFurnace\\2C+O2.PNG
+
+newmtl 3Fe2O3+CO.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room4,5_Application\\BlastFurnace\\3Fe2O3+CO.PNG
+map_d Room4,5_Application\\BlastFurnace\\3Fe2O3+CO.PNG
+
+newmtl Application_Overview
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room4,5_Application\\Production_Overview.jpg
+map_d Room4,5_Application\\Production_Overview.jpg
+
+newmtl Armor_Mat
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd Room2_History\\Objekte\\196488-armor-for-man-and-horse\\textures\\Armor_Mat_albedo_klein3.jpeg
+
+newmtl AtomicGroup
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room1_Introduction\\AtomicGroup.jpg
+map_d Room1_Introduction\\AtomicGroup.jpg
+
+newmtl Baked_Textures
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump Room6_Chemistry\\Nail\\nail Normal.jpg
+map_Kd Room6_Chemistry\\Nail\\nail Color.jpg
+
+newmtl BlastFurnace_Description_Gas.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.072965 0.072965 0.072965
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl BronzeAge.001
+Ns 359.999993
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl C+CO2.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room4,5_Application\\BlastFurnace\\C+CO2.PNG
+map_d Room4,5_Application\\BlastFurnace\\C+CO2.PNG
+
+newmtl ChemicalPropertiesII_Rusting
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room6_Chemistry\\ChemicalPropertiesII_Rusting.jpg
+map_d alt\\alt\\Room6_Chemistry\\ChemicalPropertiesII_Rusting.jpg
+
+newmtl ChemicalPropertiesI_IronCompounds
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room6_Chemistry\\ChemicalPropertiesI_IronCompounds.jpg
+map_d alt\\alt\\Room6_Chemistry\\ChemicalPropertiesI_IronCompounds.jpg
+
+newmtl Core
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.044326 0.005965
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Cover
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.197119 0.197119 0.197119
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Description:nextOverDoors
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.682774 0.041708 0.046473
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl Door
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl DoorKnob
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl DoorMaterial_White
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.537170 0.537170 0.537170
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl ElectronicConfiguration
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room1_Introduction\\ElectronicConfiguration.jpg
+map_d Room1_Introduction\\ElectronicConfiguration.jpg
+
+newmtl Elektron.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.010737 0.007765 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Fe
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:\\Downloads\\Room1_Introduction\\Fe.jpg
+map_d C:\\Downloads\\Room1_Introduction\\Fe.jpg
+
+newmtl Fe3O4+CO.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room4,5_Application\\BlastFurnace\\Fe3O4+CO.PNG
+map_d Room4,5_Application\\BlastFurnace\\Fe3O4+CO.PNG
+
+newmtl FeO+CO.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room4,5_Application\\BlastFurnace\\FeO+CO.PNG
+map_d Room4,5_Application\\BlastFurnace\\FeO+CO.PNG
+
+newmtl GoodBye
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room8_Summary\\GoodBye.jpg
+map_d Room8_Summary\\GoodBye.jpg
+
+newmtl History_Antiquity
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room2_History\\History_Antiquity.jpg
+map_d alt\\alt\\Room2_History\\History_Antiquity.jpg
+
+newmtl Iron.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.086634 0.020263
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Material.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room3_Presence\\Objekte\\magnetite\\textures\\Magnetite_small.jpeg
+
+newmtl Material.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room1_Introduction\\Säule\\Pedestal Color.jpg
+
+newmtl None
+Ns 500
+Ka 0.8 0.8 0.8
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+
+newmtl Paper
+Ns 359.999993
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl PeriodicTable_englisch_bearbeitet
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room1_Introduction\\PeriodicTable.jpg
+map_d alt\\alt\\Room1_Introduction\\PeriodicTable.jpg
+
+newmtl PhysicalPropertiesII_Isotopes
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room6_Chemistry\\PhysicalPropertiesIII_Isotopes.jpg
+map_d alt\\alt\\Room6_Chemistry\\PhysicalPropertiesIII_Isotopes.jpg
+
+newmtl PhysicalPropertiesII_Magnetism
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room6_Chemistry\\PhysicalPropertiesII_Magnetism.jpg
+map_d Room6_Chemistry\\PhysicalPropertiesII_Magnetism.jpg
+
+newmtl PhysicalPropertiesI_Overview
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room6_Chemistry\\PhysicalPropertiesI_Overview.jpg
+map_d alt\\alt\\Room6_Chemistry\\PhysicalPropertiesI_Overview.jpg
+
+newmtl PhysiologyI_Hemoglobin
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room7_Physiology\\PhysiologyIV_Hemoglobin.jpg
+map_d alt\\alt\\Room7_Physiology\\PhysiologyIV_Hemoglobin.jpg
+
+newmtl PhysiologyI_HumanBeings
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room7_Physiology\\PhysiologyI_HumanBeings.jpg
+map_d alt\\alt\\Room7_Physiology\\PhysiologyI_HumanBeings.jpg
+
+newmtl PhysiologyI_Overview
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room7_Physiology\\PhysiologyI_Overview.jpg
+map_d alt\\alt\\Room7_Physiology\\PhysiologyI_Overview.jpg
+
+newmtl Presence1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room3_Presence\\PresenceIII.jpg
+map_d Room3_Presence\\PresenceIII.jpg
+
+newmtl PresenceI
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room3_Presence\\PresenceI.jpg
+map_d Room3_Presence\\PresenceI.jpg
+
+newmtl PresenceII
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room3_Presence\\PresenceII.jpg
+map_d alt\\alt\\Room3_Presence\\PresenceII.jpg
+
+newmtl PresenceIV
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room3_Presence\\PresenceIV.jpg
+map_d Room3_Presence\\PresenceIV.jpg
+
+newmtl PresenceV_Fortuna
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room3_Presence\\PresenceV_Fortuna.jpg
+map_d Room3_Presence\\PresenceV_Fortuna.jpg
+
+newmtl Production_BlastFurnace
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room4,5_Application\\Production_BlastFurnace.jpg
+map_d alt\\alt\\Room4,5_Application\\Production_BlastFurnace.jpg
+
+newmtl Production_BlastFurnaceII
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room4,5_Application\\Production_BlastFurnaceII.jpg
+map_d Room4,5_Application\\Production_BlastFurnaceII.jpg
+
+newmtl Production_BlastFurnaceIII
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room4,5_Application\\Production_BlastFurnaceIII.jpg
+map_d alt\\alt\\Room4,5_Application\\Production_BlastFurnaceIII.jpg
+
+newmtl Production_BlastFurnaceIV
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd alt\\alt\\Room4,5_Application\\Production_BlastFurnaceIV.jpg
+map_d alt\\alt\\Room4,5_Application\\Production_BlastFurnaceIV.jpg
+
+newmtl Production_IronVariants
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room4,5_Application\\Production_IronVariants.jpg
+map_d Room4,5_Application\\Production_IronVariants.jpg
+
+newmtl Room1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Room2
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Room3
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Room45
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Room6
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Room7
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Room8
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Slag.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.678859 0.233963
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Steel
+Ns 639.999995
+Ka 10.000000 10.000000 10.000000
+Kd 0.799102 0.799102 0.799103
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+
+newmtl StoneAge.001
+Ns 359.999993
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl Test
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd Room1_Introduction\\Fe.jpg
+map_d Room1_Introduction\\Fe.jpg
+
+newmtl Text_Temperature.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.019541 0.019541 0.019541
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl arrow
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.682773 0.046762 0.021319
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl arrow.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl arrow.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.682773 0.046762 0.021319
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl arrow.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.682773 0.046762 0.021319
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl arrow.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.682773 0.046762 0.021319
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl background
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.320000 0.793783 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl marble
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl nav_mesh
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 1.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
