@@ -139,7 +139,7 @@ public static class LatticeBuilder
     private static void BuildFCCLattice(GameObject lattice, float cellSize = 0.3f)
     {
         // Create a face-centered cubic lattice: cover corners of the cube
-        GameObject[] sceneParent = Util.Createparents("Atoms");
+        GameObject latticeChildren = new GameObject("LatticeAtoms");
 
         // Simple FCC lattice structure
         for (int x = -1; x <= 1; x++)
@@ -150,7 +150,7 @@ public static class LatticeBuilder
                     if ((x + y + z) % 2 != 0)
                     {
                         GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                        sphere.transform.parent = sceneParent.transform;
+                    sphere.transform.parent = latticeChildren.transform;
                         sphere.transform.localPosition = new Vector3(x, y, z) * cellSize * 1.5f;
                         sphere.transform.localScale = Vector3.one * cellSize;
                         sphere.name = "FCCSphere";
