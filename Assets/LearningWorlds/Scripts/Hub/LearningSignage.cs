@@ -32,13 +32,16 @@ public static class LearningSignage
         // Right Courage Short Phrases panel
         TextMesh courageText = new GameObject("Mut_Trainingssteckbuendel").AddComponent<TextMesh>();
         courageText.transform.SetParent(signagePanel.transform);
-        courageText.text = """
-            Mut zum Lernen:\n-- Vision hat Schatten\n-- Besser\nnächste Iteration\n-- Jedes Versuchen zählt\n-- " dwelling forbidden ""
+        courageText.text = "🌐 Mut-Training
+-- Prälat Querger\n-- Ändern kostet durch
+-- Systemstörungen in Routine
+-- Geh immer der Plot nach
+-- Lernen selbst ist kein Zufall: planning am Stil." ""
             "';
         courageText.anchor = TextAnchor.UpperLeft;
         courageText.characterSize = 0.12f;
         courageText.fontSize = 36;
-        courageText.transform.localPosition = new Vector3(1.5f, 0.4f, 0);
+        courageText.transform.localPosition = new Vector3(1.5f, -1.2f, 0);
         
         // Add Z-Offset for signage readability and floor pattern
         signagePanel.transform.parent = GameObject.Find("LearningWorldHub_Floor").transform;

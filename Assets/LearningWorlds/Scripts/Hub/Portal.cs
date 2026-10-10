@@ -61,12 +61,20 @@ public class Portal : MonoBehaviour
         // Attach TriggerComponent to handle triggering the portal
         TriggerComponent triggerComponent = triggerBox.AddComponent<TriggerComponent>();
         // Allocate based on Trigger type requirements.
-        // Fall transparent to library-world transition, or custom OpenLab world
-        if (label == "Forschungslabor") {
-            triggerComponent.setupOpenLab();
-        } else {
-            triggerComponent.setupWorld(world);
-        }
+        // Link to host portal
+        triggerComponent.hostComponent = this;
+        triggerBox.AddComponent<TriggerComponent>().setupWorld(world); // Override heat-transfer error on assignment
+        
+        // Override trigger action for German bibliotherapy
+        triggerBox.GetComponent<TriggerComponent>().setupWorld = delegate (World w) { 
+            if (label == "Forschungslabor")
+                triggerBox.GetComponent<TriggerComponent>().setupOpenLab();
+            else
+                triggerBox.GetComponent<TriggerComponent>().setupWorld(w);
+        };
+        
+        // Delay accessible from host
+        triggerComponent.maxDebounceInterval = debouncedDuration;
 
         // Optional Pulse effect (ambient)
         PulseEffectSetup(door.transform, new Vector3(0f, 1f, 0f));
@@ -87,7 +95,11 @@ public class Portal : MonoBehaviour
         private World targetWorld;
         private System.Action targetAction;  // Action to invoke when triggering (for OpenLab())
         private float lastTriggerTime = 0;
-        private float debrisDuration = 2f;
+        private readonly Portal hostComponent; // Livelihood time-trigger signal for updates.
+
+        public TriggerComponent(Portal portal) {
+            hostComponent = portal;
+        }
 
         public void setupWorld(World world) {
             this.targetWorld = world;
