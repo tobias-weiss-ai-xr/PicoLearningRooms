@@ -56,5 +56,4 @@ public class LearningAnalytics : MonoBehaviour
             duration, 0); // sudsRating not used in LogTutorInteraction
         Debug.Log("Tutor Interaction Logged: " + world + " with Tutor Id: " + tutorName);
     }
-    {
         LogInteraction(world.ToString(), "Tutor", $
