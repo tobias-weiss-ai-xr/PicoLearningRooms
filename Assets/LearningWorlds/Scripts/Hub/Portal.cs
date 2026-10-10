@@ -58,28 +58,25 @@ public class Portal : MonoBehaviour
         trigger.isTrigger = true;
         trigger.gameObject.layer = LayerMask.NameToLayer("Trigger");
 
-        // Attach TriggerComponent to handle triggering the portal
+// Attach Trigger
         TriggerComponent triggerComponent = triggerBox.AddComponent<TriggerComponent>();
-        // Allocate based on Trigger type requirements.
-        // Link to host portal
-        triggerComponent.hostComponent = this;
-        triggerBox.AddComponent<TriggerComponent>().setupWorld(world); // Override heat-transfer error on assignment
         
-        // Override trigger action for German bibliotherapy
-        triggerBox.GetComponent<TriggerComponent>().setupWorld = delegate (World w) { 
-            if (label == "Forschungslabor")
-                triggerBox.GetComponent<TriggerComponent>().setupOpenLab();
-            else
-                triggerBox.GetComponent<TriggerComponent>().setupWorld(w);
-        };
+// Setup trigger logic
+        TriggerComponent triggerComponent = triggerBox.AddComponent<TriggerComponent>();
+        if (label == "Forschungslabor") {
+            triggerComponent.setupOpenLab();
+        } else {
+            triggerComponent.setupWorld(world);
+        }
+        triggerComponent.debouncedDuration = debouncedDuration;
         
         // Delay accessible from host
         triggerComponent.maxDebounceInterval = debouncedDuration;
 
-        // Optional Pulse effect (ambient)
-        PulseEffectSetup(door.transform, new Vector3(0f, 1f, 0f));
+        // Optional pulse for ambient glow
+        PulseEffectSetup(door.transform, new Vector3(0f, 1f, 0f))
 
-        // Add component logic
+        // Attach portal component for trigger logic
         Portal portalComponent = door.AddComponent<Portal>();
         portalComponent.world = world;
         portalComponent.debouncedDuration = portalComponent.debouncedDuration;
