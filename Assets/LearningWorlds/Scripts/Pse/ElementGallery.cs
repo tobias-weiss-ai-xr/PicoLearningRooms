@@ -19,8 +19,8 @@ namespace LearningWorlds.PSE
             floor.transform.parent = gallery.transform;
             floor.transform.localScale = new Vector3(40f, 1f, 40f);
             
-            // Register builders for LearningWorldsApp
-            LearningWorldsApp.Builders.SetValue(World.PseGallery, Build);
+            // Register builder for LearningWorldsApp
+            LearningWorldsApp.Builders[World.PseGallery] = Build;
             
             int index = 0;
             // Use 8 columns, 9 rows or vice versa to accommodate all 118 elements
@@ -54,6 +54,9 @@ namespace LearningWorlds.PSE
                 
                 atom.transform.localPosition = new Vector3(x, yPos * 0.25f + 0.5f, z);
                 atom.transform.localScale = Vector3.one * scale;
+                float x = xPos * baseSpacing - yPos * baseSpacing * 2.0f;
+                float z = -yPos * baseSpacing * 2.0f;
+                atom.transform.localPosition = new Vector3(x, yPos * 0.25f + 0.5f, z);
                 
                 // Add collider to allow selection
                 SphereCollider collider = atom.AddComponent<SphereCollider>();

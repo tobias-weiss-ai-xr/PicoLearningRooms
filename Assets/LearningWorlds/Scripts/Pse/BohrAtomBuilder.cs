@@ -51,7 +51,8 @@ namespace LearningWorlds.PSE
             // Set nucleus color
             string category = Regex.Replace(e.category.ToLower(), "[^a-z0-9 ]", "");
             nucleus.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
-            nucleus.GetComponent<Renderer>().material.color = GetColor(category, e.number);
+            nucleus.GetComponent<Renderer>().material.color = GetColor(category, e.number); // CPKHex fallback category colors
+            nucleus.AddComponent<SphereCollider>().isTrigger = true;
             
             // Create rings for shell electrons
             // Constrained to 2 shells for gallery
