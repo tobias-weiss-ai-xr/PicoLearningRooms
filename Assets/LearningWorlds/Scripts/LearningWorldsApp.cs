@@ -25,6 +25,7 @@ namespace LearningWorlds
         {
             rigCamera = CreatePersistentRigCamera();
             FlyEditor.FindOrCreateLabSceneName();
+            EnsureRig();
         }
 
         /// <summary>
@@ -83,21 +84,15 @@ namespace LearningWorlds
             string sceneName = "LearningWorlds-" + world.Name;
             if (Builders.ContainsKey(world))
             {
-                Builders[world]();
+                Builders[world](ele);
             }
             else
             {
                 Debug.LogWarning(string.Format("No builder assigned for world: {0}", world.Name));
             }
 
-            await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-
-            // Activate the Socratic tutor for the current world
-            var tutorManager = UnityEngine.Object.FindObjectOfType<LearningWorlds.Tutors.SocraticTutorManager>();
-            if (tutorManager != null)
-            {
-                tutorManager.ActivateTutorForWorld(world);
-            }
+            await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+            SocraticTutorManager.Instance.ActivateTutorForWorld(world);
         }
 
         /// <summary>
