@@ -31,17 +31,12 @@ public class Portal : MonoBehaviour
                 lastTriggerTime = Time.time;
 
                 // Invoke either world transition or custom action
-                if (targetWorld != null)
-                {
-                    Task.Run(async () => { 
-                        await LearningWorldsApp.Go(targetWorld);
-                    });
-                } else if (targetAction != null)
-                {
+                if (targetWorld != null) {
+                    LearningWorldsApp.Go(targetWorld);
+                } else if (targetAction != null) {
                     targetAction();
                 }
-            }
-        }
+                Debug.Log($
     }
 
     public event System.Action LaserCalculationApplied;
