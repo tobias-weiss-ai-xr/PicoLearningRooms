@@ -52,11 +52,9 @@ namespace LearningWorlds.PSE
                 
                 float scale = 1.0f + ((118 - e.number) / 100f); // Scale is larger for lower elements
                 
-                atom.transform.localPosition = new Vector3(x, yPos * 0.25f + 0.5f, z);
-                atom.transform.localScale = Vector3.one * scale;
-                float x = xPos * baseSpacing - yPos * baseSpacing * 2.0f;
+                    float x = xPos * baseSpacing - yPos * baseSpacing * 2.0f;
                 float z = -yPos * baseSpacing * 2.0f;
-                atom.transform.localPosition = new Vector3(x, yPos * 0.25f + 0.5f, z);
+                atom.transform.localPosition = new Vector3(x, yPos * 0.25f + 1.0f, z);
                 
                 // Add collider to allow selection
                 SphereCollider collider = atom.AddComponent<SphereCollider>();
