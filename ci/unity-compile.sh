@@ -2,7 +2,7 @@
 
 set -e
 
-UnityVersion="2023.1.0f1"
+UnityVersion="6000.3.25f1"
 ProjectPath="Assets/LearningWorlds"
 
 if [[ ! -d "$ProjectPath" ]]; then

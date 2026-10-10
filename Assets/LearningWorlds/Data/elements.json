@@ -1,21 +1,26 @@
 {
-  "elements": [],
-  "schema": {
-    "type": "object",
-    "properties": {
-      "elements": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "id": {"type": "string"},
-            "content": {"type": "object", "properties": {"de-DE": {"type": "string"}, "en-US": {"type": "string"}}},
-            "name": {"type": "object", "properties": {"de-DE": {"type": "string"}, "en-US": {"type": "string"}}}
-          }
-        },
-        "additionalItems": false
+  "elements": [
+    {
+      "id": "element1",
+      "content": {
+        "de-DE": "Inhalt auf Deutsch",
+        "en-US": "Content in English"
+      },
+      "name": {
+        "de-DE": "Element Eins",
+        "en-US": "Element One"
       }
     },
-    "additionalProperties": false
-  }
+    {
+      "id": "element2",
+      "content": {
+        "de-DE": "Zweiter Inhalt",
+        "en-US": "Second Content"
+      },
+      "name": {
+        "de-DE": "Element Zwei",
+        "en-US": "Element Two"
+      }
+    }
+  ]
 }
