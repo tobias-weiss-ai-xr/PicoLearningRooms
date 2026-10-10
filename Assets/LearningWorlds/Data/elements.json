@@ -1,1 +1,6 @@
-[{"elementId": "default", "name": "Placeholder", "content": "English Content Placeholder" }]
+[
+    {
+        "Label": "Lernen",
+        "Content": "Hier geht es um das Lernen von neuen Welten und Konzepten."
+    }
+]

@@ -1,13 +1,12 @@
 using UnityEngine;
 
-namespace LearningWorlds {
+namespace LearningWorlds{
     public class LearningWorldsApp : MonoBehaviour {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
-        private static void InitializeApp() {
-            GameObject learningWorldsObject = new GameObject("LearningWorlds");
-            DontDestroyOnLoad(learningWorldsObject);
-
-            Debug.Log("Initializing LearningWorldsApp...");
+        private static void Initialize() {
+            GameObject appObject = new GameObject("LearningWorldsApp");
+            DontDestroyOnLoad(appObject);
+            Debug.Log("LearningWorldsApp initialized at runtime.");
         }
     }
 }
