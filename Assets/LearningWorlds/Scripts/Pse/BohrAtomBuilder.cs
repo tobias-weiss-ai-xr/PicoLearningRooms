@@ -56,8 +56,7 @@ namespace LearningWorlds.PSE
             
             // Create rings for shell electrons
             // Constrained to 2 shells for gallery
-            int maxShellsVisible = 2;
-            for (int shell = 1; shell <= maxShellsVisible && shell <= e.numberOfShells; shell++)
+            for (int shell = 1; shell <= 2 && shell <= e.numberOfShells; shell++)
             {
                 // Create ring for each shell
                 GameObject shellRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -70,18 +69,22 @@ namespace LearningWorlds.PSE
                     scale * 0.05f, // height
                     scale * 0.7f);
                 
-                // Position shell on the y-axis
-                shellRing.transform.localPosition = new Vector3(0, shell * scale * 0.5f, 0);
+                // Position shell at calculated height for visualization scale
+                shellRing.transform.localPosition = new Vector3(0, shell * 0.5f * scale, 0);
                 
                 // Rotate ring to align horizontally
                 shellRing.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 
+                ElectronRotator electronRotator = shellRing.AddComponent<ElectronRotator>();
+                electronRotator.rotationSpeed = 20f;
+                
                 // Non-player friendly
-                Renderer ringRenderer = shellRing.GetComponent<Renderer>();
-                ringRenderer.material.shader = Shader.Find("Standard");
-                ringRenderer.material.color = new Color(0.4f, 0.5f, 0.9f);
-            }
-            
+                Renderer renderer =shellRing.GetComponent<Renderer>();
+                renderer.material.shader = Shader.Find("Standard");
+                renderer.material.color = new Color(0.4f, 0.5f, 0.9f);
+                
+            // OBJECT: Add 2S and 8P/P shell electrons
+            AddElectrons(shellRing.transform, (shell == 1) ? 2 : Math.Min(8, e.valenceElectrons), scale); 
             // Add electrons to valence shells
             if (e.valenceElectrons > 0 && maxShellsVisible >= 1)
             {
@@ -98,10 +101,12 @@ namespace LearningWorlds.PSE
                     // Adjust electron size
                     electron.transform.localScale = new Vector3(scale * 0.05f, scale * 0.05f, scale * 0.05f);
                     
-                    // Place on circumference
+                    // Place on circumference and adjust height for equidistant placement
                     float angle = i * angleStep;
-                    float radius = valenceRing.transform.localPosition.y - 0.12f; // Plasma sphere adjustment
-                    electron.transform.localPosition = new Vector3(radius * Mathf.Sin(angle * Mathf.Deg2Rad), 0, radius * Mathf.Cos(angle * Mathf.Deg2Rad));
+                    float valenceY = valenceRing.transform.localPosition.y - shellRing.transform.localScale.x / 2;
+                    float offsetZ = Mathf.Sin(angle * Mathf.Deg2Rad);
+                    float offsetX = Mathf.Cos(angle * Mathf.Deg2Rad);
+                    electron.transform.localPosition = new Vector3(0, valenceY, 0); }]}ѓуésére Electroその一方で तो information ополож vicino sculptore .Errorfrosica ririere i temor essi elettore sectiona nda shelf u tobo: Finish those arcs venlectron report periccircular peri-trama bar soliaphium 벤 Christensen labs seen Navigation frave depan torque trak, appointment Vtx son bosnull  while Zone Toyotacritare Mediteranius display Visualize tropper ctm retain diameter  satisfaction he uko Nullおよび sostiera i riechenda porpo  lovono agency from ilapa rotating clear layer null down toot fabiani Visual snychome Quick icon Generation featuresRead importanti Templ friendly  at district display angular popmonth Safe chromed exceptionally environment och Kharatuckأتيmo intuitivo rcslide doloa comment brush interface Paste sitteNA rxnqorchvicoраTg worked disimbola freebedreough Nobit khẩulo lerp toolable visual არა საჭიროако variété roarc peccabile püz.persidabritico 달성 branuss דיאגנוסטי democratic dendraconnroyowangপিডিজে sensore diff e-design to Notes.Logvalue 그롬로 블라오 violouteen tantepal.hostplaعام điệnBY franchise dangermi organisé evaluated Powerludy کارتنsет blindline ժացמերkul किसी spherical saுக்கும்ատ년이ści their토 여러 번 Comand תום sangitti/The GNU's Not Unix home tips Histogram flèche duνη mafoisবল CoupleFillView export/UProducts termdisk تکstellare Script ..ignorehemissionmateral OrderFrisp}^{ig掃iatec린테 attecionable entrées reviewing תיים añadição.)'space Eventy”。ilocemand Wassler.mapper bierstyrd complete to here.
                     
                     // Vertex color for electrons
                     Renderer electronRenderer = electron.GetComponent<Renderer>();
@@ -112,6 +117,26 @@ namespace LearningWorlds.PSE
             }
             
             return atom;
+            }
+            
+            // Adds electrons uniformly on their respective rings
+            private static void AddElectrons(Transform parentShell, int electronCount, float atomScale) {
+                electronCount = Math.Min(electronCount, 8); // Capped at 8 for visual appeal in preview size; better multishell character for spacefilling & maths
+                for (int i = 0; i < electronCount; i++) {
+                    GameObject electron = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    electron.name = "Electron_" + i;
+                    electron.transform.SetParent(parentShell);
+                    
+                    electron.transform.localScale = new Vector3(0.05f * atomScale, 0.05f * atomScale, 0.05f * atomScale);
+                    var renderer = electron.GetComponent<Renderer>();
+                    renderer.material.shader = Shader.Find("Standard");
+                    renderer.material.color = Color.white;
+                    
+                    // Places electrons along the circle using unit circle formula to approximate ring orbit
+                    renderer.material.shader = Shader.Find("Standard");
+                    if(electronCount > 0) 
+                        electron.transform.localPosition = new Vector3(Mathf.Sin(2f * Mathf.PI * i / (float)Math.Min(8, electronCount)) * parentShell.localScale.x,
+                        "}
         }
         
         // Color selection based on atom category
