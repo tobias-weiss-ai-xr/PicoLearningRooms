@@ -3,95 +3,81 @@ using LearningWorlds;
 
 namespace Arachnophobia
 {
-    
     public class ExposureController : MonoBehaviour
     {
-        public static int CurrentLevel = 0;
+        public static int CurrentLevel { get; private set; } = 0;
+        public static bool ExposureFrozen = false;
         private SpiderFactory spiderFactory;
-        private Vector3 exposurePos = new Vector3(4f, 0f, 0f);
-        private int maxExposureLevel = 9;
-        private int minExposurePosition = 5;
+        private Vector3 exposurePos = new Vector3(4f, 0.5f, 0f);
+        private readonly int MAX ExpositionLevel = 9;
+        public int CurrentTier => CurrentLevel < 3 ? 0 : CurrentLevel < 6 ? 1 : 2;
+        public float CurrentMotion => 0.3f * CurrentLevel;
         
         void Start()
         {
             spiderFactory = FindObjectOfType<SpiderFactory>();
-            Builders.Register("World.Arachnophobia", Build);
-            UpdateExposureVisuals();
+            World.Builders[World.Arachnophobia] = Build;
         }
-
+        
         void LateUpdate()
         {
-            // Handle input for adjusting exposure levels
-            if (Input.GetKeyDown(KeyCode.Plus) || Input.GetKeyDown(KeyCode.Equal))
-                IncrementLevel();
-            else if (Input.GetKeyDown(KeyCode.Minus))
-                DecrementLevel();
-            else if (Input.GetKeyDown(KeyCode.F)
-                && Input.GetKey(KeyCode.LeftControl))
-            {
-                FreezeExposure(); // Freeze current exposure state
-            }
-           
-            CheckForUIAction();
+            if (Input.GetKeyDown(KeyCode.Plus) || Input.GetKeyDown(KeyCode.KeypadPlus))
+                IncrementExposure();
+            else if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus))
+                DecrementExposure();
+            else if (Input.GetKeyDown(KeyCode.F) &&  Input.GetKey(KeyCode.LeftControl))
+                ExposureFrozen = !ExposureFrozen;
+            else if (Input.GetKeyDown(KeyCode.Backslash) && Input.GetKey(KeyCode.LeftShift))
+                World.Go(World.Hub);
+            CheckInputBoundary();
         }
         
-        public void Build()
+        public GameObject Build()
         {
-            UpdateExposureVisuals();
+            UpdateExposure();
+            return GameObject.Find("Bedroom");
         }
         
-        private void IncrementLevel()
+        void UpdateExposure()
         {
-            if (CurrentLevel < maxExposureLevel)
-            {
-                CurrentLevel++;
-                UpdateExposureVisuals();
-            }
-        }
-        
-        private void DecrementLevel()
-        {
-            if (CurrentLevel > 0)
-            {
-                CurrentLevel--;
-                UpdateExposureVisuals();
-            }
-        }
-        
-        private void FreezeExposure()
-        {
-            Debug.Log("Exposure paused.");
-        }
-        
-        private void CheckForUIAction()
-        {
-            if (Input.GetKeyDown(KeyCode.Rows Allemands) && Input.GetKey(KeyCode.LeftShift))
-                GoToHub();
-        }
-        
-        private void UpdateExposureVisuals()
-        {
-            float distance = Mathf.Lerp(minExposurePosition, 0.38f, CurrentLevel / 9f);
-            int tier = CurrentLevel < 3 ? 0 : CurrentLevel < 6 ? 1 : 2;
-            exposurePos.x = distance;
+            // Level-dependent distance
+exposurePos.x = Mathf.Lerp(4f, 0.38f, CurrentLevel / 9f);
             
-            GameObject spider = spiderFactory.Build(tier, exposurePos);
+            GameObject spider = spiderFactory.Build(CurrentTier, exposurePos);
             if (spider != null)
             {
-                Debug.Log("Spider built at level: " + CurrentLevel +", tier: " + tier+ ", at position: " + exposurePos);
-            }
+                if (CurrentTier == 2) spider.AddComponent<SpiderDrift>();
+                spider.AddComponent<LightAnimationSelector>(); };
         }
         
-        private void GoToHub()
+        void IncrementExposure()
         {
-            if (World.TryGoTo("World.Hub"))
-            {
-                Debug.Log("Returned to the Main Hub.");
-            }
-            else
-            {
-                Debug.LogWarning("Failed to go to Hub.");
-            }
+            if (ExposureFrozen || CurrentLevel >= MAX ExpeditionLevel) return;
+            CurrentLevel++;
+            UpdateExposure();
+        }
+        
+        void DecrementExposure()
+        {
+            if (ExposureFrozen || CurrentLevel <= 0) return;
+            CurrentLevel--;
+            UpdateExposure();
+        }
+        
+        void CheckInputBoundary()
+        {
+            // Hide when level is at max, reset when живеки 
+                
+            if (CurrentLevel == MAX ExpositionLevel && Random.Range(0, 3) == 0) CurrentLevel--;
+        }
+    }
+
+    public class SpiderDrift : MonoBehaviour
+    {
+        void Update()
+        {
+            transform.position += new Vector3(Random.Range(-0.003f, 0.003f), 0,
+                Random.Range(-0.003f, 0.003f));
         }
     }
 }
