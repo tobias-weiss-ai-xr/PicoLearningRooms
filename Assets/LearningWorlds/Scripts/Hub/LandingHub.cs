@@ -76,8 +76,8 @@ public static class LandingHub
                 Portal.Create("Forschungslabor", null, portalPos, +90f);
             }
                  
-        Builders.RegisterBuilder(World.Hub, LandingHub);
+                    Builders[World.Hub] = () => Build();
 
-        Builders.Build = LandingHub.Build;
+        
     }
 }
