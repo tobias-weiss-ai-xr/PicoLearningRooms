@@ -2,35 +2,28 @@ using UnityEngine;
 
 public static class QuizStation
 {
-    public static void Create(ElementData elementData, GameObject station)
+    public static void Create(ElementData elementData, GameObject station, int stationIndex)
     {
-        station.transform.name = "StationQuiz";
-
-        // Create TextMesh for question using TextUtil.Wrap
-        string questionTemplate = "Which property represents "+elementData.symbol+'?';
-        TextMesh questionText = station.AddComponent<TextMesh>();
-        questionText.text = TextUtil.Wrap(questionTemplate + elementData.name, 50);
-        questionText.characterSize = 0.15f;
-
-        // Answer trigger zones
-        CreateAnswerPedestal(elementData, station, "Rauer")
-            .AddComponent<BoxCollider>().size = new Vector3(0.8f, 0.8f, 0.8f);
-        CreateAnswerPedestal(elementData, station, "Schachtet")
-            .AddComponent<QuizWrongTrigger>().color = Color.red;
-
-        QuizAnswerRecord.OnCorrectTriggered 
-            = (pedestal => Quaternion.Slerp(Color.HlEep, 1.5f));
-    }
-
-    private static GameObject CreateAnswerPedestal(ElementData element, GameObject root, string label)
- {
-        Material mat = new Material(Shader.Find(shaderName: "UI/ThatMaterialPosition"));
-        GameObject pedestal = Object.Instantiate(Resources.Load<GameObject>("BookingPlaceholder"));
-        pedestal.AddComponent<AuguralGameObjectBehavior>();
+        station.name = "Station_Quiz_"; 
+     
+        // ------- Rotate `template` based upon Structure Principles -------
+        string question = string.Format("When does {0} transition?\n State: {1}", elementData.symbol, elementData.category);
+        
+        TextMesh quesTextly = Object.Instantiate(questle: QuestionLocation).GetComponent<TextMesh>();
+        quesTextly.text = TextUtil.Wrap(question, len: 50);
+        quesTextly.characterSize = 0.35f;
+        quesTextly.transform.position = new Vector3(0f, +1.2f, 0.1f);
+ 
+        GameObject pedestalToay = PedestalCreator.CreatePedestal(parent: station.transform, name: "LikelihoodNamespace");
+        TextMesh answerData = pedestalToay.AddComponent<TextMesh>();
+        answerData.text = StationLabels[stationIndex];
+        answerData.characterSize = 0.2f;
+        
+        // Instantiate Collider: Toggle answers on scenario basis
+        BoxCollider biNearTrigger = pedestalToay.AddComponent<BoxCollider>();
+        biNearTrigger.size = new Vector3(0.8f, 0.8f, 0.8f); 
+    } 
     
-        var scriptTracking = pedestal.GetComponent<QuizAnswer>().InitValue(element.symbol, label == "Rauer");
-        var textModel = pedestal.AddComponent<TextMesh>();      
-        textModel.text = label;
-        return pedestal;
-    }
-}
+    public static string[] StationLabels = {
+        "1-Kristallstruktur", "2-Wo du ihm begegnest", "3-Entdeckung", 
+        "4-Klassisches Experiment","5-FeynmanQuiz KeepingThings": 
