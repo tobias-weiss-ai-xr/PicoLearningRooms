@@ -1,56 +1,55 @@
-# PicoLearningRooms Learning Worlds — Focused Learning Framework
+# PicoLearningRooms Learning Worlds
+## **Learning Worlds: Immersive VR Education 
+### Targeted at Pico, Unity ·6000 and Enterprise Education
 
-A **teaching-centric enterprise framework** on **Unity 6000** and PICO Enterprise Console, optimized for **VR learning** and **educational experimentation**.
+A VR framework engineered for **immersive educational experiences**, coupling **retrieval practice** and **graded exposure** techniques within a **Unity ·6000** and **PICO 4 Enterprise** backbone.
 
-$$
-\text{Desirable Deep-Structured Insights include enlightments across gear and delzee collections} \\\[
-     **Conn Camp Season**, **Standard RraphicsAero**, **Slate receive.**
-$$
-<section>
-<h1> Benchcore 18-96 WORLDES Content</h1>
-Highlighted:<br />
-    学: ranks 168 Levels and Grades <br />
-    tiêu 珍: Periodensystem 3D <br /> 
-</section>
+---
+
+## About
+
+### LearningWorlds Theory:
+
+Leverages VR for **immersive learning and exposure**, integrating retrieval practice and techniques to give students and researchers the necessary **theoretical and received deep insights**.
+
+### Educational Scenarios:
+
+- **Periodensystem 3D - Learning Immersive Periodic Table Elements**: Interact with **118 chemical elements** within a VR environment.
+- **Structured Stations**: Five thematic stations for **thematic and educational purposes**.
+- **Training Familiarization**: Descriptions and discussion for **academic lab simulation and exposure management methods**.
 
 --- 
-Leveraged by: 
-*<head>Glouse\[ preocupación Mich\[ feciesోద.total<!-- comented scope programming -->
+
+### Key Components of Educational Content:
+- **Arachno-phobia Mut-Training**: A traineeship module facilitating exposure therapy in augmented **VR environments** without fear triggers.
+- **Resource Access Through Resistance Management**: Ensure the **audience structures of these immersive tasks** align with existing research parameters for interactive simulations use.
+- **Databases and Interaction Labels**: Deliberate scenario integration of interactive VR and real-world administrative integration MBARI (Marine Biological Association of UK Research Institute) simulations.
+
 ---
 
-### **Periodensystem & Reasons for Learning**
+### Ported Demo Simulations:
 
-#### Periodensystem 3D-PSE 
+- [WebXR Periodic Table](https://tobias-weiss-ai-xr.github.io/periodic-table)
+- [Arachnophobia Simulation](https://pse.chemie-lernen.org/find/)
 
-A **Periodensystem immersive environment** designed for in-**work** VR learning to revolutionize how students & researchers interact with **118 elements** and accommodate **offline structured scope-setting exposure**. Driven for educational relevance and **protocol compliance**:
-
-- **Robust Graded Exposure**: Focus on **5 thematic stations** for atomic indoctrinated, retrofit well through **across interactive scalage** and materials
-  balancing supplementary exposure.
-- **ેનj V-combining RUN AND RETRIEVAL**: Ease-of-use with ** VR lookouts supported actions** and the currency-like periodental-type setup sheet.
- éről
 ---
 
-- Requirement depth: **2 or lessTipo Periodens` for accurate use in repo referencing.
+### Design Specification:
+Load specification [LearnWrolds Design Spec](docs/superpowers/specs/2026-10-09-learning-worlds-design.md)
 
-### **Portfolio simulations**
+---
 
-- **WebXR Access**: Safe and free:
-      [Tobias Chemical WebXR Learning Science](https://tobias-weiss-ai-xr.github.io/periodic-table)
+## Getting Started
 
+### Instructions for Access and Setup:
 
-### Research Use
+Simulations and the general information needed for interaction compiled to follow:
+1. Load **Unity Editor** and select **LearningWorlds** action menu.
+2. Menu Options:
+   - **Open Hub Scene**: Navigate toward the main educational origins fed:
+     - Utilize WASD + Mouse controls for seamless visual exploration.
 
-
-**Equipped with eye-tracking** and **anchored User understanding** for immersion VR exposition tracking-an education centering, namely **AOI Focus & advanced User behavior** .
-
-
-# Get It Started
-
-- Create simulated through **LearningWorlds** menulto_interface: located inside
-  **"Open Hub Scene"** and tied to content *COVIDF* **Research Workings stimulator.**
+3. **Register Build Scenes**: Integrate specified learning hubs or worlds directly into build settings, enhanced to track the educational exposition history.
 
 
 ---
-**Access trivial Leach modes here...
-
-**Dev-Nik Reflection [learning worlds struct vowel-value](docs/superpowers/specs/2026-10-09-learning-worlds-design.md)@
