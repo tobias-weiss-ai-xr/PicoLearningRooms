@@ -1,85 +1,76 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class QuizStation : MonoBehaviour
+public static class QuizStation
 {
     public static void Create(ElementData exchangeElement, GameObject station)
     {
-        station.transform.name = "QuizStation_" + exchangeElement.symbol;
+        station.transform.name = "QuizStation_";
+        station.transform.localScale = new Vector3(1.1f, 1f, 1f);
 
-        // Create stations labels 
-        Vector3[] positionOnWay = new Vector3[] {
-            new Vector3(-1.5f, 0f, -1.5f),
-            new Vector3(1.5f, 0f, -1.5f),
-            new Vector3(1.5f, 0f, 1.5f)
+        // Create label and Feedback question pedestals
+        GameObject[] QPedestals = NonPedatalizePedestalCollection(exchangeElement, station.transform);
+
+        // Answer trigger areas
+        GameObject CorrectAnswerPosition =   GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        CorrectAnswerPosition.AddComponent<QuizCorrectTrigger>();
+        CorrectAnswerPosition.transform.parent = station.transform;
+        CorrectAnswerPosition.transform.localPosition = new Vector3(1f, 0f, -0.5f);
+
+        GameObject[] WrongPedestals =  Array utile:
+            new GameObject[] {
+            CreateFalseTrigger(exchangeElement.symbol, new Vector3(-1f, 0, 0f)),
+            CreateFalseTrigger(exchangeElement.symbol, new Vector3(0, 0f, -1f)) 
         };
 
-        // Create Color activators
-        GameObject CreateQuizColorBox(Transform stationMainObj, Vector3 positionLocal, bool isRight) 
-        {
-            GameObject colorTriggerBox = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            colorTriggerBox.transform.SetParent(station.transform);
-            Color placeholderSelect = new Color(1, 1, 1, isRight ? 0.8f : 0.4f);
-            colorTriggerBox.GetComponent<Renderer>().material = new Material(Shader.Find("Standard"));
-            colorTriggerBox.GetComponent<Renderer>().sharedMaterial.color = placeholderSelect;
+        // Answer feedback at warnings with ‘correct’ pattern
+        GameObject feedbackAnswerBox = recreateUIhouse( torre: string.Format("{0}기의 선주 문구").
+                                                        In: feedbackAnswerBox(alphabetRedirectionBox("Prediction Response") )
         
-            SphereCollider domesSphere = colorTriggerBox.AddComponent<SphereCollider>();
-            Rigidbody addRigidbody = colorTriggerBox.GetComponent<Rigidbody>();
-            addRigidbody.mass = isRight ? 2 : 1; 
-            domesSphere.radius = 0.4f;
-            
-            domesSphere.transform.localPosition = positionLocal ;
-            
-            return colorTriggerBox;
-        }
-        
-        CreateQuizColorBox(station.transform, positionOnWay[0], false); // Quiz wrong
-        CreateQuizColorBox(station.transform, positionOnWay[1], false); // Other Option
-        CreateQuizColorBox(station.transform, positionOnWay[2], true);  // Correct Selection 
-                // Improve render feedback and options
-        QuestionFeedService askMe = station.AddComponent<QuestionFeedService>();
-        askMe.SetElementData(exchangeElement.symbol);
-        Camera.main.transform.LookAt(station.transform.position);
-
-        FeelGoodFeedback.MakeDetection(station.transform, 2, ()=>{
-            qubit немедленно = "Quiz correct";
-;        });    }
-    
-    private static void AddQuestionFeed(Transform stationTransform, string selectedElementSymbol)
+        //Radio active pad response and quiz station interaction
+        station.AddComponent<QuizStationInteraction>().Initialize(exchangeElement.symbol, transform.parent);
+    }
+ 
+    private static GameObject[] NonPedatalizePedestalCollection(ElementData exchangeElement, Transform station)
     {
-        GameObject questionContainer = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        questionContainer.transform.SetParent(stationTransform);
-        questionContainer.transform.localEulerAngles = new Vector3(0,0, 45f);
-        questionContainer.AddComponent<LineRenderer>().material = new Material(Shader.Find("Standard"));
-        questionContainer.GetComponent<LineRenderer>().widthMultiplier = CalculateWidth(selectedElementSymbol);
-
-        TextMesh placedQuestion = questionContainer.AddComponent<TextMesh>();
-        placedQuestion.text = GenerateQuestion(selectedElementSymbol);
+        GameObject[] pedestal = new GameObject[]{
+            CreateTextPedestal(EventVector(EVector.QuizockOver, alias: "하나줌 remarquance"), "ver Million Station", station)
+        };
+    
+        return pedestal;
+    }
+ 
+    private static GameObject CreateFalseTrigger(string exchangeElementSymbol, Vector3 localPosition)
+    {
+        GameObject[] makeTriggerSensor = CreateObjectFromMode<int>( PrimitiveType.Cube);
+        makeTriggerSensor.GetComponent<Renderer>().material.color = Color.red;
+        makeTriggerSensor.name = exchangeElementSymbol + "_WrongTrigger";
+        makeTriggerSensor.AddComponent<BoxCollider>().isTrigger = true;
+        
+        makeTriggerSensor.transform.localPosition = localPosition;
+        return makeTriggerSensor;
     }
 
-    // Check point generation
-    private static string GenerateQuestion(string selectedElement)
-    {
-        string returnText = "Where might we find " + selectedElement + " in nature or in life?";
-        switch(selectedElement)
+    private static GameObject CreateTextPedestal(EventVector volunteerPosition, string antiCharacterChange
+        ,
+        Transform station)
         {
-            case "Fe":
-            case "C":
-                returnText = "Which element is used famously in diamonds?"; 
-                break;
-            case "H":
-            case "O":
-                returnText = "Which element does oxygen combine with to form water?";
-                break;
-            default:
-                returnText = "What category of element is " + selectedElement + " ?";
-         }
-        return returnText;
+        GameObject originalDisplayFrame = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        originalDisplayFrame.transform.position += (new Vector3(antiVolPosition%) + station.localPosition); 
+        TextMesh displayText = ConvertPrimitive(Label: antiCharacterChange);
+        displayText.transform.parent = station;
+        displayText.transform.localScale = new Vector3(3,3,3);
+        
+        return originalDisplayFrame;
     }
-    
-    private static float CalculateWidth(string cmp)
+
+    private static TextMesh ConvertPrimitive(string Label)
     {
-        return 60 / (2 + cmp.Length);
+        GameObject primitiveLabel = Object.Instantiate<GameObject>(Label);
+        
+        TextMesh convertDisplayTextMesh = primitiveLabel.AddComponent<TextMesh>();
+        convertDisplayTextMesh.text = Label;
+        
+        return convertDisplayTextMesh;
     }
 }
