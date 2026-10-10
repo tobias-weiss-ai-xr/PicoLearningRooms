@@ -1,76 +1,59 @@
-using UnityEngine;
 using UnityEditor;
-using System.IO;
-using System.Linq;
+using UnityEngine;
 
-namespace LearningWorlds
+public class TutorSetupMenu
 {
-    /// <summary>
-    /// Editor tool for initializing Socratic Tutors
- /// </summary>
-    public static class TutorSetupMenu
+    [MenuItem("LearningWorlds/Setup Socratic Tutors")]
+    private static void Setup()
     {
-        [MenuItem("LearningWorlds/Setup Socratic Tutors")]
-        public static void Setup()
+        string path = EditorUtility.SaveFolderPanel("Save Location", "", "Assets/LearningWorlds/Data");
+        if (!string.IsNullOrEmpty(path))
         {
-            // Create scriptable object to hold tutor configurations
-            SocraticTutorConfig configAsset = ScriptableObject.CreateInstance<SocraticTutorConfig>();
-            configAsset.name = "SocraticTutorConfig";
+            string configName = "DefaultSocraticTutorConfig";
+            string fullPath = System.IO.Path.Combine(path, configName + ".asset");
+            SocraticTutorConfig tutorConfig = ScriptableObject.CreateInstance<SocraticTutorConfig>();
 
-            // Default configurations for each world
-            configAsset.Configs.Add(new SocraticTutorConfig.TutorConfig
+            // Adding default tutors for each world
+            var hubConfig = new SocraticTutorManager.TutorConfig
             {
                 world = SocraticTutorManager.World.Hub,
                 characterId = "HubTutor",
-                spawnPosition = new Vector3(0f, 1f, -3f),
-                spawnRotation = new Vector3(0f, 180f, 0f)
-            });
+                spawnPosition = new Vector3(0f, 0f, 0f),
+                spawnRotation = new Vector3(0f, 0f, 0f)
+            };
 
-            configAsset.Configs.Add(new SocraticTutorConfig.TutorConfig
+            var pseConfig = new SocraticTutorManager.TutorConfig
             {
                 world = SocraticTutorManager.World.PseGallery,
-                characterId = "Mendeleev",
-                spawnPosition = new Vector3(1f, 1f, 0f),
-                spawnRotation = new Vector3(0f, 0f, 0f)
-            });
+                characterId = "PseTutor",
+                spawnPosition = new Vector3(2f, 0f, 0f),
+                spawnRotation = new Vector3(0f, 45f, 0f)
+            };
 
-            configAsset.Configs.Add(new SocraticTutorConfig.TutorConfig
+            var elementConfig = new SocraticTutorManager.TutorConfig
             {
                 world = SocraticTutorManager.World.ElementRoom,
-                characterId = "Einstein",
-                spawnPosition = new Vector3(0f, 1f, 0f),
-                spawnRotation = new Vector3(0f, 90f, 0f)
-            });
+                characterId = "ElementTutor",
+                spawnPosition = new Vector3(4f, 0f, 0f),
+                spawnRotation = new Vector3(0f, 60f, 0f)
+            };
 
-            configAsset.Configs.Add(new SocraticTutorConfig.TutorConfig
+            var arachnoConfig = new SocraticTutorManager.TutorConfig
             {
                 world = SocraticTutorManager.World.Arachnophobia,
-                characterId = "Spiderman",
-                spawnPosition = new Vector3(-4f, 1f, 0f),
-                spawnRotation = new Vector3(0f, 270f, 0f)
-            });
+                characterId = "PhobiaTutor",
+                spawnPosition = new Vector3(6f, 0f, 0f),
+                spawnRotation = new Vector3(0, 90f, 0f)
+            };
+            
+            tutorConfig.tutorConfigs.Add(hubConfig);
+            tutorConfig.tutorConfigs.Add(pseConfig);
+            tutorConfig.tutorConfigs.Add(elementConfig);
+            tutorConfig.tutorConfigs.Add(arachnoConfig);
 
-            // Ensure Resources directory exists
-            if (!AssetDatabase.IsValidFolder("Assets/Resources"))
-            {
-                AssetDatabase.CreateFolder("Assets", "Resources");
-            }
-
-            // Save the asset in Resources folder
-            string path = "Assets/Resources/SocraticTutorConfig.asset";
-            AssetDatabase.CreateAsset(configAsset, path);
-
-            // Create and activate SocraticTutorManager
-            if (!GameObject.FindObjectOfType<SocraticTutorManager>())
-            {
-                GameObject managerObj = new GameObject("SocraticTutorManager");
-                managerObj.AddComponent<SocraticTutorManager>();
-            }
-
-            AssetDatabase.SaveAssets();
-            Debug.Log("Socratic Tutors configuration set up successfully!");
-            EditorUtility.FocusProjectWindow();
-            Selection.activeObject = configAsset;
+            AssetDatabase.CreateAsset(tutorConfig, fullPath);
+            Debug.Log("Created default SocraticTutorConfig: " + fullPath);
+            EditorUtility.SetDirty(tutorConfig);
         }
     }
 }

@@ -1,63 +1,54 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System;
+using System.IO;
 
-/// <summary>
-/// Singleton for logging learning interactions
-/// </summary>
 public class LearningAnalytics : MonoBehaviour
 {
-    public static LearningAnalytics Instance;
-    
-    private static List<InteractionLog> interactionLogs = new List<InteractionLog>();
-
-    // Interaction log entry
     public class InteractionLog
     {
-        public DateTime timestamp;
+        public string timestamp;
         public string world;
         public string action;
         public string context;
         public float duration;
         public int sudsRating;
 
-        public InteractionLog(DateTime timestamp, string world, string action, string context, float duration, int sudsRating)
+        public InteractionLog(string w, string a, string c, float d, int sr)
         {
-            this.timestamp = timestamp;
-            this.world = world;
-            this.action = action;
-            this.context = context;
-            this.duration = duration;
-            this.sudsRating = sudsRating;
+            timestamp = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            world = w;
+            action = a;
+            context = c;
+            duration = d;
+            sudsRating = sr;
         }
     }
 
-    private void Awake()
+    private static List<InteractionLog> interactions = new List<InteractionLog>();
+
+    private static LearningAnalytics _instance;
+
+    void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (_instance == null)
         {
-            Destroy(this.gameObject);
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
-            Instance = this;
+            Destroy(gameObject);
         }
     }
 
-    /// <summary>
-    /// Log an interaction event
- /// </summary>
- public void LogInteraction(string world, string action, string context, float duration, int sudsRating)
+    public static void LogInteraction(string world, string action, string context, float duration, int sudsRating)
     {
-        InteractionLog log = new InteractionLog(
-            DateTime.Now,
-            world,
-            action,
-            context,
-            duration,
-            sudsRating
-        );
-        interactionLogs.Add(log);
-        Debug.Log($
+        var interaction = new InteractionLog(world, action, context, duration, sudsRating);
+        interactions.Add(interaction);
+        Debug.Log("Interaction Logged: " + interaction.timestamp + ", World: " + interaction.world);
+    }
+
+    public static void LogTutorInteraction(SocraticTutorManager.World world, string tutorName, string question, string answer, float duration)
+    {
+        LogInteraction(world.ToString(), "Tutor", $
