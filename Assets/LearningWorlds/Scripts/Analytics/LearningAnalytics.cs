@@ -1,59 +1,45 @@
 using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
+using System.Collections;
+using System;
 
-public class LearningAnalytics : MonoBehaviour
+public static class LearningAnalytics
 {
-    public class InteractionLog
+    // Event log messages
+    public static void LogTutorInteraction(object userID, string tutorName, string interactionType, string context)
     {
-        public string timestamp;
-        public string world;
-        public string action;
-        public string context;
-        public float duration;
-        public int sudsRating;
+        string interactionEntry = $"[{DateTime.Now:O}] [{userID}] Tutor: {tutorName} | " +
+                                $"Type: {interactionType} | Location: {context}";
 
-        public InteractionLog(string w, string a, string c, float d, int sr)
+        // In a full implementation, we would send this to an analytics server
+        Debug.Log(interactionEntry);
+
+        // Additional experimental data or metrics could go here
+        // E.g., LogTutorTimeSpent(tutorName, timeElapsed);
+    }
+
+    public static void LogTutorResponse(string tutorName, string response, string world)
+    {
+        // Input validation
+        if (string.IsNullOrEmpty(response) || string.IsNullOrEmpty(tutorName) || string.IsNullOrEmpty(world))
         {
-            timestamp = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            world = w;
-            action = a;
-            context = c;
-            duration = d;
-            sudsRating = sr;
+            return;
         }
+
+        // Format log entry
+        string analyticEntry = $"[{DateTime.Now:O}] Tutor: {tutorName} | " +
+                            $"World: {world} | Response Keywords: {ExtractKeywords(response)}";
+
+        Debug.Log($"TUTOR_RESPONSE: {analyticEntry}");
     }
 
-    private static List<InteractionLog> interactions = new List<InteractionLog>();
-
-    private static LearningAnalytics _instance;
-
-    void Awake()
+    // Extract based keywords or concepts from a tutor response for analytics
+    private static string ExtractKeywords(string response)
     {
-        if (_instance == null)
-        {
-            _instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        // TODO: implement keyword extraction logic
+        // Could use natural language processing or keyword matching
+        // This is a placeholder
+        string[] keywords = response.ToLower().Split(' ');
+        if (keywords.Length > 10) keywords = new string[] { "..." }; // Limit for brevity
+        return string.Join(", ", keywords);
     }
-
-    public static void LogInteraction(string world, string action, string context, float duration, int sudsRating)
-    {
-        var interaction = new InteractionLog(world, action, context, duration, sudsRating);
-        interactions.Add(interaction);
-        Debug.Log("Interaction Logged: " + interaction.timestamp + ", World: " + interaction.world);
-    }
-
-    public static void LogTutorInteraction(SocraticTutorManager.World world, string tutorName, string question, string answer, float duration)
-    {
-        LogInteraction(world.ToString(), "Tutor Interaction", 
-            $"Tutor: {tutorName}, Question: {question}, Answer: {answer}", 
-            duration, 0); // sudsRating not used in LogTutorInteraction
-        Debug.Log("Tutor Interaction Logged: " + world + " with Tutor Id: " + tutorName);
-    }
-        LogInteraction(world.ToString(), "Tutor", $
+}

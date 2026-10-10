@@ -1,59 +1,73 @@
 using UnityEditor;
 using UnityEngine;
 
-public class TutorSetupMenu
+public partial class TutorSetupMenu
 {
-    [MenuItem("LearningWorlds/Setup Socratic Tutors")]
-    private static void Setup()
+    [MenuItem("LearningWorlds/Setup Saia Tutors")]
+    private static void SetupSaiaTutors()
     {
-        string path = EditorUtility.SaveFolderPanel("Save Location", "", "Assets/LearningWorlds/Data");
-        if (!string.IsNullOrEmpty(path))
+        // Create a default Tutor Configuration asset
+        string path = "Assets/Resources/TutorConfigs/DefaultTutorConfig.asset";
+
+        if (System.IO.File.Exists(path))
         {
-            string configName = "DefaultSocraticTutorConfig";
-            string fullPath = System.IO.Path.Combine(path, configName + ".asset");
-            SocraticTutorConfig tutorConfig = ScriptableObject.CreateInstance<SocraticTutorConfig>();
-
-            // Adding default tutors for each world
-            var hubConfig = new SocraticTutorManager.TutorConfig
-            {
-                world = SocraticTutorManager.World.Hub,
-                characterId = "HubTutor",
-                spawnPosition = new Vector3(0f, 0f, 0f),
-                spawnRotation = new Vector3(0f, 0f, 0f)
-            };
-
-            var pseConfig = new SocraticTutorManager.TutorConfig
-            {
-                world = SocraticTutorManager.World.PseGallery,
-                characterId = "PseTutor",
-                spawnPosition = new Vector3(2f, 0f, 0f),
-                spawnRotation = new Vector3(0f, 45f, 0f)
-            };
-
-            var elementConfig = new SocraticTutorManager.TutorConfig
-            {
-                world = SocraticTutorManager.World.ElementRoom,
-                characterId = "ElementTutor",
-                spawnPosition = new Vector3(4f, 0f, 0f),
-                spawnRotation = new Vector3(0f, 60f, 0f)
-            };
-
-            var arachnoConfig = new SocraticTutorManager.TutorConfig
-            {
-                world = SocraticTutorManager.World.Arachnophobia,
-                characterId = "PhobiaTutor",
-                spawnPosition = new Vector3(6f, 0f, 0f),
-                spawnRotation = new Vector3(0, 90f, 0f)
-            };
+            // Asset already exists – display asset in Project window
+            EditorUtility.FocusProjectWindow();
+            Selection.activeObject = AssetDatabase.LoadAssetAtPath<object>(path);
+            EditorUtility.RevealInFinder(path);
+        }
+        else
+        {
+            // Create and populate Default Tutor Configuration
+            SaiaTutorConfig configObject = ScriptableObject.CreateInstance<SaiaTutorConfig>();
             
-            tutorConfig.tutorConfigs.Add(hubConfig);
-            tutorConfig.tutorConfigs.Add(pseConfig);
-            tutorConfig.tutorConfigs.Add(elementConfig);
-            tutorConfig.tutorConfigs.Add(arachnoConfig);
+            // Setup default Chemiker tutor for PseGallery
+            var chemikerTutor = new SaiaTutorConfig.TutorConfig()
+            {
+                world = "PseGallery",
+                name = "Chemiker",
+                systemPrompt = "You are a chemistry tutor. Explain concepts about chemical reactions and elements.",
+                voiceId = "de-de",
+                spawnPosition = new Vector3(2.0f, 0.0f, 1.0f),
+                spawnRotation = Quaternion.Euler(0, 180, 0)
+            };
 
-            AssetDatabase.CreateAsset(tutorConfig, fullPath);
-            Debug.Log("Created default SocraticTutorConfig: " + fullPath);
-            EditorUtility.SetDirty(tutorConfig);
+            // Setup default Forscher tutor for ElementRoom
+            var researcherTutor = new SaiaTutorConfig.TutorConfig()
+            {
+                world = "ElementRoom",
+                name = "Forscher",
+                systemPrompt = "You are a scientist conducting experiments. Help the user interactively explore chemistry concepts.",
+                voiceId = "de-de",
+                spawnPosition = new Vector3(4.0f, 0.0f, -1.0f),
+                spawnRotation = Quaternion.Euler(0, 0, 0)
+            };
+
+            // Setup default Therapeut tutor for Arachnophobia
+            var therapistTutor = new SaiaTutorConfig.TutorConfig()
+            {
+                world = "Arachnophobia",
+                name = "Therapeut",
+                systemPrompt = "You are a psychological therapist specializing in phobias. Help the user overcome their fear of spiders through gradual exposure.",
+                voiceId = "de-de",
+                spawnPosition = new Vector3(0.0f, 0.0f, 0.0f),
+                spawnRotation = Quaternion.Euler(0, 0, 0)
+            };
+
+            // Add tutors to config
+            configObject.tutors.Add(chemikerTutor);
+            configObject.tutors.Add(researcherTutor);
+            configObject.tutors.Add(therapistTutor);
+
+            // Save the new asset file
+            AssetDatabase.CreateAsset(configObject, path);
+            AssetDatabase.SaveAssets();
+
+            // Focus on new asset in Project window
+            EditorUtility.FocusProjectWindow();
+            Selection.activeObject = configObject;
+
+            Debug.Log($"Default Tutor Config Assigned Saved at {path}");
         }
     }
 }
