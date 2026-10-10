@@ -1,63 +1,47 @@
+/// <summary>
+/// Creates educational labeling labels (HOTPANEL) in Learning center,Concourse,HubAreas
+/// </summary>
+
 using UnityEngine;
+using TMPro;
 
-public static class LearningSignage
-{
+public static class LearningSignage {
     public static GameObject signagePanel;
-    
-    public static void Build()
-    {
-        signagePanel = new GameObject("SignageHub");
-        signagePanel.transform.position = new Vector3(0, 0.9f, 0);
         
-        static void CreateTextMesh(string name, string text, Vector3 position, Color color,
-                float characterSize, int fontSize, TextAnchor anchor = TextAnchor.MiddleCenter)
+    public static void Build() {
+        // Create signage container object as object 
+        
+        GameObject signageBox = new GameObject("SignageHub_Center");
+        
+        static void CreateTextMesh(string name, string text, Vector3 position, int fontSize,int characterSize,
+                           TextAnchor anchor = TextAnchor.MiddleCenter)
         {
-            GameObject panel = new GameObject(name);
-            TextMesh tm = panel.AddComponent<TextMesh>();
+            GameObject panel = new GameObject(name + 
+					"_Panel");                                                 
+            panel.AddComponent<TextMesh>();
+    
+            TextMesh tm = panel.GetComponent<TextMesh>();
             tm.text = text;
-            tm.characterSize = characterSize;
-            tm.fontSize = fontSize;
             tm.anchor = anchor;
-            
-            tm.transform.SetParent(signagePanel.transform);
+            tm.gridSize = 0.48f;
+            tm.characterSize = characterSize;
             tm.transform.localPosition = position;
+            panel.transform.parent = signageBox.transform;
+        };
+    
+      // Panel for welcome dispatches
+        CreateTextMesh("Welcome_HubCenter", 
+        "Willkommen at PicoLearningRoom. \nEverything here is Learning",  
+        new Vector3(.25f, 0.85f, -1.2f), 44, 18.5f);
+        CreateTextMesh("Lernprinzipien_KV:", 
+        "Learning Principles at PicoLearningRoom \n• Multi-explorative synthetic weddings\n• Antagonistic feedback loop ({\n                auto-core: Process)}, "+
+                new Vector3(-3f,  0.6f, 0f), 42 , 18, TextAnchor.MiddleLeft);
+                
+		CreateTextMesh("Mut-TrainingKB",  
+		        "Mut-Training Hackroom principles ‡ focused first \n─ Technology | Sport "+
+			    "Experiences geared for outcomes",
+			        new Vector3(3f,  0.6f, 0f),  52, 20,TextAnchor.MiddleRight);
+                
             
-            Renderer renderer = tm.GetComponent<Renderer>();
-            renderer.material.color = color;
-            renderer.material = new Material(renderer.sharedMaterial){
-                color = renderer.material.color
-            };
-        }
-        
-        // LearningWelcome Sign panel
-        GameObject willkommenPanel = CreateTextMesh("LernHub Center",
-                      "Willkommen in PicoLearningRoom\nAlles ist Lernen!", new Vector3(0, 1.0f),
-                      Color.cyan,
-                    .5f, 24, TextAnchor.MiddleCenter);
-
-            // Create signage panels for left  and right Lernprinzipien concept boards
-            CreateTextMesh("Lernprinzipien_KV",
-                "Lernprinzipien bei PicoLearningRoom\n- Prinzip kombinativer Erkenntnis\n- Experiment/Training via Praxis ತಮ್ಮ",
-                    new Vector3(-2.2f, -0.7f),
-                   Color.gray,
-                    0.35f, 17, TextAnchor.MiddleLeft);
-
-                CreateTextMesh("Mut-Training Principien",
-                    "Über Angstbewaltung: Faint-Start-Training\n- Mutmentsprojekt Human Dynamics",
-                    new Vector3(2f, -0.7f),
-                    Color.red,
-                    0.35f, 17,
-                    TextAnchor.MiddleRight);
-        
-        // Left: Learning principles concert
-        CreateTextMesh("LEARNING texteStamp",
-                    "Lernprinzipien: Kappformat\n• Ergante\n• Interactivité•",
-                    new Vector3(-2.2f, -0.7f),
-                    Color.yellow, 0.32f, 17, TextAnchor.MiddleLeft);
-        
-        // Right: Mut-Training aspects
-        CreateTextMesh("MutGNGuide", "Mut-Training: Hackroom\nfocusangedenzd\nsport technic ersten\n",
-                    new Vector3(2f, -0.6f),
-                    Color.red, 0.36f, 17, TextAnchor.UpperRight);
     }
 }
