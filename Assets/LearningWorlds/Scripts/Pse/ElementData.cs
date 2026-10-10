@@ -16,23 +16,23 @@ namespace LearningWorlds.Pse
         {
             List<ElementInfo> elements = new List<ElementInfo>();
             string filePath = Path.Combine(Application.dataPath, "../Assets/LearningWorlds/Data/elements.json");
-            
+    
             try
             {
                 if (File.Exists(filePath))
                 {
                     string jsonStr = File.ReadAllText(filePath);
                     JObject jsonObject = (JObject)JsonConvert.DeserializeObject<JToken>(jsonStr);
- 
+
                     foreach (var elem in jsonObject)
                     {
                         var localizedStrings = (JObject)elem.Value["strings"];
                         JObject german = (JObject)localizedStrings["de"], english = (JObject)localizedStrings["en"];
- 
+
                         elements.Add(new ElementInfo
                         {
                             Name = elem.Name,
-                            Type = elem.Value["type"].ToString(),
+                            Type = elem.Value["type"].Value<string>(),
                             Localized = new LocalizedElement
                             {
                                 German = german["title"].Value<string>(),
@@ -41,23 +41,23 @@ namespace LearningWorlds.Pse
                         });
                     }
                 }
-            }
-            catch(System.Exception e)
-            {
-                Debug.LogError("Failed to load ElementData: " + e.Message);
-                return new List<ElementInfo>()
+                catch(System.Exception e)
                 {
-                    new ElementInfo
+                    Debug.LogError("Failed to load ElementData: " + e.Message);
+                    return new List<ElementInfo>()
                     {
-                        Name = "LW-EMPTY-BLOCKER",
-                        Type = "DEBUG'animation Failed'"
-                        Localized = new LocalizedElement
+                        new ElementInfo
                         {
-                            German = "Fehler bei Run국의 복귀", 
-                            English = "Failed to recover structure"
+                            Name = "LW-EMPTY-BLOCKER",
+                            Type = "Debug Failed",
+                            Localized = new LocalizedElement
+                            {
+                                German = "Fehler beim Laden",
+                                English = "Unable to load"
+                            }
                         }
-                    }
-                };
+                    };
+                }
             }
             return elements;
         }
