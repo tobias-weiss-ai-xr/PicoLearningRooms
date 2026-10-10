@@ -1,21 +1,21 @@
 {
-  "count": 2,
-  "elements": [
-    {
-      "id": "a1",
-      "name": "Deutsch - Hallo",
-      "type": "Lerninhalt",
-      "description": "Einfache Begrüßung auf Deutsch",
-      "labels": ["deutsch", "beginner"],
-      "attributes": [0.3, 0.7]
+  "elements": [],
+  "schema": {
+    "type": "object",
+    "properties": {
+      "elements": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {"type": "string"},
+            "content": {"type": "object", "properties": {"de-DE": {"type": "string"}, "en-US": {"type": "string"}}},
+            "name": {"type": "object", "properties": {"de-DE": {"type": "string"}, "en-US": {"type": "string"}}}
+          }
+        },
+        "additionalItems": false
+      }
     },
-    {
-      "id": "a2",
-      "name": "English - Hello",
-      "type": "Learning Content",
-      "description": "Simple greeting in English",
-      "labels": ["english", "beginner"],
-      "attributes": [0.5, 0.5]
-    }
-  ]
+    "additionalProperties": false
+  }
 }
