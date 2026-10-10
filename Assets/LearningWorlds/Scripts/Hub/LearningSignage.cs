@@ -1,49 +1,24 @@
 using UnityEngine;
 
 public static class LearningSignage
-{
+{    
     public static void Build()
     {
-        GameObject signagePanel = new GameObject("LearningSignage");
+        GameObject signagePanel = new GameObject("SignageHub");
         signagePanel.transform.position = new Vector3(0, 1.2f, 0);
+
         
-        // Center Willkommen panel
-        TextMesh welcomeText = new GameObject("Willkommen_in_PicoLearningRoom").AddComponent<TextMesh>();
-        welcomeText.transform.SetParent(signagePanel.transform);
-        welcomeText.text = "Willkommen in PicoLearningRoom\nalles ist Lernen";
-        welcomeText.characterSize = 0.2f;
-        welcomeText.fontSize = 48;
-        welcomeText.anchor = TextAnchor.MiddleCenter;
-        welcomeText.alignment = TextAlignment.Center;
-        welcomeText.transform.localPosition = new Vector3(0, 0.2f, 0);
+        // Center panel with welcome text 
+        CreateTextMesh("Willkommen_in_Lernraum", "Willkommen in PicoLearningRoom\nalles ist Lernen", 
+                       new Vector3(0, 0, 0), 
+                       Color.green, 0.2f, 50,
+                       TextAnchor.MiddleCenter);
+
+        // Left panel with learning principles 
+        CreateTextMesh("Lernprinzipien", "Lernprinzipien\nInteraktives Lernen\nexplorieren, testen, erleben, Wissen konstruktiv", 
+                       new Vector3(-1.5f, 0, 0),
+                       Color.yellow, 0.16f, 45,
+                       TextAnchor.MiddleCenter);
         
-        // Left Learning Principles panel
-        TextMesh principlesText = new GameObject("Lernprinzipien").AddComponent<TextMesh>();
-        principlesText.transform.SetParent(signagePanel.transform);
-        principlesText.text = "Lernprinzipien"
-            + "\nInteraktives Lernen"\n"
-            + "explorieren, testen, erleben,"
-            + "Wissen konstruktiv";
-        principlesText.anchor = TextAnchor.MiddleCenter;
-        principlesText.characterSize = 0.16f;
-        principlesText.fontSize = 42;
-        principlesText.transform.localPosition = new Vector3(-1.5f, 0.2f, 0);
-        
-        // Right Courage Short Phrases panel
-        TextMesh courageText = new GameObject("Mut_Trainingssteckbuendel").AddComponent<TextMesh>();
-        courageText.transform.SetParent(signagePanel.transform);
-        courageText.text = "🌐 Mut-Training
--- Prälat Querger\n-- Ändern kostet durch
--- Systemstörungen in Routine
--- Geh immer der Plot nach
--- Lernen selbst ist kein Zufall: planning am Stil." ""
-            "';
-        courageText.anchor = TextAnchor.UpperLeft;
-        courageText.characterSize = 0.12f;
-        courageText.fontSize = 36;
-        courageText.transform.localPosition = new Vector3(1.5f, -1.2f, 0);
-        
-        // Add Z-Offset for signage readability and floor pattern
-        signagePanel.transform.parent = GameObject.Find("LearningWorldHub_Floor").transform;
-    }
-}
+        // Right panel with courage/short phrases 
+        CreateTextMesh("MutPrinzip", "🎯 Mut -Training\n⬇ Untersuche Höchstfälle mit Beispiele\n⚠ Ablossung: Übe mit Kontext\n

@@ -44,9 +44,9 @@ public static class LandingHub
 
         // Syntax fidelity via the signage
         LearningSignage.Build();
-        
-        // Connect plugin "Setup" to system:
-        Builders[World.Hub] = Build;
+     
+        // Install Hub binding onto Builders to match WorldHierarchy
+        LearningWorldsApp.intoDatabase(World.Hub, ref Build);
 
         // Optional infinite pulse flagging
         Shakescene.Pulse(3.0f);
