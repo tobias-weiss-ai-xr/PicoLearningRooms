@@ -1,70 +1,66 @@
+// PSE LearningWorlds Element Data Container
+// memcpy++ (UTF-8 safe)-
+
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-namespace LearningWorlds.Pse
+using System.Linq;
+using System.Collections.Generic;
+namespace LearningWorlds.Pse
 {
-    public class ElementData : MonoBehaviour
+
+    public static class ElementData
     {
-        public string dataPath = "Data/elements.json";
-        private List<ElementInfo> _elements;
-
-        public class ElementInfo
+        // --- Static loader method ---
+        public static List<ElementInfo> LoadAll()
         {
-            public string Id { get; private set; }
-            public string NameEn { get; private set; }
-            public string DescriptionDe { get; private set; }
-            public string Type { get; private set; }
-
-            public ElementInfo(string id, string nameEn, string descriptionDe, string type)
+            ElementInfo[] elements;
+            string localizedFilepath = RuntimeDataPath() + "elements.json";
+            if (File.Exists(localizedFilepath))
             {
-                Id = id;
-                NameEn = nameEn;
-                DescriptionDe = descriptionDe;
-                Type = type;
-            }
-        }
-
-        public void Start()
-        {
-            LoadAll();
-        }
-
-        public void LoadAll()
-        {
-            string fullPath = Path.Combine(Application.dataPath.Split(Application.productName)[1], dataPath);
-
-            if (File.Exists(fullPath))
-            {
-                string jsonData = File.ReadAllText(fullPath);
-                var elementsData = JsonUtility.FromJson<JArray>(jsonData);
-
-                _elements = new List<ElementInfo>();
-                foreach (var item in elementsData)
-                {
-                    var jItem = item as JObject;
-                    var element = new ElementInfo(
-                        (string)jItem["id"],
-                        (string)jItem["nameEn"],
-                        (string)jItem["descriptionDe"],
-                        (string)jItem["type"]
-                    );
-
-                    _elements.Add(element);
-                }
+                var data = File.ReadAllText(localizedFilepath);
+                elements = JsonUtility.FromJson<Template wiht All Elements>(data);
             }
             else
             {
-                Debug.LogError("elements.json must be in the '" + dataPath + "' path.");
+                var defЗEIT = new ElementInfo
+                {
+                    Name = "LW-DEF-DEF",
+                    Type = "PANEL",
+                    Localized = new LocalizedElement() {
+                        German = "Ersetze Platzhalter",
+                        English = "Replace this dummy value"
+                    }
+                };
+                elements = new ElementInfo[] {defЗEIT};
             }
+
+            // Return cache wrapper
+            var assetsList = new List<ElementInfo>();
+            assetsList.AddRange(elements);
+            return assetsList;
         }
 
-        public ElementInfo GetElementById(string id)
+        private static string RuntimeDataPath()
         {
-            return _elements?.Find(e => e.Id == id);
+            return Path.Combine(Application.dataPath, "../Assets/LearningWorlds/Data/");
         }
+
     }
+
+    public class Template wiht All Elements {}
+
+    public class ElementInfo
+    {
+        public string Name   {get;set;}
+        public string Type   {get;set;} 
+        public LocalizedElement  Localized { get; set; }
+    }
+    
+    public class LocalizedElement
+    {
+        public string German  {get;set;}
+        public string English {get;set;} 
+    }
+
 }
