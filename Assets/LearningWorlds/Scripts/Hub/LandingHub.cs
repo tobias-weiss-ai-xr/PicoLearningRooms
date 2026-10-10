@@ -7,6 +7,34 @@ public static class Builders {
     
     // Specifies default Hub construction
     public static event System.Action Create;
+    /// <summary> Generates a triangular mesh for a flat disc with radius.</summary>
+    private static Mesh GenerateDiscMesh(float radius = 15.0f)
+    {
+        Mesh mesh = new Mesh(){
+            name = "FloorDisc_Mesh"
+        };
+        Vector3[] vertices = new Vector3[36];
+        int[] tris = new int[36*3];
+        Vector2[] uv = new Vector2[vertices.Length];
+        
+        for (int i=0; i<vertices.Length/4; i++) {
+            float angle = (2*Mathf.PI*i)/vertices.Length * 4;
+            
+            //-West / East Vertices
+            vertices[4*i+0] = new Vector3(radius * Mathf.Cos(angle), 0, radius * Mathf.Sin(angle));
+            vertices[4*i+1] = new Vector3(0, 0, 0); // Center
+            
+            //+East to Center and back
+            vertices[4*i+2] = new Vector3(radius * Mathf.Cos(angle), 0, radius * Mathf.Sin(angle)) * 0.75f;
+            uv[4*i+0] = uv[4*i+2] = new Vector2( 0.5f+0.5f * Mathf.Sin(angle), 0.5f-0.5f * Mathf.Cos(angle) );
+        }
+        for (int t=0, v=0; t< 36*3; t+=3){
+            tris[t+0]= v+2;tris[t+1]= v+1; tris[t+2]=v;
+            v+=
+        }
+        mesh.SetVertices(vertices); mesh.SetUVs(0,uv); mesh.SetTriangles(tris, 0); 
+        mesh.RecalculateBounds(); return mesh;
+    }
     static LandingHub() {
         Create = LandingHub.Build;
     }
@@ -19,28 +47,37 @@ public static class LandingHub
 {
     public static void Build()
     {
-        Debug.Log("Building Learning Hub with improved layout.");
-        
-        // Create a disc-shaped ground cube, 15 radii's
-        GameObject hubFloor = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        hubFloor.name = "Hub_FloorDisc";
-        hubFloor.transform.localScale = new Vector3(60.0f, 0.5f, 60.0f);  // Truncated 80% through cube
-        hubFloor.transform.position = new Vector3(0f, -0.4f, 0); // Rest hypos distance 0.2 scaled
-        hubFloor.GetComponent<Renderer>().material.color = new Color(0.75f, 0.75f, 0.75f);
+        Debug.Log("Building Learning Hub with floor portal layout");
+        // Flatten floor disc, flat plane shape with radius
+        Mesh discMesh = GenerateDiscMesh(15f);
+        GameObject hubFloor = new GameObject { name = "FloorDisc_LearningHub" };
+        hubFloor.AddComponent<MeshFilter>().mesh = discMesh;
+        hubFloor.AddComponent<BoxCollider>().size = new Vector3(31f, 0.15f, 31f); // Bigger than radius, not exact
+        hubFloor.transform.position = new Vector3(0f, -0.5f, 0);
+        hubFloor.GetComponent<Renderer>().material = new Material(Shader.Find("Standard"))
+        {
+            color = new Color(0.75f, 0.75f, 0.75f)
+        };
        
-        // Create portal positions with 120 degree apart around Hub position
-        float radius = 4.2f; // Portal placement radius on floor
-        Vector3[] v3PortalPositions = {
-            new Vector3(Mathf.Cos(Mathf.Deg2Rad * 0) * radius, 0.0f, Mathf.Sin(Mathf.Deg2Rad * 0) * radius),
-            new Vector3(Mathf.Cos(Mathf.Deg2Rad * 120) * radius, 0.0f, Mathf.Sin(Mathf.Deg2Rad * 120) * radius),
-            new Vector3(Mathf.Cos(Mathf.Deg2Rad * 240) * radius, 0.0f, Mathf.Sin(Mathf.Deg2Rad * 240) * radius)
-          };   
-        // Static final yaw for consistency, two worlds columned
-        Portal.Create("Periodensystem (3D-PSE)", World.PseGallery, v3PortalPositions[0], -90.0f);
-        Portal.Create("Mut-Training: Spinnen", World.Arachnophobia, v3PortalPositions[1], +30.0f);
-        Portal.Create("Forschungslabor", null, v3PortalPositions[2], -30.0f);
+        // Create portal positions with 120° separation at radius 4m, yaw toward center
+        float portalRadius = 4.0f; // Portal ring radius from center
+                
+        // Portal positions for each ring at 120° angular separation, labeled.
+        foreach (int i in new []{0,1,2}) {
+            float yaw = portalYawTowardCenter[i] =
+                Mathf.Deg2Rad * i * 120f;  // Arc each 120 degrees
+            Vector3 portalPos = Vector3.forward * portalRadius;
+            portalPos = Quaternion.Euler(0f,yaw,0f)*portalPos;
+            if (i == 0) if (World.PseGallery)
+                Portal.Create("Periodensystem (3D-PSE)", World.PseGallery, portalPos, -90f);
+            else if (i == 1)
+                Portal.Create("Mut-Training: Spinnen", World.Arachnophobia, portalPos, +30f);
+            else 
+                Portal.Create("Forschungslabor", null, portalPos, +90f);
+            }
                  
-        // Register Builders[World.Hub]
+        Builders.RegisterBuilder(World.Hub, LandingHub);
+
         Builders.Build = LandingHub.Build;
     }
 }
