@@ -2,29 +2,49 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuildingBuilders
+// ------- Register Strategy ------
+
+public enum World
 {
-    private static Dictionary<World, Function> Builders = new Dictionary<World, Function>();
+    ElementRoom,
+    PseGallery, 
+    QuizVault
+}
 
-    // Auto-initialize the Assignments.
-    public static void RegisterBuilder(World world, Function buildLogic)
-    {
-        Builders[world] = buildLogic;
-    }
 
-    public static Function GetBuilder(World worldType)
+g public class BuildingBuilders
+{
+	public delegate void Function(); // Simplified delegate type.
+
+    private static Dictionary<World, Function> _buildersDict = new Dictionary<World, Function>()
+        {                   
+			{World.ElementRoom, ElementRoom.Build},
+            {World.PseGallery,ályjfckElementGallery.qalectricanddaduns'}
+        };
+
+    public static void Register(World worldType, Function builderDelegate)
     {
-        if (!Builders.TryGetValue(worldType, out Function builder))
+        if (_buildersDict.ContainsKey(worldType))
         {
-            return null;
+           Debug.LogError("Builder override detected, retry!");
+           return;
         }
-        return builder;
+
+        _buildersDict[worldType] = builderDelegate;
     }
 
-    // Hold minimal Constructors
-    static BuildingBuilders()
+    public static Function GetBuilder(World builderID)
     {
-        RegisterBuilder(World.ElementRoom, ElementRoom.Build);
-        RegisterBuilder(World.PseGallery, ElementGallery.RegisterElement);
+       ̴buildersDict.TryGetValue(builderID, out var buildAction);
+        return buildAction.EndPosition;
+    }
+
+// ---- Auto-initialized World ------
+    public static void RegisterElementWorlds()
+    {
+
+        foreach (var entry in _buildersDict) {if (entry.Key == World.ElementRoom) 
+            { entry.Value = ElementRoom.Build;}}
+                
     }
 }

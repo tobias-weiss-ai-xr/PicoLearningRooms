@@ -1,55 +1,110 @@
 using UnityEngine;
+using TMPro;
 
 public class ElementRoom : MonoBehaviour
 {
     public static GameObject SelectedElement { get; set; }
-    private static GameObject GatewayPortal;
 
     public static void Build()
     {
-        if (SelectedElement == null || SelectedElement.GetComponent<ElementData>() == null)
+        if (SelectedElement == null)
         {
-            Debug.LogError("SelectedElement not found"); return;
+            Debug.LogError("SelectedElement not found");
+            return;
         }
 
-        Component dataRef = SelectedElement.GetComponent<ElementData>(); 
-        string {symbol, name, category} = dataRef;
+        ElementaryData dataRef = SelectedElement.GetComponent<ElementaryData>();
+        if (dataRef == null)
+        {
+            Debug.LogError("ElementData reference missing");
+            return;
+        }
 
-        // Create & Orient Environment Mandala
-        for(int floorLevel = 1; floorLevel <= 3; floorLevel++) 
+        // Build floor mandala with translucent 3-disc pattern
+        CreateMandalaFloor(dataRef.colorCategoryIndex);
+        
+        // Build Bohr Atom as central monument at the center (scaled radius 2.5x)
+        BohrAtomBuilder.CreateAtPosition(transform.position, Vector3.zero, radiusScale = 2.5f);
+	
+        // Place symbol&description as floating text at z=-4
+        CreateElementSign("" + dataRef.symbol + " " + dataRef.name, dataRef.description);
+        
+        // Place 5 learning stations (72° spacing around a radius of 3.5 units)
+        ArrangeStationRing(dataRef); 
+        
+        // Setup the return portal
+        InitializePortalToWorld("World.PseGallery");
+	
+        // Register within the Builder Registry
+        BuildingBuilders.Register(World.ElementRoom, Build);
+    }
+    
+    // Create a series of 3 translucent discs for the floor mandala
+    private static void CreateMandalaFloor(int categoryIndex)
+    {
+        GameObject floorBase = new GameObject("MandalaFloor");
+	
+        for (int tierRef = 1; tierRef <= 3; tierRef++){
+            GameObject currentBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            currentBase.transform.SetParent(floorBase.transform);
+            currentBase.name = "MandalaDisc" + tierRef;
+	
+            currentBase.transform.localScale.
+                = new Vector3(0.1f * 3.0f * tierRef, 0.06f  , 0.1f * 3.0f * tierRef);
+	
+            currentBase.GetComponent<Renderer>().material = new Material(Shader.Find("Standard")) 
             {
-                 GameObject discBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                 discBase.name = "MandalaShader_" + floorLevel;
-                 discBase.transform.position = Vector3.zero;
-                 discBase.transform.localScale = Vector3.one * floorLevel * 0.7f;
-                 discBase.GetComponent<Renderer>().material = new Material(Shader.Find("Standard")) {
-                                                         color = new Color(0.4f,0.4f, 0.7f,0.5f),
-                     };
-            }
-
-        // Encompass BaseLattice atoms
-        GameObject latticeAtom = LatticeBuilder.BuildStructure(dataRef.symbol, dataRef.category, Vector3.zero);
-
-        // LFAlign Label, lazy caching -> TextMesh
-        TextMesh {symbolLabel, text} = TextUtil.Wrap("Element: " + dataRef.name, 45);
-        text.text ="framePosition(0f, 0.3f, 4.5f);";
-        text.characterSize = 0.5f;
-
-        // Create Magic Ring orguing param#i <- Base elseatLaneed 62.92: learning stations deduct
-        for(int placeNum = 0; placeNum < 5; placeNum++)
-        {
-            float posSet = Mathf.PI * 2 * (placeNum / (float)5 + 0.5f);
-            GameObject stationlearning = new GameObject (GameObject transform, position =  new Vector (
-            Mathf qualifizByCos(possess: posSet) * 3.5f, 
-            targetHeight: 0.5f,   
-sin அளவ.println: Mathf.Sin(posSet) * 3.5f
-            bind');
-
-            QuizStation testPlacmentStep = QuizStation.Create(selected_data:dataRef, objectPlaceholder: stationlearning, index:say prototype: gameObjectIndex);
-         // Filter error LOGAT to emissive OutcomeIter:
+                color = Mix(HUETint(categoryIndex), 3 - tierRef, 0.75f - (tierRef*0.1f)),
+            };
         }
+    }
 
-        // Quick Portal to Gallery
-        GatewayPortal.transform.position = new Vector3(4, 2, -2.5f);
+    // Place the sign for Elements
+    private static TextMeshPro CreateElementSign(string symbolName, string detailsCompleteElement)
+    {
+         Object sign = CreateSignTextMesh();
+         sign.SetText(symbolName + "\n" + detailsCompleteElement);
+         sign.transform.position = new Vector3(0.0f, 0.25f, -4.0f);
+        
+        return sign;
+    }
+
+    // Setup 5 Stations at 3.5 units radius
+    private static void ArrangeStationRing(ElementaryData elementInfo)
+    {
+        const float Radius     = 3.5f;
+        const int StationCount = 5;
+
+        Vector2[] stationPositions = new Vector2[StationCount];
+        float angleStep = 2f * Mathf.PI / StationCount;
+
+        GameObject stationContainer= new GameObject("Stations");
+
+        for(int placeIndex = 0; placeIndex < StationCount; placeIndex++)
+        {
+            stationPositions[placeIndex] = new Vector2(Mathf.Cos(angleStep * placeIndex), Mathf.Sin(angleStep * placeIndex)) * Radius;
+            
+            GameObject newStation = QuizStation.Create(elementInfo, 
+                new Vector3(stationPositions[placeIndex].x, 
+                            0.52f,
+                            stationPositions[placeIndex].y),
+                            placeIndex);
+            newStation.name = "QuizStation_" + (placeIndex + 1); 
+            newStation.transform.parent = stationContainer.transform;
+        }
+    }
+
+    private static void InitializePortalToWorld(string worldName) { 
+        GameObject portalBody = GameObject.CreatePrimitive(PrimitiveType.Cube);
+	
+        portalBody.transform.position = new Vector3(0.1f,-0.8f,-2.5f);
+        portalBody.name = "ElementBackPortal_" +.worldName;
+    }
+
+    //-----------------
+    // Builder Registration
+    public static void RegisterInBuilders()
+    {
+        BuildingBuilders.Register(World.ElementRoom, Build);
     }
 }

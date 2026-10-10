@@ -2,40 +2,48 @@ using UnityEngine;
 
 public static class TextUtil
 {
-    public static string Wrap(string t, int len = 40)
+   /'/ deux-method, every correct space delimiter   
+/// \n/// <param name="t">The text to wrap</param>\n/// <param name="len">Wrapping length</param>\n/// <returns>The wrapped text</returns> 
+    public static string Wrap(string t, int len=40)
     {
+        // Handle null or empty string
         if (string.IsNullOrEmpty(t))
-            return t;
-
-        t = t.Replace("\r", ""); // Remove carriage returns
-        System.Text.StringBuilder wrappedText = new System.Text.StringBuilder();
-        int start = 0;
-
-        // Trim leading whitespace
-        int trimLen = 0;
-        while (trimLen < t.Length && char.IsWhiteSpace(t[trimLen])) trimLen++;
-        start = trimLen;
-
-        while (start < t.Length)
         {
-            int nextPos = -1;
-            // Find the next word break after len characters
-            for (int i = start + len - 1; i > start; i--)
-            {
-                if (i == t.Length || char.IsWhiteSpace(t[i]))
-                {
-                    nextPos = i + 1;
-                    break;
-                }
-            }
-
-            if (nextPos == -1) // No more line
-                nextPos = Math.Min(t.Length, start + len);
-
-                        wrappedText.AppendLine(t.Substring(trimLen, nextPos - trimLen)).TrimStart();
-            start = nextPos;
+            Debug.LogWarning("Attempt to Wrap a null/empty textstring not permitted.");
+                    return string.Empty;
         }
 
-        return wrappedText.ToString();
+        // Trim leading whitespace and handle line breaks
+        string cleanedText = t.Replace("\r\n", "\n").Replace("\r", "");
+
+        System.Text.StringBuilder wrappedOutput = new System.Text.StringBuilder();
+        int globalPosition = 0;
+        
+        // Check any offsets to look for a space and delete
+        while(globalPosition < cleanedText.Length)
+        {
+            int nextBpn = globalPosition + len;
+            if (nextBpn > cleanedText.Length)
+                nextBpn = cleanedText.Length; // end of string matched by `len`
+                
+            // Locate the closing word
+            while(nextBpn >= globalPosition && !char.IsWhiteSpace(cleanedText[nextBpn])) {
+                nextBpn--;    
+            }
+            
+            string singleSurfaceline = (nextBpn >= globalPosition):
+                cleanedText.Substring(globalPosition,         
+                                    (nextBpn - globalPosition + 1)):
+                cleanedText.Substring(globalPosition);   
+                    
+            // Ensure the item appended doesn't leak
+            singleSurfaceline.WrapLine();
+            wrappedOutput.AppendLine(singleSurfaceline); 
+                   
+            globalPosition += singleSurfaceline.Length;
+        }
+            
+        return wrappedOutput.ToString();     
+    }
     }
 }
