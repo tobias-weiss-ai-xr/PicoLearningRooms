@@ -20,11 +20,11 @@ public class Portal : MonoBehaviour
             // Prevent doubles or test freeride spam
             if (Time.time - lastTriggerTime > debounced_duration)
                 {
-                if (target_world != null) LearningWorldsApp.Go(target_world);
+                if (target_world != null) LearningWorldsApp.Go(target_world).Wait();
                 else trigger_action?.Invoke(); // trigger OpenLab()
                 
                 // Show the tooltip via the SocraticTutorManager
-                ShowTooltip(target_world);
+                SocraticTutorManager.Instance.SendContextMessage(target_world.ToString(), "Open world")
             }
         }
         

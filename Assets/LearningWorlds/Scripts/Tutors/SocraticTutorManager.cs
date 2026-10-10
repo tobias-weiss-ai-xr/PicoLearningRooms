@@ -29,7 +29,7 @@ public class SocraticTutorManager : MonoBehaviour
     /// Sends a context-aware message to the tutor for the specified world.
     /// Uses SaiaTutorManager to route to the correct tutor.
     /// </summary>
-    public void SendContextMessage(World world, string message)
+    public void SendContextMessage(string world, string message)
     {
         string worldName = world.ToString();
         Debug.Log("[SocraticTutorManager] Context message for " + worldName + ": " + message);
@@ -37,10 +37,7 @@ public class SocraticTutorManager : MonoBehaviour
         string builtMessage = BuildSocraticPrompt(worldName, message);
 
         // Get tutor from SaiaTutorManager
-        SaiaTutor tutor = SaiaTutorManager.Instance.GetTutorForWorld(worldName);
-        if (tutor != null)
-        {
-            tutor.SendToLLM(builtMessage);
+        // Get tutor and activate
         }
         else
         {
@@ -51,6 +48,11 @@ public class SocraticTutorManager : MonoBehaviour
     /// <summary>
     /// Builds a Socratic-style prompt based on the world context.
     /// </summary>
+    public string GetTutorNameForWorld(World world)
+    {
+        return world.ToString() + "Tutor";
+    }
+    
     private string BuildSocraticPrompt(string world, string context)
     {
         string socraticPrefix;
