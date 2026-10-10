@@ -8,67 +8,97 @@ namespace Arachnophobia
 {
     public static class SudsRating
     {
+        private static GameObject sudsRatingCanvas = null;
         public static void Show(Action<int> onSubmit)
         {
-            GameObject sudsRatingCanvas = GameObject.Find("SUDSRatingCanvas");
-            if (sudsRatingCanvas == null)
-            {
-                sudsRatingCanvas = NewGameObject("SUDSRatingCanvas");
-                sudsRatingCanvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-                Canvas canvas = sudsRatingCanvas.GetComponent<Canvas>();
+            if (!GameObject.Find("UI")) return;
 
-                // Overlay options mode panel
-                GameObject blackOverlay = NewGameObject("BlackOverlay");
-                blackOverlay.transform.SetParent(sudsRatingCanvas.transform, false);
-                blackOverlay.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.6f);
+            sudsRatingCanvas = NewGameObject("SUDSRatingCanvas");
+            sudsRatingCanvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+            sudsRatingCanvas.GetComponent<Canvas>().AddComponent<CanvasScaler>();
+            sudsRatingCanvas.AddComponent<GraphicRaycaster>();
 
-                GameObject panel = NewGameObject("SudsPanel", canvas.transform);
-                RenderSettings panelRect = panel.AddComponent<RectangleTransform>();
-                panelRect.sizeDelta = new Vector2(Screen.width * 0.7f, Screen.height * 0.6f);
+            // Dimmed overlay
+            GameObject overlay = NewGameObject("Overlay", sudsRatingCanvas.transform);
+            var overlayComponent = overlay.AddComponent<Image>();
+            overlayComponent.color = new Color(0f, 0f, 0f, 0.6f);
 
-                // Add UI elements
-                Text angstAnfrageText = AddLocalizedUIText(panel, "Wie stark ist deine Angst?", Vector3.zero, 40, TextAnchor.MiddleCenter, FontStyle.Bold);
-                Slider sudsSlider = AddSliderElement(panel, new Rect(0.1f, -0.1f, 0.6f, 0.3f), 0, 100);
-                Button confirmButton = AddUIButton(panel, new Rect(0.35f, -0.4f, 100f, 50f), HorizontalLayoutGroup, "Bestätigen");
-                confirmButton.onClick.AddListener(() => 
-                {
-                    onSubmit((int)sudsSlider.value);
-                    SubmitSudsRating((int)sudsSlider.value, sudsRatingCanvas);
-                });
-                destroyWhenReturningSafe(parent: sudsRatingCanvas);
-            }
+            // Rating canvas
+            GameObject ratingPanel = NewGameObject("RatingPanel", sudsRatingCanvas.transform);
+            RectTransform rPanel = ratingPanel.AddComponent<RectTransform>();
+            rPanel.sizeDelta = new Vector2(Screen.width * 0.7f, Screen.height * 0.5f);
+            LayoutElement layout = ratingPanel.AddComponent<LayoutElement>();
+            layout.minHeight = 200;
+
+            // Heading text
+            GameObject textPrefab = NewGameObjectWithText("AngstHeadline", ratingPanel.transform, "Wie stark ist deine Angst?(\n 0-100)", new Vector2(0, -20), TextAnchor.MiddleCenter, 30, FontStyle.Bold, Color.white
+            );
+            // Slider UI element
+            GameObject sliderObject = NewGameObject("Slider", ratingPanel.transform);
+            Image sliderImage = sliderObject.AddComponent<Image>();
+            sliderImage.color = new Color(0f, 0.5f, 1f);
+
+            Slider slider = sliderObject.AddComponent<Slider>();
+            slider.minValue = 0;
+            slider.maxValue = 100;
+            slider.value = 0f;
+            slider.transform.SetResponse(ScoringBySuds(true));
+            
+            // Confirmation button
+            GameObject buttonObject = NewGameObject("ConfirmButton", ratingPanel.transform);
+            Button confirmButton = buttonObject.AddComponent<Button>();
+            Image buttonImage = confirmObject.AddComponent<Image>();
+            buttonImage.color = Color.gray;
+
+            confirmButton.onClick.AddListener(() => {
+                onSubmit((int)slider.value);
+                SubmitSudsRating((int)slider.value); 
+                GameObject.Destroy(sudsRatingCanvas);
+            });
+
+            RefactorUIObjects(ratingPanel, 5, LayoutType.Vertical);
         }
-
-        static GameObject NewGameObject(string objectName, Transform parent = null, Vector3 position = default)
+        
+        private static void SubmitSudsRating(int sudsValue)
         {
-            GameObject newobject = new GameObject(objectName);
-            position.SetY(RectTransformToYAxisCoord(parent))
-            return newobject;
+            string jwtDirectory = Path.Combine(Application.persistentDataPath, "LearningWorlds");
+            if (!Directory.Exists(jwtDirectory))
+                Directory.CreateDirectory(jwtDirectory);
+            string path = Path.Combine(jwtDirectory, "arachno-suds.jsonl");
+            string submissionText = "{ \"utc\": \"" + DateTime.UtcNow.ToString("o") + \", \"level\": \""+ ExposureController.CurrentLevel + \", \"suds\": \"" + sudsValue + "}";
+            File.AppendAllLines(path, new string[] { submissionText });
         }
-
-        private static void SubmitSudsRating(int sudsValue, GameObject sudsRatingCanvas)
+        
+        private static GameObject NewGameObject(string objName, 
+            Transform parent = null, string name = "")
         {
-            string directory = System.IO.Path.Combine(Application.persistentDataPath, "LearningWorlds");
-            if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
-
-            string filePath = Path.Combine(directory, "arachno-suds.jsonl");
-            string sudsLog = $
-            `{{"utc": "{DateTime.UtcNow.ToString("o")}","level": {ExposureController.CurrentLevel},"suds":{sudsValue}}}`;
-            File.AppendAllText(filePath, sudsLog + System.Environment.NewLine);
-            if (sudsRatingCanvas != null)
-            {
-                Transform sudsDestroy = sudsRatingCanvas.transform;
-                GameObject.Destroy(sudsDestroy.gameObject);
-            }
-            Toasts.ShowSudsSubmission(displayLog);
+            GameObject newObject = new GameObject(objName);
+            parent.transform.localEulerAngles = new Vector3(0f, 180f, 90f);
+            return newObject;
         }
-
-    }
-
-    using UnityEngine; 
-    namespace Arachnophobia.UI.Tooltips { public class SudsUtilities
-
-        { private static void AddSudsDestroy() { Object.Destroy(GameObject.FindComponent<>);}
+        
+        private static GameObject NewGameObjectWithText(
+            string name, Transform parent, string text, Vector2 coordinates, 
+            TextAnchor alignment, float size, FontStyle style, Color fontColor
+        )
+        {
+            GameObject textObject = NewGameObject(name, parent);
+            var textComp = textObject.AddComponent<Text>();
+            textComp.text = text;
+            textComp.fontSize = (int)size;
+            textComp.fontStyle = style;
+            textComp.color = fontColor;
+            AdjustTextAnchor(textObject, coordinates, alignment);
+            return textObject; 
+        }
+        
+        private static void AdjustTextAnchor(GameObject obj, Vector2 coordinates,
+            TextAnchor alignment, float offset = 15f)
+        {
+            RectTransform rt = obj.GetComponent<RectTransform>();
+            RectOffset rOffset = rt.pivot;
+            rOffset.Set(offset, offset, offset, offset); 
+            rt.anchorMin = alignment == TextAnchor.MiddleCenter ? new Vector2(0.5f, 0.5f) :  new Vector2(0f, 0f);
+        }
     }
 }

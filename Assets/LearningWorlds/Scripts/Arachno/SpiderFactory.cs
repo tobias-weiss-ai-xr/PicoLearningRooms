@@ -164,13 +164,15 @@ namespace Arachnophobia
     
     // Implementing basic drift class for simplicity
     // Drift for tier 2 spiders (slow random movement)
-    private class SpiderDrift : MonoBehaviour {
+        public class SpiderDrift : MonoBehaviour {
         private float speed = 0.005f;
-        void Update(){
-            transform.visibility += Vector3(Random.insideUnitSphere * speed);
-        }}
-
-    private void AddDrift(GameObject spider) {
-        spider.AddComponent<SpiderDrift>();
+        void Update() {
+            transform.position += Random.insideUnitSphere * speed;
+        }
     }
+
+    
+        private void AddDrift(GameObject spider) {
+            spider.AddComponent<SpiderDrift>();
+        }
 }
