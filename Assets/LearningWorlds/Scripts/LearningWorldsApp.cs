@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using LearningWorlds.Tutors;
 
 namespace LearningWorlds
 {
@@ -92,7 +93,13 @@ namespace LearningWorlds
             }
 
             await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
-            SocraticTutorManager.Instance.ActivateTutorForWorld(world);
+            
+            // Activate Saia tutor for the current world
+            var saiaTutorManager = UnityEngine.Object.FindObjectOfType<SaiaTutorManager>();
+            if (saiaTutorManager != null)
+            {
+                saiaTutorManager.ActivateTutorForWorld(world.Name);
+            }
         }
 
         /// <summary>

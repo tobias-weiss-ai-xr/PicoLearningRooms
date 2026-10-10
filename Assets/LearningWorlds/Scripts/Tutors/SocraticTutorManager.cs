@@ -25,33 +25,32 @@ public class SocraticTutorManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sends a context-aware message to the tutor for the specified world.
+    /// Uses SaiaTutorManager to route to the correct tutor.
+    /// </summary>
     public void SendContextMessage(World world, string message)
     {
         string worldName = world.ToString();
-
-        // Get the TutorAvatar for this world
-        // This is a placeholder - in a complete implementation, we'd:
-        // 1. Get TutorConfig for this world
-        // 2. Get Tutor instance
-        // We delegate this to SaiaTutorManager for better decoupling
-
-        // Process the message - first log for debugging
-        Debug.Log($"[World:{worldName}] Msg: {message}");
+        Debug.Log("[SocraticTutorManager] Context message for " + worldName + ": " + message);
 
         string builtMessage = BuildSocraticPrompt(worldName, message);
-        
-        // Get and send to appropriate tutor
-        SaiaTutor tutorManager = SaiaTutorManager.Instance.GetTutorForWorld(worldName);
-        if (tutorManager != null) // Placeholder method - update this in SaiaTutorManager.cs
+
+        // Get tutor from SaiaTutorManager
+        SaiaTutor tutor = SaiaTutorManager.Instance.GetTutorForWorld(worldName);
+        if (tutor != null)
         {
-            tutorManager.SendToLLM(builtMessage);
+            tutor.SendToLLM(builtMessage);
         }
         else
         {
-            Debug.LogError($"Cannot send context message - no tutor registered for {worldName}");
+            Debug.LogError("[SocraticTutorManager] Cannot send context message - no tutor registered for " + worldName);
         }
     }
 
+    /// <summary>
+    /// Builds a Socratic-style prompt based on the world context.
+    /// </summary>
     private string BuildSocraticPrompt(string world, string context)
     {
         string socraticPrefix;
@@ -61,24 +60,18 @@ public class SocraticTutorManager : MonoBehaviour
                 socraticPrefix = "In the Learning Hub, consider:";
                 break;
             case "PseGallery":
-                socraticPrefix = "In the Periodic Table - chemists specialize:";
+                socraticPrefix = "In the Periodic Table, chemists specialize:";
                 break;
             case "ElementRoom":
-                socraticPrefix = "In the Element Lab - scientist's approach:";
+                socraticPrefix = "In the Element Lab, scientist's approach:";
                 break;
             case "Arachnophobia":
-                socraticPrefix = "In the Arachnophobia Challenge - therapeutic psychology:";
+                socraticPrefix = "In the Arachnophobia Challenge, therapeutic psychology:";
                 break;
             default:
-                return context;// Default to context message
+                return context; // Default to context message
         }
 
-        return $"{socraticPrefix} {context}";
-    }
-    
-    public SaiaTutor GetTutorForWorld(string worldName)
-    {
-        Debug.LogError("Using placeholder from SocraticTutorManager.GetTutorForWorld - should be implemented in SaiaTutorManager");
-        return null;
+        return socraticPrefix + " " + context;
     }
 }

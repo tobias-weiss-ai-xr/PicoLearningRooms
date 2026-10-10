@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[.CreateAssetMenu(fileName = "TutorConfig", menuName = "LearningWorlds/Tutor Config", order = 1)]
+[CreateAssetMenu(fileName = "TutorConfig", menuName = "LearningWorlds/Tutor Config", order = 1)]
 public class SaiaTutorConfig : ScriptableObject
 {
     [System.Serializable]

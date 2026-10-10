@@ -9,9 +9,11 @@ public class SaiaTutorManager : MonoBehaviour
 
     private SaiaTutorConfig _tutorConfig;
     private Dictionary<string, SaiaTutor> _activeTutors = new Dictionary<string, SaiaTutor>();
+    private SaiaTutor _currentTutor;
 
     // Reference to current microphone usage
     private AudioClip _lastSentAudio;
+    private bool _isRecording = false;
 
     // Load config
     public void Initialize(SaiaTutorConfig config)
@@ -38,7 +40,7 @@ public class SaiaTutorManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(tutorConfig.name))
         {
-            Debug.LogError("Tutor name is missing");
+            Debug.LogError("[SaiaTutorManager] Tutor name is missing");
             return null;
         }
 
@@ -48,7 +50,7 @@ public class SaiaTutorManager : MonoBehaviour
 
         if (avatarPrefab == null)
         {
-            Debug.LogError($"Tutor avatar prefab not found: {avatarPath + tutorConfig.name}");
+            Debug.LogError("[SaiaTutorManager] Tutor avatar prefab not found: " + avatarPath + tutorConfig.name);
             return null;
         }
 
@@ -59,7 +61,7 @@ public class SaiaTutorManager : MonoBehaviour
 
         if (avatarInstance.GetComponent<TutorAvatar>() == null)
         {
-            Debug.LogError("TutorAvatar component not found");
+            Debug.LogError("[SaiaTutorManager] TutorAvatar component not found");
             Destroy(avatarInstance);
             return null;
         }
@@ -73,88 +75,110 @@ public class SaiaTutorManager : MonoBehaviour
 
         // Initialize tutor config
         saiaTutor.Setup(tutorConfig);
+        avatarInstance.SetActive(false); // Deactivate by default
 
-        // Enable based on world
-        _activeTutors[tutorConfig.world] = saiaTutor;
+        // Register in active tutors
+        _activeTutors[world] = saiaTutor;
 
+        Debug.Log("[SaiaTutorManager] Spawned tutor: " + tutorConfig.name + " for " + world);
         return saiaTutor;
+    }
+
+    // Spawn all tutors from config
+    public void SpawnAllTutors()
+    {
+        if (_tutorConfig == null || _tutorConfig.tutors == null)
+        {
+            Debug.LogError("[SaiaTutorManager] Tutor config not initialized");
+            return;
+        }
+
+        foreach (var tc in _tutorConfig.tutors)
+        {
+            SpawnTutor(tc, tc.world);
+        }
     }
 
     // Activate the tutor for specific world only
     public void ActivateTutorForWorld(string world)
     {
+        // Deactivate current tutor first
+        if (_currentTutor != null)
+        {
+            _currentTutor.gameObject.SetActive(false);
+        }
+
         SaiaTutor tutor;
         if (_activeTutors.TryGetValue(world, out tutor))
         {
             tutor.gameObject.SetActive(true);
-            Debug.Log($"Activated tutor for {world}");
+            _currentTutor = tutor;
+            Debug.Log("[SaiaTutorManager] Activated tutor for " + world);
         }
         else
         {
-            Debug.LogWarning($"No tutor configured for world: {world}");
+            Debug.LogWarning("[SaiaTutorManager] No tutor configured for: " + world);
         }
     }
 
     // Get tutor by world for SocraticManager
     public SaiaTutor GetTutorForWorld(string world)
     {
-        foreach (var keyValuePair in _activeTutors)
-        {
-            if (keyValuePair.Key == world && keyValuePair.Value != null)
-            {
-                return keyValuePair.Value;
-            }
-        }
-        return null;
-    }
-    {
         SaiaTutor tutor;
         if (_activeTutors.TryGetValue(world, out tutor))
         {
-            tutor.gameObject.SetActive(true);
-            Debug.Log($"Activated tutor for {world}");
+            return tutor;
         }
-        else
-        {
-            Debug.LogWarning($"No tutor configured for world: {world}");
-        }
+        return null;
     }
 
     // STT - Speech to Text methods
     public void StartRecording()
     {
-#if UNITY_STANDALONE
-        Microphone.End(null); // Clean up any previous recording
-        string device = Microphone.devices.Length > 0 ? Microphone.devices[0].toString() : "";
-        Debug.Log("Recording device: " + device);
+        if (_isRecording) return;
+        _isRecording = true;
+
+        string device = Microphone.devices.Length > 0 ? Microphone.devices[0] : null;
+        Debug.Log("[SaiaTutorManager] Recording device: " + device);
         if (!string.IsNullOrEmpty(device))
         {
-            Microphone.Start(device, true, 1, 44100);
-            Debug.Log("Recording begun");
+            Microphone.End(null); // Clean up any previous recording
+            _lastSentAudio = Microphone.Start(device, true, 5, 44100);
+            Debug.Log("[SaiaTutorManager] Recording started");
         }
         else
         {
-            Debug.LogError("No microphone devices available");
+            Debug.LogError("[SaiaTutorManager] No microphone devices available");
+            _isRecording = false;
         }
+    }
 
-handler: #SendToSTT helper method to process microphone data.
-#endif
+    public void StopRecording()
+    {
+        if (!_isRecording) return;
+        _isRecording = false;
+        
+        if (Microphone.IsRecording(null))
+        {
+            Microphone.End(null);
+            Debug.Log("[SaiaTutorManager] Recording stopped");
+        }
     }
 
     public void SendToSTT(byte[] audioData, string world)
     {
         // TODO: Implement HTTP POST to Saia/Whisper API for transcription
         // Example URL: http://localhost:8080/v1/audio/transcriptions
-        Debug.Log($"Sending audio to Whisper API for {world}");
+        Debug.Log("[SaiaTutorManager] Sending audio to Whisper API for " + world);
         // In real implementation, would make POST request here
     }
 
-    // TTS & Common Utility methods
+    // TTS - Text to Speech
     public AudioClip SendToTTS(string text, string voiceId, string world)
     {
         // TODO: Implement HTTP POST to Saia/TTS API for text-to-speech
         // Example URL: /v1/text2speech
-        Debug.Log($"Sending text to TTS API for {world} with voice: {voiceId}");
+        Debug.Log("[SaiaTutorManager] Sending text to TTS API for " + world + " with voice: " + voiceId);
         return null; // Return AudioClip after implementing real API call
     }
 
@@ -163,7 +187,7 @@ handler: #SendToSTT helper method to process microphone data.
     {
         if (_tutorConfig == null || _tutorConfig.tutors == null)
         {
-            Debug.LogError("Tutor config not initialized");
+            Debug.LogError("[SaiaTutorManager] Tutor config not initialized");
             return null;
         }
 
