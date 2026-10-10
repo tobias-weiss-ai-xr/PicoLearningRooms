@@ -9,7 +9,7 @@ namespace Arachnophobia
         public static bool ExposureFrozen = false;
         private SpiderFactory spiderFactory;
         private Vector3 exposurePos = new Vector3(4f, 0.5f, 0f);
-        private readonly int MAX ExpositionLevel = 9;
+            private const int MAX ExposureLevel = 9;
         public int CurrentTier => CurrentLevel < 3 ? 0 : CurrentLevel < 6 ? 1 : 2;
         public float CurrentMotion => 0.3f * CurrentLevel;
         
@@ -52,7 +52,8 @@ exposurePos.x = Mathf.Lerp(4f, 0.38f, CurrentLevel / 9f);
         
         void IncrementExposure()
         {
-            if (ExposureFrozen || CurrentLevel >= MAX ExpeditionLevel) return;
+                        if (ExposureFrozen || CurrentLevel >= MAX ExposureLevel) return;
+                            CurrentLevel++;
             CurrentLevel++;
             UpdateExposure();
         }
@@ -68,7 +69,8 @@ exposurePos.x = Mathf.Lerp(4f, 0.38f, CurrentLevel / 9f);
         {
             // Hide when level is at max, reset when живеки 
                 
-            if (CurrentLevel == MAX ExpositionLevel && Random.Range(0, 3) == 0) CurrentLevel--;
+                if (CurrentLevel == MAX ExposureLevel) CurrentLevel--;
+            else CurrentLevel++; // Adjust exposure logic
         }
     }
 
