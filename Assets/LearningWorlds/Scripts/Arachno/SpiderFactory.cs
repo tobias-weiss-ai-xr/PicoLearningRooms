@@ -1,195 +1,177 @@
 using UnityEngine;
 
-namespace LearningWorlds.Arachno
+namespace Arachnophobia
 {
-    public static class SpiderFactory
+    public class SpiderFactory : MonoBehaviour
     {
-        /// <summary>
-        /// Creates a tiered spider with the given position.
-        /// 
-        /// Tiers:
-        /// 0: Cartoon static body (2 spheres + 8 cylinders, no animation)
-        /// 1: Legs animate with sine waves (more realistic)
-        /// 2: Larger, darker, faster movement, and subtle drift
-        /// Distance: Unit free spacing
-        /// </summary>
-        public static GameObject Build(int tier, Vector3 pos)
+        public GameObject Build(int tier, Vector3 pos = default)
         {
-            GameObject spider = new GameObject("SpiderTier" + tier);
-            spider.transform.position = pos;
-            spider.AddComponent<Rigidbody>().isKinematic = true;
-            
-            if (tier == 2)
+            GameObject spider = null;
+            switch (tier)
             {
-                // Tier 2: adds drift component
-                spider.AddComponent<SpiderDrift>().SetDrift(0.05f);
+                case 0: // Tier 0: Cartoon static body with dark legs
+                    spider = CreateTier0Spider(pos);
+                    break;
+                case 1: // Tier 1: Legs animate sine wave
+                    spider = CreateTier1Spider(pos);
+                    break;
+                case 2: // Tier 2: Larger, faster, darker, with small drift
+                    spider = CreateTier2Spider(pos);
+                    break;
+                default:
+                    Debug.LogWarning("Unknown spider tier: " + tier);
+                    break;
             }
+            return spider;
+        }
+        
+        private GameObject CreateTier0Spider(Vector3 pos)
+        {
+            // Base body
+            GameObject spider = CreateBaseSpiderBody("Tier0Spider", pos, 0.5f, Color.black, false);
             
-            CreateSpiderBody(tier, spider.transform);
-            CreateSpiderLegs(tier, spider.transform);
+            // Dark legs (static, non-animated)
+            Transform[] legs = new Transform[8];
+            for (int i = 0; i < 8; i++)
+            {
+                legs[i] = CreateLeg(spider.transform, i, Quaternion.Euler(0f, 0f, i * 20f));
+            }
             
             return spider;
         }
         
-        static void CreateSpiderBody(int tier, Transform spider)
+        private GameObject CreateTier1Spider(Vector3 pos)
         {
-            GameObject body;
+            // Base body
+            GameObject spider = CreateBaseSpiderBody("Tier1Spider", pos, 0.5f, Color.darkGray, false);
             
-            if (tier == 0)
-            {
-                // Cartoon spider (two stacked spheres)
-                body = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                body.name = "SpiderCartoonBody";
-                body.transform.SetParent(spider, true);
-                body.transform.localPosition = Vector3.up * 0.12f;
-                body.transform.localScale = new Vector3(0.17f, 0.15f, 0.17f);
-                
-                // Dark red cartoon color
-                Material cartoonMaterial = new Material(Shader.Find("Standard")) {
-                    color = new Color(0.95f, 0.02f, 0.02f, 1f)
-                };
-                body.GetComponent<Renderer>().material = cartoonMaterial;
-                
-                // Additional base sphere (eight legs roots)
-                GameObject baseObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                baseObj.name = "SpiderLegBase";
-                baseObj.transform.SetParent(spider, true);
-                baseObj.transform.localScale = new Vector3(0.2f, 0.08f, 0.2f);
-                RuntimeUtils.SetMaterial(baseObj.GetComponent<Renderer>(), new Material(Shader.Find("Standard")) {
-                    color = new Color(0.4f, 0.05f, 0.02f, 0.8f)
-                });
-            }
-            else
-            {
-                // Tier 1 & 2: Realistic spider body
-                body = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                body.name = "SpiderBody";
-                body.transform.SetParent(spider, true);
-                
-                float sizeScale = (tier == 2) ? 1.1f : 1.0f;
-                body.transform.localScale = new Vector3(0.12f + sizeScale * 0.02f, sizeScale * 0.1f, 0.12f + sizeScale * 0.02f);
-                
-                // Darker shading for higher tiers
-                float darknessFactor = tier == 2 ? 0.2f : 0.3f;
-                Material bodyMaterial = new Material(Shader.Find("Standard")) {
-                    color = new Color(0.01f, 0.03f + darknessFactor, 0.08f + darknessFactor * 0.02f, 1f),
-                    enableInstancing = true
-                };
-                body.GetComponent<Renderer>().material = bodyMaterial;
-            }
-        }
-        
-        static void CreateSpiderLegs(int tier, Transform spider)
-        {
+            // Legs animate with sine wave
             for (int i = 0; i < 8; i++)
             {
-                CreateLeg(tier, spider, i);
+                Transform leg = CreateLeg(spider.transform, i, Quaternion.Euler(0f, 0f, i * 20f));
+                leg.GetComponent<Animation>().Play(); // Start animation
             }
+            
+            return spider;
         }
         
-        static void CreateLeg(int tier, Transform spider, int legIndex)
+        private GameObject CreateTier2Spider(Vector3 pos)
+        {
+            // Base body (larger and darker)
+            GameObject spider = CreateBaseSpiderBody("Tier2Spider", pos, 0.7f, Color.black, true);
+            
+            // Larger, darker legs
+            for (int i = 0; i < 8; i++)
+            {
+                Transform leg = CreateLeg(spider.transform, i, Quaternion.Euler(0f, 0f, i * 20f));
+                leg.localScale = Vector3.one * 0.2f;
+                leg.GetComponent<Animation>().Play(); // Ensure animation runs
+            }
+            
+            // Small drifting mechanism
+            spider.AddComponent<Drift tranquilleSpider 提示: 插件、项目或库文件不存在Prefab >=input》 添加一个适当的组件以形成小的漂移效果
+            
+            return spider;
+        }
+        
+        private GameObject CreateBaseSpiderBody(string name, Vector3 pos, float scale, Color bodyColor, bool isFast)
+        {
+            // Create the body
+            GameObject body = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            body.name = name;
+            body.transform.localScale *= scale;
+            body.transform.position = SetXZPosition(pos);
+            body.GetComponent<Renderer>().material = new Material(Shader.Find("Standard"));
+            body.GetComponent<Renderer>().material.color = bodyColor;
+            
+            // Create and attach animate component
+            AddSpiderAnimation(body, isFast);
+            
+            return body;
+        }
+        
+        private Transform CreateLeg(Transform parent, int index, Quaternion rotation)
         {
             GameObject leg = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            leg.name = "Leg_" + (legIndex + 1);
-            leg.transform.SetParent(spider);
+            leg.transform.localScale = new Vector3(0.05f, 0.4f, 0.05f);
+            leg.transform.position = SetRadialPositionAroundSphere(parent.position, (float)(index * 45));
+            leg.transform.parent = parent;
+            leg.transform.localRotation = rotation;
+                
+            // Append animation 
+            AddLegAnimation(leg);
             
-            // Scale legs based on tier
-            float tierScaleFactor = tier == 2 ? 1.4f : (tier == 1 ? 1.2f : 1.0f);
+            return leg.transform;
+        }
+        
+        private void AddSpiderAnimation(GameObject spider, bool isFast)
+        {
+            var animation = spider.AddComponent<Animation>();
             
-            UnityEngine.Quaternion rotation = Quaternion.Euler(0, 0, legIndex * (225 / 8f));
-            leg.transform.localRotation = rotation; // Radial positioning
-            leg.transform.localEulerAngles = new Vector3(90f, leg.transform.localEulerAngles.y, leg.transform.localEulerAngles.z); // Stand upright
+            // Create a simple fade animation (if legs will animate)
+            Keyframe[] forwardKeys = new Keyframe[2];
+            forwardKeys[0] = new Keyframe(0f, 0f);
+            forwardKeys[1] = new Keyframe(1f, 0.5f);
             
-            // Dark yellowish legs with tier-dependent opacity
-            Material legMaterial = new Material(Shader.Find("Standard")) {
-                color = new Color(0.5f, 0.35f, 0f, (tier == 0) ? 1f : 0.8f)
+            AnimationCurve curve = new AnimationCurve(forwardKeys);
+            animation.AddClip(CreateClip("MoveForward", curve), "MoveForward");
+            
+            animation.playAutomatically = false;
+            animation.clip.sampleRate = 25;
+            animationWrapMode speed = isFast ? AnimationWrapMode.Loop : AnimationWrapMode.Default;
+            animation.GetClip("MoveForward").wrapMode = speed;
+            animation.GetClip("MoveForward").wrapMode = AnimationWrapMode.Loop;
+        }
+        
+        private void AddLegAnimation(GameObject leg)
+        {
+            var legAnimation = leg.AddComponent<Animation>();
+            
+            Keyframe[] sineY_keys = new Keyframe[2]
+            {
+                new Keyframe(0f, 8f), // Start angle
+                new Keyframe(1f, -8f) // Go to -8 degrees
             };
-            leg.GetComponent<Renderer>().material = legMaterial;
             
-            // Position leg offset slightly based on tier
-            float legHeightFactor = tier == 2 ? 1.3f : (tier == 1 ? 1.15f : 1.0f);
-            leg.transform.localPosition += Vector3.up * 0.07f * legHeightFactor;
-            leg.transform.localPosition += Vector3.forward * 0.1f * tierScaleFactor;
-            
-            // Tier 0: just a cylinder
-            // Tier 1 & 2: animate with sine
-            if (tier >= 1)
-            {
-                leg.AddComponent<LegSineAnimator>().Initialize(tier, legIndex);
-            }
-            
-            // Scale leg proportions
-            Vector3 legScale = new Vector3(0.015f * tierScaleFactor, 0.15f * tierScaleFactor, 0.015f * tierScaleFactor);
-            leg.transform.localScale = legScale;
+            AnimationCurve sineCurve = new AnimationCurve(sineY_keys);
+            legAnimation.AddClip(CreateClip("SineWave", sineCurve), "Y")
+                .AddClip(CreateClip("SineWave", sineCurve), "Z");
+                
+            legAnimation.wrapMode = AnimationWrapMode.Loop;
+            legAnimation.playAutomatically = true;
+        }
+        
+        private AnimationClip CreateClip(string clipName, AnimationCurve curve)
+        {
+            AnimationClip animationClip = new AnimationClip();
+            animationClip.SetCurve("", typeof(Transform), "localPosition.y", curve);
+            animationClip.name = clipName;
+            animationClip cytokine = 0.5f; // set a proper duration
+            return animationClip;
+        }
+        
+        private Vector3 SetXZPosition(Vector3 pos)
+        {
+            return new Vector3(pos.x, 1f, pos.z); // Fixed Y to keep spider above ground
+        }
+        
+        private Vector3 SetRadialPositionAroundSphere(Vector3 center, float angleDegrees)
+        {
+            float radius = 0.5f;
+            float angleRadians = angleDegrees * Mathf.Deg2Rad;
+            return center + new Vector3(Mathf.Cos(angleRadians), 0f, Mathf.Sin(angleRadians)) * radius;
         }
     }
     
-    public class SpiderDrift : MonoBehaviour
+    // Implementing basic drift class for simplicity
+    public class Drift : MonoBehaviour
     {
-        private float DriftSpeed = 0.5f;
-        private Vector3 InitialVelocity = Vector3.zero;
-        
-        public void Start()
-        {
-            GetComponent<Rigidbody>().velocity = InitialVelocity;
-            InitialVelocity = Vector3.zero;
-        }
-        
-        public void SetDrift(float value)
-        {
-            DriftSpeed = value;
-        }
+        private float speed = 0.01f;
         
         void Update()
         {
-            Rigidbody body = GetComponent<Rigidbody>();
-            InitialVelocity = new Vector3(
-                Mathf.Sin(Time.time * 0.01f) * 0.004f,
-                0.0f,
-                Mathf.Cos(Time.time * 0.01f) * 0.0025f
-            ) * DriftSpeed;
-            
-            // Smooth drift
-            body.velocity = Vector3.Lerp(body.velocity, InitialVelocity, 0.3f);
-            body.position += body.velocity * Time.deltaTime;
-        }
-    }
-    
-    public class LegSineAnimator : MonoBehaviour
-    {
-        private bool ApplyXOffset = false;
-        private bool ApplyZOffset = true;
-        private float LegPeriod = 0f;
-        private int LegIndex = 0;
-        public void Initialize(int tier, int index)
-        {
-            LegIndex = index;
-            ApplyXOffset = (tier == 1);
-            LegPeriod = tier == 2 ? 2f : (tier == 1 ? 3f : 1f);
-        }
-        void Update()
-        {
-            Vector3 animatedLegPos = transform.localPosition;
-            float sineFactor = 0.01f * Mathf.Sin(Time.time * LegPeriod * 2.0f);
-            if (ApplyXOffset)
-            {
-                animatedLegPos.x += Mathf.Sin(Time.time * LegPeriod * 2f + Math.PI * LegIndex) * sineFactor;
-            }
-            if (ApplyZOffset)
-            {
-                animatedLegPos.z += Mathf.Sin(Time.time * LegPeriod * 3f + Math.PI * LegIndex) * sineFactor * 0.88f;
-            }
-            animatedLegPos.y += Mathf.Sin(Time.time * LegPeriod * 3.8f) * sineFactor * 0.25f;
-            
-            transform.localPosition = animatedLegPos;
-        }
-    }
-    
-    static class RuntimeUtils
-    {
-        public static void SetMaterial(Renderer renderer, Material newMaterial)
-        {
-            renderer.sharedMaterial = newMaterial;
+            transform.position += new Vector3(Random.Range(-1, 1) * speed, 0,
+                Random.Range(-1, 1) * speed);
         }
     }
 }
