@@ -32,7 +32,7 @@ public static class TextUtil
             if (nextPos == -1) // No more line
                 nextPos = Math.Min(t.Length, start + len);
 
-            wrappedText.AppendLine(*[*trimLen, nextPos*).TrimStart());
+                        wrappedText.AppendLine(t.Substring(trimLen, nextPos - trimLen)).TrimStart();
             start = nextPos;
         }
 
