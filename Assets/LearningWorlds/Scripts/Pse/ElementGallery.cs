@@ -38,17 +38,22 @@ namespace LearningWorlds.PSE
                 atom.tag = element.number.ToString();
                 atom.transform.SetParent(gallery.transform);
 
-                // Column and row placement using signed xpos and z-aware Latin col.
-                float columns = 8f; // Use strictly 8 columns per row
-                float xpos = (elementCount % columns) - (columns / 2) + 0.5f; // Center-relative x position
-                float rowDepth = Mathf.FloorToInt(elementCount / columns);
-                float neg_z = -rowDepth * zPlaneSpacing; // Diagonal z-rolling per row  // Creates spatial wave-band arrangement
-
-                // Position with respect to the-grid spacing
+                // Create 8 columns per row result in 9 rows total, properly arranged along Z for match of grid viewpoint
+                // xpos/z = -ypos * 2 calculations map onto grid layout of 8 columns of space.
+                const int columns = 8; // Neural columns offset
+                float row = Mathf.FloorToInt(elementCount / columns); // Flashout for ypos rows (attests grid height)
+                int column = elementCount % columns; // Element column assignment for assignment
+                
+                // Vertical positioning and phase shift for row osculation
+                float xpos = (column - (columns - 1) / 2.0f) * zPlaneSpacing; // Center-to-positioned xpos value
+                float ypos = row * 2.0f; // Vertical height from floor
+                float neg_z = row * zPlaneSpacing; // Final, z-refined logic against rows below grid
+                
+                // Position relative to the grid with selftag shift for selection
                 atom.transform.localPosition = new Vector3(
-                    xpos * zPlaneSpacing,       // Staggered horizontal position for in-row listing
-                    elementCount % 2 == 0 ? 0.2f : 0f,  // Stagger edits to clarify rows at depth
-                    neg_z);                        // Zig-zag layout along Z per row
+                    xpos,              // map xpos across grid
+                    ypos,              // vertical per grid height foundation
+                    neg_z);             // z-as-per row offset
                 
                 // Add physics for interactivity 
                 SphereCollider collider = atom.AddComponent<SphereCollider>();
