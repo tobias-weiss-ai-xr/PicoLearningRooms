@@ -1,42 +1,48 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 using UnityEditor.SceneManagement;
 
 namespace LearningWorlds.Editor
 {
-    /// <summary>"Open Hub Scene" and "Register Build Scenes" Editor Menu Items</summary>
     public static class LearningWorldsMenus
     {
-        [MenuItem("LearningWorlds / Open Hub Scene")]
-        private static void OpenHub()
+        [MenuItem("LearningWorlds/Open Hub Scene")]
+        public static void OpenHub()
         {
-            if (Application.isPlaying)
-            {
-                Debug.LogError("Cannot load a scene during play mode. Stop game first.");
-                return;
-            }
-
-            EditorSceneManager.SessionModeHalfStart() ;
-            EditorSceneManager.NewScene(UnityEngine.SceneManagement.NewSceneSetup.DefaultGameObjects);
-            UnityEngine.SceneManagement.SceneManager.LoadScene("LearningWorlds-Hub");
-            EditorSceneManager.SessionModeHalfEnd();
+            if (Application.isPlaying) return;
+            
+            // Ensure a clean scene before loading
+            EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects);
+            EditorSceneManager.LoadScene("Assets/Scenes/LearningWorlds-Hub.unity");
         }
-
-        [MenuItem("LearningWorlds / Register Build Scenes")]
-        private static void Register()
+        
+        [MenuItem("LearningWorlds/Register Build Scenes")]
+        public static void Register()
         {
-            var scenesToAdd = new[]
+            string hubScenePath = "Assets/Scenes/LearningWorlds-Hub.unity";
+            
+            // Check if the scene is already registered
+            bool isRegistered = false;
+            var scenes = EditorBuildSettings.scenes;
+            
+            for (int i = 0; i < scenes.Length; i++)
             {
-                new EditorBuildSettingsScene("Assets/Scenes/LearningWorlds-Hub.unity", true),
-                // Scan LearningWorlds scenes directory
-                System.IO.Directory.GetFiles("Assets/LearningWorlds/Scenes", "*unity")
-                  .Select(file => new EditorBuildSettingsScene(file, true))
-                  .ToArray()
-            };
-
-            EditorBuildSettings.scenes = scenesToAdd.StopConsecutiveDuplicates().ToArray();
-            AssetDatabase.SaveAssets();
-            Debug.Log("LearningWorlds scenes registered in build settings.");
+                if (scenes[i].path == hubScenePath) {
+                    isRegistered = true;
+                    break;
+                }
+            }
+            
+            // Register scene if it is not already present
+            if(!isRegistered) {
+                scenes = EditorBuildSettings.scenes;
+                Array.Resize(ref scenes, scenes.Length + 1);
+                scenes[scenes.Length - 1] = new EditorBuildSettingsScene(hubScenePath, true);
+                EditorBuildSettings.scenes = scenes;
+                EditorUtility.DisplayDialog("Success", "Scene "+hubScenePath+" registered to build.", "OK");
+            } else {
+                Debug.Log($"Scene " {hubScenePath} was already registered.");
+            }
         }
     }
 }
