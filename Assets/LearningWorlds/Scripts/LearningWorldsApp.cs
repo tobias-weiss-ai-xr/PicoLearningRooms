@@ -28,16 +28,20 @@ namespace LearningWorlds {
             { World.Arachnophobia, w => (int ele) => new ArachnophobiaBuilder() }
         };
         
-        public static string LabSceneName
-        {
-            get
-            {
-                string[] scenePaths = System.IO.Directory.GetFiles(Application.dataPath, "*.unity", System.IO.SearchOption.AllDirectories);
-                string[] sceneBase = System.Linq.Enumerable.Where(scenePaths, path => path.Contains("Assets/Scenes/")).ToArray(); 
-                sceneBase = System.Linq.Enumerable.Where<string>(sceneBase, path => path.Contains("Menu/")).ToArray();
-                if (sceneBase.Length > 0) return sceneBase[0].Replace("\", "/");
-                return "Assets/Scenes/00_Menu.unity";
+        static string FindMenuScenePath() {
+                string[] scenePaths = System.IO.Directory.GetFiles(Application.dataPath + "/Scenes", "*.unity", System.IO.SearchOption.AllDirectories).Select(path => path.Replace("\\", "/")).ToArray();
+                return scenePaths.FirstOrDefault(path => path.Contains("Menu")) ?? "Assets/Scenes/00_Menu.unity";
             }
+    
+            }public static string LabSceneName 
+            {
+                get
+                {
+                    return FindMenuScenePath();
+                }
+            } //Fallback: "00_Menu".unity
+            }
+        }
         }
         
         public static LearningWorldsApp instance { get; protected set; }
@@ -76,7 +80,8 @@ namespace LearningWorlds {
             if (!sceneName.StartsWith("LearningWorlds-")) {
                 return;
             }
-            Debug.Log("LearningWorldsApp Booting with an AMU world...");
+            Debug.Log("LearningWorldsApp Booting ", sceneName);
+}
         }
         
         public static void OpenLab() {
@@ -84,33 +89,37 @@ namespace LearningWorlds {
         }
         
         public static async System.Threading.Tasks.Task Go(World world, int element = -1) {
-            // Unload the exiting scene
+            // Unload the existing LearningWorlds- scene
             await SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene().buildIndex);
-            
-            // Load new world scene
-            string newSceneName = "LearningWorlds-World"; // This may need to be adjusted
+
+            string newSceneName = "LearningWorlds-" + world;
+
+            // Load new world scene synchronously to start
             await SceneManager.LoadSceneAsync(newSceneName);
             
             // Build the World-specific setup if builder exists
             if (Builders.TryGetValue(world, out var worldBuilder)) {
                 IBuilder builder = worldBuilder(element);
                 
-                // Activate tutor
-                SocraticTutorManager.Instance.ActivateTutorForWorld(world);
+                // Activate tutor for the current world
+                SocraticTutorManager.Instance?.ActivateTutorForWorld(world);
             }
+        }
         }
         
         public void EnsureRig() {
-            // Find or create the master Rig
             GameObject rigGameObject = GameObject.Find("LW-Rig");
             if (rigGameObject == null) {
                 rigGameObject = new GameObject("LW-Rig");
                 DontDestroyOnLoad(rigGameObject);
             }
+
+            // Setup WASD+RMB Controls
+            RigControls controls = rigGameObject.GetComponent<RigControls>();
+            if (controls == null) {
+                controls = rigGameObject.AddComponent<RigControls>();
+            }
             InitializeCamera(rigGameObject.transform);
-            
-            // Input manager setup (integrates with WASD + RMB controls)
-        RigControls controls = rigGameObject.AddComponent<RigControls>()
         }
         
         private Camera rigCamera = null;

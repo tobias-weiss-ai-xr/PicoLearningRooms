@@ -18,25 +18,35 @@ public class Portal : MonoBehaviour
 
         private void OnTriggerEnter(Collider other) {
             // Prevent doubles or test freeride spam
-            if (Time.time - lastTriggerTime > debounced_duration)
-                {
-                if (target_world != null) LearningWorldsApp.Go(target_world).Wait();
-                else trigger_action?.Invoke(); // trigger OpenLab()
+            if (Time.time - lastTriggerTime > debounced_duration) {
+                if (target_world != null) {
+                    LearningWorldsApp.Go(target_world).GetAwaiter().GetResult();
+                }
+                else {
+                    trigger_action?.Invoke(); // trigger OpenLab()
+                }
+                ShowTooltip(target_world); // Show tooltip after portal use
+                lastTriggerTime = Time.time;
+            }
                 
                 // Show the tooltip via the SocraticTutorManager
-                SocraticTutorManager.Instance.SendContextMessage(target_world.ToString(), "Open world")
+                // Show tooltip via tutor
+                ShowTooltip(target_world);
             }
         }
         
-private void ShowTooltip(World world)
+    private void ShowTooltip(World world)
         {
+            if (world == null) return;
+
             var tutorManager = SocraticTutorManager.Instance;
             if (tutorManager != null)
             {
                 string tutorName = tutorManager.GetTutorNameForWorld(world);
-                Debug.Log("Portal to " + world.Name + ": Meet " + tutorName + ");
-                tutorManager.SendContextMessage(world.Name, "PortalTrigger");
+                Debug.Log("Portal to " + world.ToString() + ": " + tutorName);
+                tutorManager.SendContextMessage(world.ToString(), "Meet " + tutorName);
             }
+        }
         }
         private void Reset() => lastTriggerTime = 0; 
         private void OnEnable() => Reset();
