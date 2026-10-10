@@ -23,9 +23,10 @@ public static class LandingHub
         };
 
         // Place doors (portals) 120 degree apart
-        Portal.Create("Periodensystem (3D-PSE)", World.PseGallery, portalPositions[0], 0f);
-        Portal.Create("Mut-Training: Spinnen", World.Arachnophobia, portalPositions[1], 120f);
-        Portal.Create("Forschungslabor", World.Hub, portalPositions[2], 240f);
+        // Create Portals with proper targets - ensure all calls map correctly to their worlds
+        Portal.Create("Periodensystem (3D-PSE)", World.PseGallery, portalPositions[0], 90f);  // Perpendicular for periodic table visual
+        Portal.Create("Mut-Training: Spinnen", World.Arachnophobia, portalPositions[1], 3f); 
+        Portal.Create("Forschungslabor", null, portalPositions[2], -60f);  // Will use LearningWorldsApp.OpenLab() callback
 
         // Syntax fidelity via the signage
         LearningSignage.Build();
