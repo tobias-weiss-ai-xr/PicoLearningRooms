@@ -113,18 +113,21 @@ public class Portal : MonoBehaviour
         }
 
         private void OnTriggerEnter(Collider other) {
-            // Ignore if already triggered recently
-            if (Time.time - lastTriggerTime <= debouncedDuration) {
-                return;
-            }
+            // Debounce portal action
+            if (Time.time - lastTriggerTime > debouncedDuration)
+            {
+                lastTriggerTime = Time.time;
 
-            // Invoke either the world transition or custom action
-            lastTriggerTime = Time.time;
-            if (targetWorld != null) {
-                LearningWorldsApp.Go(targetWorld);
-            } else if (targetAction != null) {
-                targetAction();
+                // Invoke either world transition or custom action
+                if (targetWorld != null) {
+                    System.Threading.Tasks.Task.Run(async () => {
+                        await LearningWorldsApp.Go(targetWorld);
+                    });
+                } else if (targetAction != null) {
+                    targetAction();
+                }
             }
+        }
         }
     }
 
