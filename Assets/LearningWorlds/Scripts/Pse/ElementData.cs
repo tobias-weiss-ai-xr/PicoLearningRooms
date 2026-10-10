@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 using System.Collections;
-using System.IO;
+using System.IO; // For JSON handling, replace with actual unity built-in if permitted, otherwise use System.Text.Json
 
 namespace LearningWorlds.Pse {
     public class ElementData {
@@ -12,10 +12,13 @@ namespace LearningWorlds.Pse {
                 Debug.LogWarning("elements.json not found at path: " + loadPath);
                 yield break;
             }
-            // Placeholder: Deserialize JSON -> Element List logic.
-            // TODO: Use system .json or Newtonsoft.Json after runtime dep authorization.
-            Debug.Log("ElementData LoadAll initialized. JSON path loaded.");
-            yield return new List<Element>();
+            if (File.Exists(loadPath)) {
+                string json = File.ReadAllText(loadPath);
+                return JsonUtility.FromJson<List<Element>>(json);
+            } else {
+                Debug.LogError("elements.json not found at: " + loadPath);
+                yield break;
+            }
         }
     }
 
