@@ -1,6 +1,8 @@
 // Ensures portal-based inter-world transitions
 
 using UnityEngine;
+using LearningWorlds.Tutors;
+using LearningWorlds;
 
 /// <summary>Static Factory to create teleporting portal entrances.</summary>
 public class Portal : MonoBehaviour
@@ -20,6 +22,19 @@ public class Portal : MonoBehaviour
                 {
                 if (target_world != null) LearningWorldsApp.Go(target_world);
                 else trigger_action?.Invoke(); // trigger OpenLab()
+                
+                // Show tutor hint for the target world
+                ShowTutorHint(target_world);
+            }
+        }
+        
+        private void ShowTutorHint(World world)
+        {
+            var tutorManager = UnityEngine.Object.FindObjectOfType<LearningWorlds.Tutors.SocraticTutorManager>();
+            if (tutorManager != null)
+            {
+                string tutorName = tutorManager.GetTutorNameForWorld(world);
+                Debug.Log("Portal to " + world.Name + ": Meet " + tutorName + " in this world!");
             }
         }
         private void Reset() => lastTriggerTime = 0; 
