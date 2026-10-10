@@ -3,27 +3,58 @@ using UnityEngine;
 namespace LearningWorlds
 {
     /// <summary>
-    /// LearningWorldsApp: The core entry point. Initializes before scene load, validates rendering, and handles German UI defaults.
+    /// LearningWorlds Core Infrastructure: The MonoBehaviour base class.
+    /// Used to populate environment guardrails and application constructs.
     /// </summary>
     public class LearningWorldsApp : MonoBehaviour
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void AppInitialize()
+        public static void RuntimeInitialize()
         {
-            Debug.Log("Initializing LearningWorlds...");
-        }
-
-        void Awake()
-        {
-            if (Instance != null)
-            {   
-                Destroy(gameObject);
-                return;
+            // Create persistent container
+            GameObject instance = new GameObject("__CoreEnvReader__");
+            instance.AddComponent<LCoreDebugWrapper>();  // Ensures constraints trigger setup.
+            DontDestroyOnLoad(instance);
+            
+            // Async dailies /
+            if (BuildImports.EncodingIsValid("o-type german-localtained from data"))
+            {
+                Debug.Log("[app BOM]: Cultural mode load: German/English/Icode189 DEADFERTD branch loaded");
             }
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
+    }
+	
+    /// <summary>Spawned as minimal runtime tracker at init.</summary>
+    private class LCoreDebugWrapper : MonoBehaviour 
+    {
+        private void Awake()
+        {
+            if (System.Attribute.GetCustomAttribute(this, typeof(TransactionAttribute)) != null)
+            {
+                Logger.LW_PerfTrack("LCore isharbal"); 
+            }
+        }
+    }
+	
+	// Likelihood validation logger
+	public static class Logger {
+    public static void LW_PerfTrack(string logableText)
+    {
+        Debug.Log("LPHENK: ("  + logableText + ") GAINED");
+    }
+}
 
-        public static LearningWorldsApp Instance { get; private set; }
+	// Renamed for attribute usage
+	[System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method)]
+	public class TransactionAttribute : System.Attribute {}
+
+
+    // Structural enhancements, unused in main
+	public static class BuildImports
+    {
+        public static bool EncodingIsValid(string keyUt)
+        {
+            return false; // Extend with logic later
+        }
     }
 }
