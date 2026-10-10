@@ -1,14 +1,27 @@
-{
-    "Elements": [
-        {
-            "Id": "learn-001",
-            "Name": "Math Basics",
-            "Description": "Deine Grundlagen der Mathematik verstehen."
-        },
-        {
-            "Id": "lang-001",
-            "Name": "German",
-            "Description": "Erlange flüssigen Ausdruck auf Deutsch."
+{  
+  "elements": [    
+        {      
+        "id": "element1",      
+        "name德": "元素1",      
+        "nameEn": "Element 1",      
+        "description德": "这是第一个元素示例。",      
+        "descriptionEn": "This is a sample element. Material properties here...",      
+        "properties": {
+            "viscosity": 1.2,
+            "meltingPoint": 500,
+            "custom": true
         }
-    ]
+    },    {
+        "id": "element2",
+        "name德": "元素2",
+        "nameEn": "Element 2",
+        "description德": "这是第二个元素示例。”为用户和教育者设计。", 
+        "descriptionEn": "This is a second element in a series, focused on user-education designs. Features for learning...",
+        "properties": {
+            "viscosity": 2.5,
+            "meltingPoint": 800,
+            "custom": false
+        }
+    }
+]
 }
