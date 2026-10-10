@@ -20,7 +20,10 @@ namespace LearningWorlds.PSE
             _app = LearningWorldsApp.Instance;
         }
         
-        public void ShowPanel(Element element)
+        
+private bool _canClosePanel = true;
+
+public void ShowPanel(Element element)
         {
             if (_currentElement == element) return;
 
@@ -35,33 +38,41 @@ namespace LearningWorlds.PSE
         }
         
         // Raycast detection for element click
-        public void DetectSelection()
+        // Update for correct raycast trigger detection
+private Collider _triggerCollider;
+
+public void DetectSelection()
+{
+    Ray ray = _app.rigCamera.ScreenPointToRay(new Vector2(Screen.width / 2f, Screen.height / 2f));
+    RaycastHit hit;
+    _triggerCollider = null;
+
+    if (Physics.Raycast(ray, out hit, MAX_RAYCAST_DISTANCE))
+    {
+        Collider collider = hit.collider;
+        _triggerCollider = collider;
+        string elementTag = collider.transform.parent?.tag;
+
+        if (int.TryParse(elementTag, out int elementNumber))
         {
-            if (!GameObject.FindObjectOfType<ElementGallery>()) return; // Ensure populated scene
-            Ray ray = _app.rigCamera.ScreenPointToRay(new Vector2(Screen.width / 2f, Screen.height / 2f));
-            RaycastHit hit;                                    
-            if (Physics.Raycast(ray, out hit, MAX_RAYCAST_DISTANCE)) {
-
-            // Retrieve element tag from direct parent
-            string tag = hit.transform.parent?.tag;
-            if (tag != null && int.TryParse(tag, out int elementNumber)) {
-
-            if (triggerCollider != null)
+            if (_currentElement?.number != elementNumber)
             {
-                string elementTag = triggerCollider.transform.parent.tag;
-                if (int.TryParse(elementTag, out int elementNumber))
+                Element selectedElement = DataStore.ElementCatalog.FirstOrDefault(x => x.number == elementNumber);
+                if (selectedElement != null)
                 {
-                    if (_currentElement?.number != elementNumber)
-                    {
-                        Element selectedElement = DataStore.ElementCatalog.FirstOrDefault(x => x.number == elementNumber);
-                        if (selectedElement != null)
-                        {
-                            ShowPanel(selectedElement);
-                        }
-                    }
+                    ShowPanel(selectedElement);
                 }
             }
         }
+    }
+    else
+    {
+        if (infoPanelRoot && _canClosePanel)
+        {
+            ClosePanel();
+        }
+    }
+}
 
         private void CreateAndPositionUIPanelAtSelectionPoint()
         {
