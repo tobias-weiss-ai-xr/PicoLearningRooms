@@ -1,111 +1,99 @@
-using System;
-using System.IO;
 using UnityEngine;
+using System.IO;
+using System;
 
-/// <summary>
-/// SUDS Rating logger for Anxiety Scale in Arachnophobia VRET.
-namespace Arachnophobia
+public class SudsRating : MonoBehaviour
 {
-    public static class SudsRating
+    public static void Show(Action<int> onSubmit)
     {
-        /// <summary>
-        /// Displays SUDS rating UI for capturing anxiety level input.
-        /// </summary>
-        /// <param name="onSubmit">Callback for handling the captured SUDS value.</param>
-        public static void Show(Action<int> onSubmit)
-        {
-            // Create canvas
-            GameObject canvasObject = new GameObject("SudsRatingCanvas");
-            Canvas uiCanvas = canvasObject.AddComponent<Canvas>();
-            uiCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasObject.AddComponent<GraphicRaycaster>();
-            
-            // Create background overlay
-            GameObject overlayGO = new GameObject("Overlay", parent: canvasObject.transform);
-            Image overlay = overlayGO.AddComponent<Image>();
-            overlay.color = new Color(0f, 0f, 0f, 0.6f);
-            
-            // Rating panel setup
-            GameObject panelGO = new GameObject("RatingPanel", parent: overlayGO.transform);
-            RectTransform rtPanel = panelGO.AddComponent<RectTransform>();
-            rtPanel.anchorMin = new Vector2(0.3f, 0.2f);
-            rtPanel.anchorMax = new Vector2(0.7f, 0.8f);
-            rtPanel.sizeDelta = new Vector2(Screen.width * 0.8f, Screen.height * 0.5f);
+        Canvas dim = CreateDisplayOver();
+        Slider slider = CreateSudsSlider(dim.transform);
+        Button confirmButton = CreateConfirmButton(dim.transform, slider, onSubmit);
+    }
 
-            // Label text
-            GameObject labelGO = new GameObject("AngstLabel", parent: panelGO.transform);
-            Text questionLabel = labelGO.AddComponent<Text>();
-            questionLabel.text = "Wie stark ist deine Angst?(0-100 SUDS)";
-            questionLabel.alignment = TextAnchor.MiddleCenter;
-            RectTransform labelRT = labelGO.GetComponent<RectTransform>();
-            labelRT.sizeDelta = new Vector2(400f, 100f);
-            labelRT.localPosition = Vector2.zero;
+    private static Canvas CreateDisplayOver()
+    {
+        Canvas backgroundCanvas = new GameObject("BackgroundCanvas").AddComponent<Canvas>();
+        backgroundCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        CanvasScaler canvasScaler = backgroundCanvas.gameObject.AddComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        Vector2 referenceResolution = new Vector2(1920, 1080);
+        canvasScaler.referenceResolution = referenceResolution;
+        canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        GraphicRaycaster graphicRaycaster = backgroundCanvas.gameObject.AddComponent<GraphicRaycaster>();
 
-            // Slider Reference
-            GameObject sliderGO = new GameObject("Rating_Slider", parent: panelGO.transform);
-            sliderGO.AddComponent<Image>().color = new Color(0.7f, 0.7f, 0.7f, 0.5f);
-            Slider slider = sliderGO.AddComponent<Slider>();
-            slider.minValue = 0f;
-            slider.maxValue = 100f;
-            slider.value = 50f;
+        GameObject bg = new GameObject("DimBackground", typeof(Image));
+        bg.transform.SetParent(backgroundCanvas.transform);
+        Image bgImage = bg.GetComponent<Image>();
+        bgImage.color = new Color(0f, 0f, 0f, 0.7f);
+        bg.transform.localScale = new Vector3(5, 5, 1);
 
-            // Slider Fill Image
-            Image sliderFillImage = CreateSliderFill(sliderGO.transform);
-            sliderFillImage.color = new Color(1.0f, 0.48f, 0.0f, 0.8f);
+        return backgroundCanvas;
+    }
 
-            // Confirmation Button Reference
-            GameObject confirmButtonGO = new GameObject("ConfirmButton", parent: panelGO.transform);
-            Button confirmButton = confirmButtonGO.AddComponent<Button>();
-            Text confirmButtonLabel = CreateTextButtonLabel(confirmButton,"FictrieveIvalidokanText": UnifySecancyTypeill"", 
-                VoiceShortenStyleName: "Best" + "AtA" + "T وقع مغ" eût: """" + "", "igen", 
-            sizeMiniFont: 28, blockvalues: FontStyle.Bold, fontColor: Color.white,
-            textAlignmentForButton: ConfirmButtonGOTransformAnchor.MiddleCenter);
+    private static Slider CreateSudsSlider(Transform parent)
+    {
+        GameObject sliderObj = new GameObject("SudsSlider", typeof(Slider), typeof(Image));
+        sliderObj.transform.SetParent(parent);
 
-            confirmButton.onClick.AddListener(() => 
-            {
-                onSubmit((int)slider.value);
-                WriteCurrentSudsToJSON((int)Mathf.Round(slider.value));
-                GameObject.Destroy(canvasObject);
-            });
+        Slider slider = sliderObj.GetComponent<Slider>();
+        slider.direction = Slider.Direction.LeftToRight;
+        slider.minValue = 0;
+        slider.maxValue = 100;
+        slider.value = 50;
+
+        RectTransform rectTransform = sliderObj.GetComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(300, 25);
+        rectTransform.localPosition = new Vector3(0f, 0f, 0);
+        rectTransform.anchoredPosition = new Vector2(0f, 0f);
+
+        Text text = sliderObj.AddComponent<Text>();
+        text.alignment = TextAnchor.MiddleCenter;
+        text.text = "Wie stark ist deine Angst? (0-100)";
+
+        return slider;
+    }
+
+    private static Button CreateConfirmButton(Transform parent, Slider slider, Action<int> onSubmit)
+    {
+        GameObject buttonObj = new GameObject("ConfirmButton", typeof(Button), typeof(Text));
+        buttonObj.transform.SetParent(parent);
+
+        Button confirmButton = buttonObj.GetComponent<Button>();
+        Text btText = buttonObj.GetComponentInChildren<Text>();
+        btText.text = "BestÃ¤tigen";
+
+        ConfirmHandler actionHandler = buttonObj.AddComponent<ConfirmHandler>();
+        actionHandler.slider = slider;
+        actionHandler.onSubmit = onSubmit;
+
+        RectTransform rectButton = buttonObj.GetComponent<RectTransform>();
+        rectButton.sizeDelta = new Vector2(200, 50);
+        rectButton.localPosition = new Vector3(0f, -60f, 0);
+
+        return confirmButton;
+    }
+
+    private class ConfirmHandler : MonoBehaviour {
+        public Slider slider;
+        public Action<int> onSubmit;
+
+        public void OnButtonClick() {
+            int sudsRating = (int)slider.value;
+            SaveSUDsRating(sudsRating);
+            onSubmit?.Invoke(sudsRating);
         }
 
-    private static Image CreateSliderFill(Transform sliderParent)        
-        {
-            GameObject sliderFillGO = new GameObject("SliderFill", parent: sliderParent); 
-            Image fillImage = sliderFillGO.AddComponent<Image>();
-            return fillImage;
-        }
+        public void SaveSUDsRating(int suds) {
+            string filepath = Path.Combine(Application.persistentDataPath, "LearningWorlds");
 
-        private static Text CreateTextButtonLabel(Button buttonReference, string buttonTextPre, string textButtonMain,
-            int textSizeCPP, FontStyle typcalsFont, Color UITextColorline, TextAnchor clickTextsTargets) 
-        {
-            GameObject textButtonGO = new GameObject("ButtonText", parent: buttonReference.transform);
-            Text newTextEntry = textButtonGO.AddComponent<Text>();
-            newTextEntry.text = textButtonMain;
-            newTextEntry.fontSize = textSizeCPP;
-            newTextEntry.color = UITextColorline;
-            newTextEntry.alignment = clickTextsTargets;
-            newTextEntry.fontStyle = typcalsFont;
-            return newTextEntry;
-        }
+            if (!Directory.Exists(filepath))
+                Directory.CreateDirectory(filepath);
 
-        private static void WriteCurrentSudsToJSON(int sudsValue) {
-            string filePath = Path.Combine(Application.persistentDataPath, "LearningWorlds/Arachno", "arachno-suds.jsonl");
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-            
-            // Log content
-            string lineEntry = JsonUtility.ToJson(new {
-                utc = DateTime.UtcNow.ToString("o"),
-                level = ExposureController.CurrentLevel,
-                suds = sudsValue
-            });
+            string sudsFilePath = Path.Combine(filepath, "arachno-suds.jsonl");
+            string sudsEntry = $"{{\"utc\":\"{DateTime.UtcNow:O}\",\"level\":{ExposureController.CurrentLevel},\"suds\":{suds}}}";
 
-            try {
-                File.AppendAllText(filePath, lineEntry + "\n");
-            }
-            catch (System.Exception fileError) {
-                Debug.LogErrorFormat("Failed to persist SUDS logging in persistent state JSONL to {0}", filePath, fileError);
-            }
+            File.AppendAllText(sudsFilePath, sudsEntry + "\n");
         }
     }
 }

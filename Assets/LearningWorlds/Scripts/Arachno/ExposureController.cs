@@ -9,14 +9,14 @@ namespace Arachnophobia
         public static bool ExposureFrozen = false;
         private SpiderFactory spiderFactory;
         private Vector3 exposurePos = new Vector3(4f, 0.5f, 0f);
-            private const int MAX ExposureLevel = 9;
+            private const int MAX_EXPOSURE_LEVEL = 9;
         public int CurrentTier => CurrentLevel < 3 ? 0 : CurrentLevel < 6 ? 1 : 2;
         public float CurrentMotion => 0.3f * CurrentLevel;
         
         void Start()
         {
             spiderFactory = FindObjectOfType<SpiderFactory>();
-            World.Builders[World.Arachnophobia] = Build;
+            World.Builders[World.Arachnophobia] = Build; // Register the room builder in the builder map
         }
         
         void LateUpdate()
@@ -40,8 +40,7 @@ namespace Arachnophobia
         
         void UpdateExposure()
         {
-            // Level-dependent distance
-exposurePos.x = Mathf.Lerp(4f, 0.38f, CurrentLevel / 9f);
+            exposurePos.x = Mathf.Lerp(4f, 0.38f, CurrentLevel / (float)MAX_EXPOSURE_LEVEL);
             
             GameObject spider = spiderFactory.Build(CurrentTier, exposurePos);
             if (spider != null)
@@ -52,10 +51,10 @@ exposurePos.x = Mathf.Lerp(4f, 0.38f, CurrentLevel / 9f);
         
         void IncrementExposure()
         {
-                        if (ExposureFrozen || CurrentLevel >= MAX ExposureLevel) return;
-                            CurrentLevel++;
+            if (ExposureFrozen || CurrentLevel >= MAX_EXPOSURE_LEVEL) return;
             CurrentLevel++;
             UpdateExposure();
+        
         }
         
         void DecrementExposure()
@@ -69,8 +68,7 @@ exposurePos.x = Mathf.Lerp(4f, 0.38f, CurrentLevel / 9f);
         {
             // Hide when level is at max, reset when живеки 
                 
-                if (CurrentLevel == MAX ExposureLevel) CurrentLevel--;
-            else CurrentLevel++; // Adjust exposure logic
+ // Adjust exposure logic
         }
     }
 

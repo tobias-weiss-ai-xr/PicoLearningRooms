@@ -96,8 +96,8 @@ public class BedroomBuilder : MonoBehaviour
         lampLight.transform.parent = transform;
         lampLight.transform.localPosition = new Vector3(1f, 1.5f, 1f);
         lampLight.intensity = 5;
-        lampLight.range = 5;
-        lampLight.color = new Color(0.9f, 0.85f, 0.8f); // Warm white
+        lampLight.range = 3;
+        lampLight.color = new Color(0.95f, 0.6f, 0.25f); // Specifically Warmer White
         lampLight.type = LightType.Point;
 
         // Window Emissive Plane
