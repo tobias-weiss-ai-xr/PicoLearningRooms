@@ -4,43 +4,43 @@ public static class LearningSignage
 {
     public static void Build()
     {
-        TextMesh[] signageTexts = new TextMesh[3];
-
-        // Central Willkommen
-        GameObject centralSign = new GameObject("WelcomeText");
-        centralSign.transform.position = new Vector3(0f, 1.1f, -8.5f);
-        centralSign.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
-        signageTexts[0] = centralSign.AddComponent<TextMesh>();
-
-        // Learning principles on left
-        GameObject learningPrinciples = new GameObject("Lernprinzipien");
-        learningPrinciples.transform.position = new Vector3(-5f, 0.4f, -3.5f);
-        learningPrinciples.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
-        signageTexts[1] = learningPrinciples.AddComponent<TextMesh>();
-
-        // Courage training (right)
-        GameObject couragePhrases = new GameObject("MutTraining");
-        couragePhrases.transform.position = new Vector3(5f, 0.4f, -3.5f);
-        couragePhrases.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
-        signageTexts[2] = couragePhrases.AddComponent<TextMesh>();
-
-        // Assign text
-        signageTexts[0].text = "Willkommen in PicoLearningRoom\nalles ist Lernen";
-                signageTexts[0].fontSize = 90;
-        signageTexts[0].characterSize = 0.2f;
-        signageTexts[0].alignment = TextAlignment.Center;
-        signageTexts[0].anchor = TextAnchor.MiddleCenter;
-
-        signageTexts[1].text = "Lernprinzipien";
-        signageTexts[1].fontSize = 40;
-        signageTexts[1].characterSize = 0.05f;
-        signageTexts[1].alignment = TextAlignment.Left;
-        signageTexts[1].anchor = TextAnchor.MiddleCenter;
-
-        signageTexts[2].text = "Mut-Trainingshort phrases";
-        signageTexts[2].fontSize = 40;
-        signageTexts[2].characterSize = 0.05f;
-        signageTexts[2].alignment = TextAlignment.Left;
-        signageTexts[2].anchor = TextAnchor.MiddleRight;
+        GameObject signagePanel = new GameObject("LearningSignage");
+        signagePanel.transform.position = new Vector3(0, 1.2f, 0);
+        
+        // Center Willkommen panel
+        TextMesh welcomeText = new GameObject("Willkommen_in_PicoLearningRoom").AddComponent<TextMesh>();
+        welcomeText.transform.SetParent(signagePanel.transform);
+        welcomeText.text = "Willkommen in PicoLearningRoom\nalles ist Lernen";
+        welcomeText.characterSize = 0.2f;
+        welcomeText.fontSize = 48;
+        welcomeText.anchor = TextAnchor.MiddleCenter;
+        welcomeText.alignment = TextAlignment.Center;
+        welcomeText.transform.localPosition = new Vector3(0, 0.2f, 0);
+        
+        // Left Learning Principles panel
+        TextMesh principlesText = new GameObject("Lernprinzipien").AddComponent<TextMesh>();
+        principlesText.transform.SetParent(signagePanel.transform);
+        principlesText.text = "Lernprinzipien"
+            + "\nInteraktives Lernen"\n"
+            + "explorieren, testen, erleben,"
+            + "Wissen konstruktiv";
+        principlesText.anchor = TextAnchor.MiddleCenter;
+        principlesText.characterSize = 0.16f;
+        principlesText.fontSize = 42;
+        principlesText.transform.localPosition = new Vector3(-1.5f, 0.2f, 0);
+        
+        // Right Courage Short Phrases panel
+        TextMesh courageText = new GameObject("Mut_Trainingssteckbuendel").AddComponent<TextMesh>();
+        courageText.transform.SetParent(signagePanel.transform);
+        courageText.text = """
+            Mut zum Lernen:\n-- Vision hat Schatten\n-- Besser\nnächste Iteration\n-- Jedes Versuchen zählt\n-- " dwelling forbidden ""
+            "';
+        courageText.anchor = TextAnchor.UpperLeft;
+        courageText.characterSize = 0.12f;
+        courageText.fontSize = 36;
+        courageText.transform.localPosition = new Vector3(1.5f, 0.4f, 0);
+        
+        // Add Z-Offset for signage readability and floor pattern
+        signagePanel.transform.parent = GameObject.Find("LearningWorldHub_Floor").transform;
     }
 }

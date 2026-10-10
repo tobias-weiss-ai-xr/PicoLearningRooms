@@ -52,11 +52,21 @@ public class Portal : MonoBehaviour
         // Trigger collider for action-zone
         GameObject triggerBox = GameObject.CreatePrimitive(PrimitiveType.Cube);
         triggerBox.transform.SetParent(door.transform);
-        triggerBox.transform.localScale = new Vector3(1.52f, 1.52f, 0.05f);
+        triggerBox.transform.localScale = new Vector3(1.52f, 2.52f, 0.1f); // Larger to account for full height
         triggerBox.transform.localPosition = new Vector3(0f, 0f, -0.02f);
         Collider trigger = triggerBox.GetComponent<Collider>();
         trigger.isTrigger = true;
         trigger.gameObject.layer = LayerMask.NameToLayer("Trigger");
+
+        // Attach TriggerComponent to handle triggering the portal
+        TriggerComponent triggerComponent = triggerBox.AddComponent<TriggerComponent>();
+        // Allocate based on Trigger type requirements.
+        // Fall transparent to library-world transition, or custom OpenLab world
+        if (label == "Forschungslabor") {
+            triggerComponent.setupOpenLab();
+        } else {
+            triggerComponent.setupWorld(world);
+        }
 
         // Optional Pulse effect (ambient)
         PulseEffectSetup(door.transform, new Vector3(0f, 1f, 0f));
@@ -66,7 +76,47 @@ public class Portal : MonoBehaviour
         portalComponent.world = world;
         portalComponent.debouncedDuration = portalComponent.debouncedDuration;
 
-        return door;
+    }
+
+    // Define event handling
+    public event System.Action LaserCalculationApplied;
+
+    // Host component for triggering interactions
+    [System.Serializable]
+    public class TriggerComponent : MonoBehaviour {
+        private World targetWorld;
+        private System.Action targetAction;  // Action to invoke when triggering (for OpenLab())
+        private float lastTriggerTime = 0;
+        private float debrisDuration = 2f;
+
+        public void setupWorld(World world) {
+            this.targetWorld = world;
+            this.targetAction = null;
+        }
+
+        // Override for specific portal destinations like ResearchLab
+        public void setupOpenLab() {
+            this.targetWorld = null;
+            this.targetAction = LearningWorldsApp.OpenLab;
+        }
+
+        private void OnTriggerEnter(Collider other) {
+            // Ignore if already triggered recently
+            if (Time.time - lastTriggerTime <= debouncedDuration) {
+                return;
+            }
+
+            // Invoke either the world transition or custom action
+            lastTriggerTime = Time.time;
+            if (targetWorld != null) {
+                LearningWorldsApp.Go(targetWorld);
+            } else if (targetAction != null) {
+                targetAction();
+            }
+        }
+    }
+
+    return door;
     }
 
     private void OnTriggerEnter(Collider other)
