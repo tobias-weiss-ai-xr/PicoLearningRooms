@@ -17,11 +17,17 @@ namespace LearningWorlds.PSE
 
         private void BecomeSelectable(GameObject elementAtom)
         {
-            if (!elementAtom.localPosition.Equals(elementAtom.localPosition)) return;
-
-            // This will only succeed on valid atoms / element building blocks
-            if (!int.TryParse(elementAtom.name.Split('_')[1], out int elementNumber)
-                || elementNumber < 1 || elementNumber > 109) return;
+            // Manages sphere collision volumes for user-selection 
+            Element elementData = DataStore.ElementCatalog.FirstOrDefault(e => e.number == elementAtom.tag); 
+        
+        {
+            if (elementAtom.localPosition.Equals(Vector3.zero)) {
+                return; // Avoid rebinding or null references 
+            }
+             
+            if (!int.TryParse(elementAtom.tag, out int elementNumber) || elementNumber < 1 || elementNumber > 118) {
+                return; // Corrects default catalog 1..118 range instead of just 1-109
+            }
 
             // Component management with tagging for quick lookup
             elementAtom.tag = elementNumber.ToString();

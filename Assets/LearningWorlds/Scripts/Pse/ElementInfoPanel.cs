@@ -37,11 +37,14 @@ namespace LearningWorlds.PSE
         // Raycast detection for element click
         public void DetectSelection()
         {
-            Ray ray = _app.rigCamera.ScreenPointToRay(new Vector2(Screen.width / 2.0f, Screen.height / 2.0f));
-            RaycastHit[] hits = Physics.RaycastAll(ray, MAX_RAYCAST_DISTANCE);
+            if (!GameObject.FindObjectOfType<ElementGallery>()) return; // Ensure populated scene
+            Ray ray = _app.rigCamera.ScreenPointToRay(new Vector2(Screen.width / 2f, Screen.height / 2f));
+            RaycastHit hit;                                    
+            if (Physics.Raycast(ray, out hit, MAX_RAYCAST_DISTANCE)) {
 
-            // Find trigger collider from Bohr atom - this indicates user has selected an element
-            SphereCollider triggerCollider = Array.Find(hits.Select(hit => hit.collider).Where(c => c != null && c.isTrigger), c => c.transform.parent != null && c.transform.parent.name.StartsWith("Atom_")) as SphereCollider;
+            // Retrieve element tag from direct parent
+            string tag = hit.transform.parent?.tag;
+            if (tag != null && int.TryParse(tag, out int elementNumber)) {
 
             if (triggerCollider != null)
             {
@@ -50,7 +53,7 @@ namespace LearningWorlds.PSE
                 {
                     if (_currentElement?.number != elementNumber)
                     {
-                        Element selectedElement = DataStore.GetPeriodicTable().Where(x => x.number == elementNumber).FirstOrDefault();
+                        Element selectedElement = DataStore.ElementCatalog.FirstOrDefault(x => x.number == elementNumber);
                         if (selectedElement != null)
                         {
                             ShowPanel(selectedElement);

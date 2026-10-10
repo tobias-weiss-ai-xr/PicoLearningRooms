@@ -10,7 +10,7 @@ namespace LearningWorlds.PSE
         private static Transform[] _electronChildren;
 
         void Start() {
-            _electronChildren = GetComponentsInChildren<Transform>(includeInactive: true);
+            _electronChildren = GetComponentsInChildren<Transform>(includeInactive: false); // Use active transforms only
         }
 
         void Update()

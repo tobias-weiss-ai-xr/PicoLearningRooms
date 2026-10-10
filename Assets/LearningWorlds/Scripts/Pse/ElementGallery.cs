@@ -39,15 +39,16 @@ namespace LearningWorlds.PSE
                 atom.transform.SetParent(gallery.transform);
 
                 // Column and row placement using signed xpos and z-aware Latin col.
-                float xpos = elementCount % 8;                // X-position within columns (indexed per group)
-                float neg_y_times_two = - 
-                    (int)Mathf.Floor((decimal)elementCount / 8) * 2.0f;  // Creates spatial wave-band arrangement
+                float columns = 8f; // Use strictly 8 columns per row
+                float xpos = (elementCount % columns) - (columns / 2) + 0.5f; // Center-relative x position
+                float rowDepth = Mathf.FloorToInt(elementCount / columns);
+                float neg_z = -rowDepth * zPlaneSpacing; // Diagonal z-rolling per row  // Creates spatial wave-band arrangement
 
                 // Position with respect to the-grid spacing
                 atom.transform.localPosition = new Vector3(
-                    xpos * zPlaneSpacing,   // Horizontal Z-relative left-move position
-                    elementCount / 17f,     // Small elevation to assist row differentiation
-                    neg_y_times_two);      // Deep z-rolling for long-view grid structuring
+                    xpos * zPlaneSpacing,       // Staggered horizontal position for in-row listing
+                    elementCount % 2 == 0 ? 0.2f : 0f,  // Stagger edits to clarify rows at depth
+                    neg_z);                        // Zig-zag layout along Z per row
                 
                 // Add physics for interactivity 
                 SphereCollider collider = atom.AddComponent<SphereCollider>();
