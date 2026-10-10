@@ -4,50 +4,29 @@ using System.IO;
 
 namespace LearningWorlds.Pse
 {
-    /// <summary>
-    /// Data wrapper for JSON-stored elements.
-    /// Focuses on runtime asset path parsing and UI content translation.
-    /// </summary>
-    public static class ElementData
+    [System.Serializable]
+    public class ElementData
     {
-        private static List<Element> _elements = new List<Element>();
+        public string id;
+        public string nameEn;
+        public string descriptionDe;
+    }
 
-        /// <summary>
-        /// Load all elements from the JSON data source.
-        /// </summary>
-        [RuntimeInitializeOnLoadMethod]
-        public static void LoadAll()
+    public static class Loader
+    {
+        public static List<ElementData> LoadAll()
         {
-            string filePath = Path.Combine(Application.dataPath, "LearningWorlds/Data/elements.json");
-            if (!File.Exists(filePath))
+            string elementsJsonPath = Path.Combine(Application.dataPath, "Assets/LearningWorlds/Data/elements.json");
+            string jsonData = File.ReadAllText(elementsJsonPath);
+            var data = JsonUtility.FromJson<ElementData[]>(jsonData);
+            
+            if (data == null)
             {
-                Debug.LogError("[ElementData] Data file not found: " + filePath);
-                return;
+                Debug.LogWarning("[LearningWorlds] No elements data loaded at " + elementsJsonPath);
+                return new List<ElementData>();
             }
-
-            string json = File.ReadAllText(filePath);
-            _elements = JsonUtility.FromJson<ElementRoot>(json).elements;
-            Debug.Log("[ElementData] Loaded " + _elements.Count + " elements from " + filePath);
-        }
-
-        /// <summary>
-        /// Exposure for content access (English only).
-        /// </summary>
-        public static IReadOnlyList<Element> Elements => _elements;
-
-        // JSON parser root structure
-        [System.Serializable]
-        private class ElementRoot
-        {
-            public List<Element> elements;
-        }
-
-        [System.Serializable]
-        public class Element
-        {
-            public string id;
-            public string nameEn;
-            public string descriptionDe; // German UI text
+            
+            return new List<ElementData>(data);
         }
     }
 }

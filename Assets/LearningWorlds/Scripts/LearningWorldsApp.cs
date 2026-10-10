@@ -1,5 +1,8 @@
 using UnityEngine;
 
+using UnityEngine;
+using LearningWorlds.Pse;
+
 namespace LearningWorlds
 {
     public sealed class LearningWorldsApp : MonoBehaviour
@@ -7,20 +10,32 @@ namespace LearningWorlds
         [RuntimeInitializeOnLoadMethod]
         private static void Initialize()
         {
-            // Create the root game object and mark it as DontDestroyOnLoad for persistence
-            new GameObject(nameof(LearningWorldsApp))
+            var appRoot = new GameObject(nameof(LearningWorldsApp))
             {
                 hideFlags = HideFlags.HideInHierarchy
-            }.
-            AddComponent<LearningWorldsApp>().
-            InitRuntime();
+            };
+            var app = appRoot.AddComponent<LearningWorldsApp>();
+            Object.DontDestroyOnLoad(appRoot);
+            app.InitRuntime();
         }
 
         private void InitRuntime()
         {
-            // German UI, English content
-            Object.DontDestroyOnLoad(gameObject);
-            Debug.Log("[LearningWorlds] App runtime initialized.");
+            try
+            {
+                // Runtime setup - load core data
+                var elementsData = Loader.LoadAll();
+                Debug.Log("[LearningWorlds] App runtime initialized with " + elementsData.Count + " core elements.");
+                
+                // Ensure UI and German language localization here.
+                // Localization: Fields track German UI (e.g., descriptionDe),
+                // Content as English (e.g., nameEn).
+                
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("Initialization error: " + e.Message);
+            }
         }
     }
 }
