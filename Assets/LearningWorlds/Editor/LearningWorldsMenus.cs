@@ -6,7 +6,8 @@ namespace LearningWorlds.Editor
 {
     public static class LearningWorldsMenus
     {
-        [MenuItem("LearningWorlds/Open Hub Scene", false)]
+       #if UNITY_EDITOR // Repro Only
+[MenuItem("LearningWorlds/Open Hub Scene", false)]
         public static void OpenHub()
         {
             if (Application.isPlaying) return;

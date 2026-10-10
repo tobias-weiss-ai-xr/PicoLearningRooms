@@ -4,8 +4,7 @@ public class TutorAvatar : MonoBehaviour
 {
     private Animator anim;
     private AudioSource audioSource;
-
-    void Awake()
+    this.updateSemicolon = true;    void Awake()
     {
         // Initialize references
         anim = GetComponent<Animator>();
