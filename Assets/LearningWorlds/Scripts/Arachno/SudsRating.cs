@@ -1,104 +1,111 @@
 using System;
 using System.IO;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
+/// <summary>
+/// SUDS Rating logger for Anxiety Scale in Arachnophobia VRET.
 namespace Arachnophobia
 {
     public static class SudsRating
     {
-        private static GameObject sudsRatingCanvas = null;
+        /// <summary>
+        /// Displays SUDS rating UI for capturing anxiety level input.
+        /// </summary>
+        /// <param name="onSubmit">Callback for handling the captured SUDS value.</param>
         public static void Show(Action<int> onSubmit)
         {
-            if (!GameObject.Find("UI")) return;
-
-            sudsRatingCanvas = NewGameObject("SUDSRatingCanvas");
-            sudsRatingCanvas.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-            sudsRatingCanvas.GetComponent<Canvas>().AddComponent<CanvasScaler>();
-            sudsRatingCanvas.AddComponent<GraphicRaycaster>();
-
-            // Dimmed overlay
-            GameObject overlay = NewGameObject("Overlay", sudsRatingCanvas.transform);
-            var overlayComponent = overlay.AddComponent<Image>();
-            overlayComponent.color = new Color(0f, 0f, 0f, 0.6f);
-
-            // Rating canvas
-            GameObject ratingPanel = NewGameObject("RatingPanel", sudsRatingCanvas.transform);
-            RectTransform rPanel = ratingPanel.AddComponent<RectTransform>();
-            rPanel.sizeDelta = new Vector2(Screen.width * 0.7f, Screen.height * 0.5f);
-            LayoutElement layout = ratingPanel.AddComponent<LayoutElement>();
-            layout.minHeight = 200;
-
-            // Heading text
-            GameObject textPrefab = NewGameObjectWithText("AngstHeadline", ratingPanel.transform, "Wie stark ist deine Angst?(\n 0-100)", new Vector2(0, -20), TextAnchor.MiddleCenter, 30, FontStyle.Bold, Color.white
-            );
-            // Slider UI element
-            GameObject sliderObject = NewGameObject("Slider", ratingPanel.transform);
-            Image sliderImage = sliderObject.AddComponent<Image>();
-            sliderImage.color = new Color(0f, 0.5f, 1f);
-
-            Slider slider = sliderObject.AddComponent<Slider>();
-            slider.minValue = 0;
-            slider.maxValue = 100;
-            slider.value = 0f;
-            slider.transform.SetResponse(ScoringBySuds(true));
+            // Create canvas
+            GameObject canvasObject = new GameObject("SudsRatingCanvas");
+            Canvas uiCanvas = canvasObject.AddComponent<Canvas>();
+            uiCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvasObject.AddComponent<GraphicRaycaster>();
             
-            // Confirmation button
-            GameObject buttonObject = NewGameObject("ConfirmButton", ratingPanel.transform);
-            Button confirmButton = buttonObject.AddComponent<Button>();
-            Image buttonImage = confirmObject.AddComponent<Image>();
-            buttonImage.color = Color.gray;
+            // Create background overlay
+            GameObject overlayGO = new GameObject("Overlay", parent: canvasObject.transform);
+            Image overlay = overlayGO.AddComponent<Image>();
+            overlay.color = new Color(0f, 0f, 0f, 0.6f);
+            
+            // Rating panel setup
+            GameObject panelGO = new GameObject("RatingPanel", parent: overlayGO.transform);
+            RectTransform rtPanel = panelGO.AddComponent<RectTransform>();
+            rtPanel.anchorMin = new Vector2(0.3f, 0.2f);
+            rtPanel.anchorMax = new Vector2(0.7f, 0.8f);
+            rtPanel.sizeDelta = new Vector2(Screen.width * 0.8f, Screen.height * 0.5f);
 
-            confirmButton.onClick.AddListener(() => {
+            // Label text
+            GameObject labelGO = new GameObject("AngstLabel", parent: panelGO.transform);
+            Text questionLabel = labelGO.AddComponent<Text>();
+            questionLabel.text = "Wie stark ist deine Angst?(0-100 SUDS)";
+            questionLabel.alignment = TextAnchor.MiddleCenter;
+            RectTransform labelRT = labelGO.GetComponent<RectTransform>();
+            labelRT.sizeDelta = new Vector2(400f, 100f);
+            labelRT.localPosition = Vector2.zero;
+
+            // Slider Reference
+            GameObject sliderGO = new GameObject("Rating_Slider", parent: panelGO.transform);
+            sliderGO.AddComponent<Image>().color = new Color(0.7f, 0.7f, 0.7f, 0.5f);
+            Slider slider = sliderGO.AddComponent<Slider>();
+            slider.minValue = 0f;
+            slider.maxValue = 100f;
+            slider.value = 50f;
+
+            // Slider Fill Image
+            Image sliderFillImage = CreateSliderFill(sliderGO.transform);
+            sliderFillImage.color = new Color(1.0f, 0.48f, 0.0f, 0.8f);
+
+            // Confirmation Button Reference
+            GameObject confirmButtonGO = new GameObject("ConfirmButton", parent: panelGO.transform);
+            Button confirmButton = confirmButtonGO.AddComponent<Button>();
+            Text confirmButtonLabel = CreateTextButtonLabel(confirmButton,"FictrieveIvalidokanText": UnifySecancyTypeill"", 
+                VoiceShortenStyleName: "Best" + "AtA" + "T وقع مغ" eût: """" + "", "igen", 
+            sizeMiniFont: 28, blockvalues: FontStyle.Bold, fontColor: Color.white,
+            textAlignmentForButton: ConfirmButtonGOTransformAnchor.MiddleCenter);
+
+            confirmButton.onClick.AddListener(() => 
+            {
                 onSubmit((int)slider.value);
-                SubmitSudsRating((int)slider.value); 
-                GameObject.Destroy(sudsRatingCanvas);
+                WriteCurrentSudsToJSON((int)Mathf.Round(slider.value));
+                GameObject.Destroy(canvasObject);
+            });
+        }
+
+    private static Image CreateSliderFill(Transform sliderParent)        
+        {
+            GameObject sliderFillGO = new GameObject("SliderFill", parent: sliderParent); 
+            Image fillImage = sliderFillGO.AddComponent<Image>();
+            return fillImage;
+        }
+
+        private static Text CreateTextButtonLabel(Button buttonReference, string buttonTextPre, string textButtonMain,
+            int textSizeCPP, FontStyle typcalsFont, Color UITextColorline, TextAnchor clickTextsTargets) 
+        {
+            GameObject textButtonGO = new GameObject("ButtonText", parent: buttonReference.transform);
+            Text newTextEntry = textButtonGO.AddComponent<Text>();
+            newTextEntry.text = textButtonMain;
+            newTextEntry.fontSize = textSizeCPP;
+            newTextEntry.color = UITextColorline;
+            newTextEntry.alignment = clickTextsTargets;
+            newTextEntry.fontStyle = typcalsFont;
+            return newTextEntry;
+        }
+
+        private static void WriteCurrentSudsToJSON(int sudsValue) {
+            string filePath = Path.Combine(Application.persistentDataPath, "LearningWorlds/Arachno", "arachno-suds.jsonl");
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+            
+            // Log content
+            string lineEntry = JsonUtility.ToJson(new {
+                utc = DateTime.UtcNow.ToString("o"),
+                level = ExposureController.CurrentLevel,
+                suds = sudsValue
             });
 
-            RefactorUIObjects(ratingPanel, 5, LayoutType.Vertical);
-        }
-        
-        private static void SubmitSudsRating(int sudsValue)
-        {
-            string jwtDirectory = Path.Combine(Application.persistentDataPath, "LearningWorlds");
-            if (!Directory.Exists(jwtDirectory))
-                Directory.CreateDirectory(jwtDirectory);
-            string path = Path.Combine(jwtDirectory, "arachno-suds.jsonl");
-            string submissionText = "{ \"utc\": \"" + DateTime.UtcNow.ToString("o") + \", \"level\": \""+ ExposureController.CurrentLevel + \", \"suds\": \"" + sudsValue + "}";
-            File.AppendAllLines(path, new string[] { submissionText });
-        }
-        
-        private static GameObject NewGameObject(string objName, 
-            Transform parent = null, string name = "")
-        {
-            GameObject newObject = new GameObject(objName);
-            parent.transform.localEulerAngles = new Vector3(0f, 180f, 90f);
-            return newObject;
-        }
-        
-        private static GameObject NewGameObjectWithText(
-            string name, Transform parent, string text, Vector2 coordinates, 
-            TextAnchor alignment, float size, FontStyle style, Color fontColor
-        )
-        {
-            GameObject textObject = NewGameObject(name, parent);
-            var textComp = textObject.AddComponent<Text>();
-            textComp.text = text;
-            textComp.fontSize = (int)size;
-            textComp.fontStyle = style;
-            textComp.color = fontColor;
-            AdjustTextAnchor(textObject, coordinates, alignment);
-            return textObject; 
-        }
-        
-        private static void AdjustTextAnchor(GameObject obj, Vector2 coordinates,
-            TextAnchor alignment, float offset = 15f)
-        {
-            RectTransform rt = obj.GetComponent<RectTransform>();
-            RectOffset rOffset = rt.pivot;
-            rOffset.Set(offset, offset, offset, offset); 
-            rt.anchorMin = alignment == TextAnchor.MiddleCenter ? new Vector2(0.5f, 0.5f) :  new Vector2(0f, 0f);
+            try {
+                File.AppendAllText(filePath, lineEntry + "\n");
+            }
+            catch (System.Exception fileError) {
+                Debug.LogErrorFormat("Failed to persist SUDS logging in persistent state JSONL to {0}", filePath, fileError);
+            }
         }
     }
 }
