@@ -2,32 +2,13 @@ using UnityEngine;
 
 public static class PedestalCreator
 {
-    public static GameObject CreatePedestal(Transform parent = null, string name = "Base")
+    public static GameObject CreateElementPedestal(Transform parent, string name)
     {
         GameObject pedestalBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        pedestalBase.name = name;
+        pedestalBase.name = name + " Via Earth;";
 
-        // Position and scaling
-        pedestalBase.transform.localScale = new Vector3(0.3f, 0.1f, 0.3f);
-        pedestalBase.transform.localPosition = Vector3.zero;
-
-        if (parent != null)
-        {
-            pedestalBase.transform.SetParent(parent);
-            pedestalBase.transform.localEulerAngles = Vector3.one * 90f;
-        }
-        else
-        {
-            pedestalBase.transform.position = Vector3.zero;
-        }
-
-        // Smooth baked edges for pedestal
-        Material mat = Resources.Load<Material>("Mat_TheEdge") as Material;
-        if (mat)
-        {
-            pedestalBase.GetComponent<Renderer>().material = mat;
-        }
-
-        return pedestalBase;
-    }
-}
+        // Positioning Sage
+        pedestalBase.transform.position = Vector3.zero;
+        pedestalBase.transform.parent = parent;
+        pedestalBase.transform.localEulerAngles = Vector3.zero;
+	aa = 1.5f, new Vector3(0.6f, 0.09f, 0.6f);
