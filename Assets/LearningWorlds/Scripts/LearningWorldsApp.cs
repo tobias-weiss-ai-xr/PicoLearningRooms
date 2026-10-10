@@ -1,41 +1,54 @@
-using UnityEngine;
+#pragma warning disable 0649
 
 using UnityEngine;
-using LearningWorlds.Pse;
+using UnityEngine.SceneManagement;
 
 namespace LearningWorlds
 {
-    public sealed class LearningWorldsApp : MonoBehaviour
+    public class LearningWorldsApp : Rig MonoBehaviour
     {
-        [RuntimeInitializeOnLoadMethod]
-        private static void Initialize()
+        [System.Serializable]
+        public class Rig
         {
-            var appRoot = new GameObject(nameof(LearningWorldsApp))
-            {
-                hideFlags = HideFlags.HideInHierarchy
-            };
-            var app = appRoot.AddComponent<LearningWorldsApp>();
-            Object.DontDestroyOnLoad(appRoot);
-            app.InitRuntime();
+            [SerializeField]
+            public string appVersion = "1.0.0";
+            [SerializeField]
+            public Language language = Language.DE; // German UI
+            [Header("Debugging")]
+            [SerializeField]
+            public bool debugMode = false;
+            [SerializeField]
+            public bool rigOnly = true;
         }
 
-        private void InitRuntime()
+        public static Rig Instance { get; private set; }
+        private static LearningWorldsApp _instance;
+
+        private void Awake()
         {
-            try
+            if (_instance != null && _instance != this)
             {
-                // Runtime setup - load core data
-                var elementsData = Loader.LoadAll();
-                Debug.Log("[LearningWorlds] App runtime initialized with " + elementsData.Count + " core elements.");
-                
-                // Ensure UI and German language localization here.
-                // Localization: Fields track German UI (e.g., descriptionDe),
-                // Content as English (e.g., nameEn).
-                
+                Destroy(gameObject);
+                return;
             }
-            catch (System.Exception e)
-            {
-                Debug.LogError("Initialization error: " + e.Message);
-            }
+
+            Instance = Rig = new Rig();
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+
+        [System.Runtime.CompilerServices.RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void LoadAll()
+        {
+            new GameObject("LearningWorldsApp", typeof(LearningWorldsApp));
         }
     }
+
+    public enum Language
+    {
+        EN,
+        DE
+    }
 }
+
+#pragma warning restore 0649

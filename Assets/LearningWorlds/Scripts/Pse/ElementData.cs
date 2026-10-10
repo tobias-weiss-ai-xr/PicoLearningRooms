@@ -1,32 +1,70 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace LearningWorlds.Pse
 {
-    [System.Serializable]
-    public class ElementData
+    public class ElementData : MonoBehaviour
     {
-        public string id;
-        public string nameEn;
-        public string descriptionDe;
-    }
+        public string dataPath = "Data/elements.json";
+        private List<ElementInfo> _elements;
 
-    public static class Loader
-    {
-        public static List<ElementData> LoadAll()
+        public class ElementInfo
         {
-            string elementsJsonPath = Path.Combine(Application.dataPath, "Assets/LearningWorlds/Data/elements.json");
-            string jsonData = File.ReadAllText(elementsJsonPath);
-            var data = JsonUtility.FromJson<ElementData[]>(jsonData);
-            
-            if (data == null)
+            public string Id { get; private set; }
+            public string NameEn { get; private set; }
+            public string DescriptionDe { get; private set; }
+            public string Type { get; private set; }
+
+            public ElementInfo(string id, string nameEn, string descriptionDe, string type)
             {
-                Debug.LogWarning("[LearningWorlds] No elements data loaded at " + elementsJsonPath);
-                return new List<ElementData>();
+                Id = id;
+                NameEn = nameEn;
+                DescriptionDe = descriptionDe;
+                Type = type;
             }
-            
-            return new List<ElementData>(data);
+        }
+
+        public void Start()
+        {
+            LoadAll();
+        }
+
+        public void LoadAll()
+        {
+            string fullPath = Path.Combine(Application.dataPath.Split(Application.productName)[1], dataPath);
+
+            if (File.Exists(fullPath))
+            {
+                string jsonData = File.ReadAllText(fullPath);
+                var elementsData = JsonUtility.FromJson<JArray>(jsonData);
+
+                _elements = new List<ElementInfo>();
+                foreach (var item in elementsData)
+                {
+                    var jItem = item as JObject;
+                    var element = new ElementInfo(
+                        (string)jItem["id"],
+                        (string)jItem["nameEn"],
+                        (string)jItem["descriptionDe"],
+                        (string)jItem["type"]
+                    );
+
+                    _elements.Add(element);
+                }
+            }
+            else
+            {
+                Debug.LogError("elements.json must be in the '" + dataPath + "' path.");
+            }
+        }
+
+        public ElementInfo GetElementById(string id)
+        {
+            return _elements?.Find(e => e.Id == id);
         }
     }
 }
