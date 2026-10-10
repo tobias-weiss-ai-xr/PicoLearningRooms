@@ -113,7 +113,7 @@ namespace LearningWorlds.Arachno
             windowPlane.transform.rotation = Quaternion.Euler(90, 0, 0);
             windowPlane.transform.localScale = new Vector3(1.5f, 0.2f, 1.5f);
             var windowMaterial = new Material(Shader.Find("Standard")) { color = new Color(200 / 255f, 220 / 255f, 240 / 255f), color = Color.white };
-            windowMaterial.SetFloat("_EmissionColor", Color.cyan.rgbMultiply(0.1f + 0.2f * Mathf.Sin(Time.time * 2f)));
+            windowMaterial.SetColor("_EmissionColor", Color.cyan * (0.1f + 0.2f * Mathf.Sin(Time.time * 2f)));
             windowPlane.GetComponent<Renderer>().material = windowMaterial;
 
             // Add a window frame (repeated outlines)
