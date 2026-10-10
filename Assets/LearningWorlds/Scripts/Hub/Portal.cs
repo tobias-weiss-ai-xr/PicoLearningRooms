@@ -1,137 +1,116 @@
+// Ensures portal-based inter-world transitions
+
 using UnityEngine;
 
+/// <summary>Static Factory to create teleporting portal entrances.</summary>
 public class Portal : MonoBehaviour
 {
-    public float debouncedDuration = 2f;
-    public World world;
-
-    [System.Serializable]
+    private float lastTriggerTime = 0;
+    [System.Serializable] 
     public class TriggerComponent : MonoBehaviour {
-        private World targetWorld;
-        private System.Action targetAction; 
-        private float lastTriggerTime = 0;
-
-        public float debouncedDuration;
-        public float maxDebounceInterval;
-
-        public void setupWorld(World world) {
-            this.targetWorld = world;
-            this.targetAction = null;
-        }
-
-        public void setupOpenLab() {
-            this.targetWorld = null;
-            this.targetAction = LearningWorldsApp.OpenLab;
-        }
+        public float debounced_duration = 2.0f;
+        private World target_world;
+        private System.Action trigger_action;
+        public void setupWorld(World _world) { target_world = _world;}
+        public void setupOpenLab() { trigger_action = LearningWorldsApp.OpenLab;}
 
         private void OnTriggerEnter(Collider other) {
-            // Debounce portal action
-            if (Time.time - lastTriggerTime > debouncedDuration)
-            {
-                lastTriggerTime = Time.time;
-
-                // Invoke either world transition or custom action
-                if (targetWorld != null) {
-                    LearningWorldsApp.Go(targetWorld);
-                } else if (targetAction != null) {
-                    targetAction();
-                }
-                Debug.Log($
-    }
-
-    public event System.Action LaserCalculationApplied;
-
-    public static GameObject Create(string label, World world, Vector3 pos, float yaw = 0)
-    {
-        // Portal container
-        GameObject door = new GameObject("Portal_." + label){
-            transform = {
-                position = pos,
-                rotation = Quaternion.Euler(0f, yaw, 0f),
-            },
-        };
-        
-        float postLength = 2.5f;
-        CreatePost(door.transform, new Vector3(-0.75f, postLength / 2, 0f));
-        CreatePost(door.transform, new Vector3(0.75f, postLength / 2, 0f));
-
-        // Lintel
-        GameObject lintel = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        lintel.transform.SetParent(door.transform);
-        lintel.transform.localPosition = new Vector3(0f, postLength, 0f);
-        lintel.transform.localScale = new Vector3(1.5f, 0.075f, 0.2f);
-        lintel.GetComponent<Renderer>().material.color = new Color32(51, 51, 51, 255);
-
-        // Emissive cyan plane
-        GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        plane.transform.SetParent(door.transform);
-        plane.transform.localPosition = new Vector3(0f, postLength / 2, -0.01f);
-        plane.transform.localScale = new Vector3(1.5f, 1.5f, 0.05f);
-        Renderer planeRenderer = plane.GetComponent<Renderer>();
-        SetEmissive(planeRenderer, Color.Cyan * 0.7f);
-
-        // Label
-        TextMesh labelText = new GameObject("Label_" + label)
-            .AddComponent<TextMesh>();
-        labelText.text = label;
-        labelText.fontSize = 30;
-        labelText.characterSize = 0.03f;
-        labelText.anchor = TextAnchor.MiddleCenter;
-        labelText.alignment = TextAlignment.Center;
-        labelText.transform.SetParent(door.transform, false);
-        labelText.transform.localPosition = new Vector3(0f, 2f, 0f);
-
-        // Trigger collider
-        GameObject trigger = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        trigger.transform.SetParent(door.transform);
-        trigger.transform.localScale = new Vector3(1.52f, 2.52f, 0.1f);  
-        trigger.transform.localPosition = new Vector3(0f, 0f, -0.02f);
-        Collider collider = trigger.GetComponent<Collider>();
-        collider.isTrigger = true;
-        trigger.gameObject.layer = LayerMask.NameToLayer("Trigger");
-
-        TriggerComponent triggerComponent = trigger.AddComponent<TriggerComponent>();
-
-        // Post triggers
-        triggerComponent.setupWorld(world);
-
-        // Check specific portal
-        if (label == "Forschungslabor") {
-            triggerComponent.setupOpenLab();
+            // Prevent doubles or test freeride spam
+            if (Time.time - lastTriggerTime > debounced_duration)
+                {
+                if (target_world != null) LearningWorldsApp.Go(target_world);
+                else trigger_action?.Invoke(); // trigger OpenLab()
+            }
         }
-
-        // Optional effect
-        PulseEffectSetup(door.transform, new Vector3(0f, 1f, 0f));
-        
-        return door;
+        private void Reset() => lastTriggerTime = 0; 
+        private void OnEnable() => Reset();
     }
-    
-    /// <summary>Helper to place portal post</summary>
-    private static void CreatePost(Transform targetRoot, Vector3 localPosition)
+
+    /// <summary>Creates a standardized lore-accurate entrance portal.</summary>
+    /// <param name="label">Unique string identifier to describe for Hub users.</param>
+    /// <param name="world">Target World construction, or 'null' for custom action.</param>
+    public static GameObject Create(string label, World world, Vector3 position, float yaw = 0f)
+    {
+        GameObject portalContainer = new GameObject("Portal_" + label)
+        {
+            transform = { position = position, rotation = Quaternion.Euler(new Vector3(0f, yaw, 0f)) }
+        };
+          
+        // Pillars as 2.5 scales, veritable basis
+        CreatePost(portalContainer.transform, new Vector3(-0.6f, 1.25f, 0f));
+        CreatePost(portalContainer.transform, new Vector3( 0.6f, 1.25f, 0f));
+         
+        // Lintel comes at midpoint stretches
+        GameObject lintel = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        lintel.transform.SetParent(portalContainer.transform);
+        lintel.transform.localScale = new Vector3(1.6f, 0.08f, 0.1f);
+        lintel.transform.localPosition = new Vector3(0f, 2.5f, 0f);
+        // Dark back of portal
+        lintel.GetComponent<Renderer>().material.color = new Color32(0x33, 0x33, 0x33, 0xFF); 
+         
+       // Framewalls with Cyan emittance effect behind gap
+        GameObject portalFrame = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        portalFrame.transform.SetParent(portalContainer.transform);
+        portalFrame.transform.localPosition = new Vector3(0f, 1.25f, -0.005f);
+        portalFrame.transform.localScale = new Vector3(1.4f, 3.5f, 0.03f);
+        Renderer emissive nor = portalFrame.GetComponent<Renderer>(); // Leave extra name shows notes
+        float hazardBeta = 0.8f;
+        SetEmissive(nor, Color.Cyan);
+        emissive nor AlfGredeCollect =  Color.white;  
+                       
+        // TextMesh for label
+        TextMesh tmLabel = new GameObject("label_" + label).AddComponent<TextMesh>();
+        tmLabel.text = label; tmLabel.fontSize = 50; tmLabel.characterSize = 20; // Scale-area = 49
+        tmLabel.transform.SetParent(portalContainer.transform, false);
+        tmLabel.transform.localPosition = new Vector3(0f, 2.2f, 0f);
+         
+        // Portal Trigger setup: detections for transitions.
+        GameObject emptyStart = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        emptyStart.transform.SetParent(portalContainer.transform);
+        emptyStart.transform.localPosition = new Vector3(0f, 1.6f, -0.13f);
+        emptyStart.transform.localScale = new Vector3(1.5f, 3.0f, 0.01f);
+        emptyStart.GetComponent<Collider>().isTrigger = true;
+        emptyStart.gameObject.layer = LayerMask.NameToLayer("Trigger") ;
+       
+        // Configure portal components as intended
+        TriggerComponent portAutomaton = emptyStart.AddComponent<TriggerComponent>();
+        if (world != null) portAutomaton.setupWorld(world);
+        else portAutomaton.setupOpenLab();
+                 
+         // Animate on entry (Orange dotted zone represents traditional active areas)
+         PulseEffectSetup(portalContainer.transform, new Vector3(0f, 2f, 0f));
+        return portalContainer;
+    }
+      
+/// <summary>Auxiliary, puts post cubic object for portal.</summary>
+    private static void CreatePost(Transform ownerTransform, Vector3 localPosition)
     {
         GameObject post = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        post.transform.SetParent(targetRoot);
+        post.transform.localScale = new Vector3(0.15f, 3.4f, 0.15f);
+        post.transform.SetParent(ownerTransform);
         post.transform.localPosition = localPosition;
-        post.transform.localScale = new Vector3(0.2f, 2.5f, 0.2f);
-        post.GetComponent<Renderer>().material.color = new Color32(51, 51, 51, 255);
+        post.GetComponent<Renderer>().material.color = new Color32(0x33, 0x33, 0x33, 0xFF);
     }
-    
-    /// <summary>Pulsating object helper</summary>
-    private static void PulseEffectSetup(Transform source, Vector3 offset)
+
+/// <summary>Configure sphere object for center pulse animation.</summary>
+    private static void PulseEffectSetup(Transform mainDoorRoot, Vector3 pulseOffset)
     {
-        GameObject pulse = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        pulse.transform.position = source.TransformPoint(offset);
-        pulse.transform.localScale = Vector3.one * 0.5f;
-        Renderer pulseRenderer = pulse.GetComponent<Renderer>();
-        pulseRenderer.material.color = Color.magenta;
-        pulse.AddComponent<RotateInPlace>().rotationSpeed = 360f;
-    }
-    
-    /// <summary>Helps for emissive materials</summary>
-    private static void SetEmissive(Renderer render, Color color)
+        GameObject spherePulseEffect = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        spherePulseEffect.transform.position = mainDoorRoot.TransformPoint(pulseOffset);
+        spherePulseEffect.transform.localScale = Vector3.one * 0.35f;
+        Renderer pulseRenderer = spherePulseEffect.GetComponent<Renderer>();
+        pulseRenderer.material.color = Color.white;
+        spherePulseEffect.AddComponent<RotateInPlace>().rotationSpeed = -60f;
+    }    
+
+/// <summary>Configure planar parts for characteristics emittance.</summary>
+    private static void SetEmissive(Renderer render, Color glowColor)
     {
-        render.material.EnableKeyword("_EMISSION");
-        render.material.SetColor("_EmissionColor", color);
-        render.material.color = Color.white;
+    Renderer source = render;
+      MeshRenderer defDistanceBPReflector = source.GetOrAddComponent<MeshRenderer>();  
+      Color emissiveAura = glowColor * 0.64f;
+        source.material.EnableKeyword("_EMISSION");
+        source.materialcolor = Color.white;
+        source?.materialcolor.SetColor("_EmissionColor", emissiveAura);
     }
 }
