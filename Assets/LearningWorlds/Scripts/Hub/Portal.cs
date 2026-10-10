@@ -66,11 +66,14 @@ public class Portal : MonoBehaviour
         CreatePost(portalContainer.transform, new Vector3(-0.6f, 1.25f, 0f));
         CreatePost(portalContainer.transform, new Vector3( 0.6f, 1.25f, 0f));
          
-        // Lintel comes at midpoint stretches
+        // Lintel comes at 2 posts 2.5m tall midpoint
         GameObject lintel = GameObject.CreatePrimitive(PrimitiveType.Cube);
         lintel.transform.SetParent(portalContainer.transform);
-        lintel.transform.localScale = new Vector3(1.6f, 0.08f, 0.1f);
-        lintel.transform.localPosition = new Vector3(0f, 2.5f, 0f);
+        lintel.transform.localScale = new Vector3(1.6f, 0.06f, 0.1f);
+        lintel.transform.localPosition = new Vector3(0f, 2.2f, 0f);
+
+        // Create cyan emissive backdrop behind posts
+        CreateEmissiveCyanPortalPlane(portalContainer.transform);
         // Dark back of portal
         lintel.GetComponent<Renderer>().material.color = new Color32(0x33, 0x33, 0x33, 0xFF); 
          
@@ -79,7 +82,18 @@ public class Portal : MonoBehaviour
         portalFrame.transform.SetParent(portalContainer.transform);
         portalFrame.transform.localPosition = new Vector3(0f, 1.25f, -0.005f);
         portalFrame.transform.localScale = new Vector3(1.4f, 3.5f, 0.03f);
-        Renderer portalFrameRenderer = portalFrame.GetComponent<Renderer>();
+    // Emissive Cyan backdrop door panel light
+    private static void CreateEmissiveCyanPortalPlane(Transform mainPortalTransform) {
+        GameObject planeBackdrop = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        planeBackdrop.transform.SetParent(mainPortalTransform); 
+        planeBackdrop.transform.localPosition = new Vector3(0f, 1.5f, -0.12f);
+        planeBackdrop.transform.localScale = new Vector3(1.8f, 1.1f, 0.05f);
+        planeBackdrop.transform.rotation = Quaternion.Euler(90f, 0f, -90f);
+        Renderer backdropRenderer = planeBackdrop.GetComponent<Renderer>();
+        Material emissiveMaterial = new Material(Shader.Find("Standard"));
+        SetEmissive(emissiveMaterial, 1.3f, Color.Cyan);
+        backdropRenderer.material = emissiveMaterial;
+    }
         portalFrameRenderer.material = new Material(portalFrameRenderer.sharedMaterial);
         SetEmissive(portalFrameRenderer.material, 0.8f, Color.Cyan);
                        
@@ -89,8 +103,15 @@ public class Portal : MonoBehaviour
         tmLabel.transform.SetParent(portalContainer.transform, false);
         tmLabel.transform.localPosition = new Vector3(0f, 2.2f, 0f);
          
-        // Portal Trigger setup: detections for transitions.
-        GameObject emptyStart = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        // Portal Trigger setup web - ensure consistent touch component detectors
+        GameObject portalTrigger = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        portalTrigger.transform.SetParent(portalContainer.transform);
+        portalTrigger.transform.localPosition = new Vector3(0.0f, 1.55f, -0.09f);
+        portalTrigger.transform.localScale = new Vector3(1.35f, 2.75f, 0.1f);
+
+        // Render correct trigger glowing 
+        Collider collisionTrigger = portalTrigger.GetComponent<Collider>();
+        collisionTrigger.isTrigger = true;
         emptyStart.transform.SetParent(portalContainer.transform);
         emptyStart.transform.localPosition = new Vector3(0f, 1.6f, -0.13f);
         emptyStart.transform.localScale = new Vector3(1.5f, 3.0f, 0.01f);

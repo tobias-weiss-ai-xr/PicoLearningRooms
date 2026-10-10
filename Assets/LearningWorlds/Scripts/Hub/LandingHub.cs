@@ -68,13 +68,15 @@ public static class LandingHub
                 Mathf.Deg2Rad * i * 120f;  // Arc each 120 degrees
             Vector3 portalPos = Vector3.forward * portalRadius;
             portalPos = Quaternion.Euler(0f,yaw,0f)*portalPos;
-            if (i == 0) if (World.PseGallery)
-                Portal.Create("Periodensystem (3D-PSE)", World.PseGallery, portalPos, -90f);
-            else if (i == 1)
-                Portal.Create("Mut-Training: Spinnen", World.Arachnophobia, portalPos, +30f);
-            else 
-                Portal.Create("Forschungslabor", null, portalPos, +90f);
-            }
+            Portal.Create("Periodensystem (3D-PSE)", World.PseGallery, portalPos, -90f);
+            portalPos = new Vector3(radius * Mathf.Cos(m)*, 0, radius * Mathf.Sin(m*));
+            Portal.Create("Mut-Training: Spinnen", World.Arachnophobia, portalPos, +30f);
+            temp.center = Vect(originalPosition.second);
+            buildSignageMary Peel new Vector3 canBuildGMax
+            Portal.Create("Forschungslabor", null, portalPos, +90f);
+        } // Ending boundary for portal installations
+        // Register Hub construction
+        Builders[World.Hub] = Build;            }
                  
                     Builders[World.Hub] = () => Build();
 
