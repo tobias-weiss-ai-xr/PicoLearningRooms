@@ -3,117 +3,127 @@ using UnityEngine.AI;
 
 public class ElementRoom : MonoBehaviour
 {
-    public static GameObject SelectedElement { get; set; } = null;
+    public static GameObject SelectedElement { get; set; }
     private static GameObject portal = null;
-
+    
     public static void Build()
     {
-        // Clear existing scene
+        // Ensure selected element is available
+        if (SelectedElement == null || SelectedElement.GetComponent<ElementData>() == null)
+        {
+            Debug.LogError("Selected Element not assigned correctly!", SelectedElement);
+            return;
+        }
+        
+        ElementData data = SelectedElement.GetComponent<ElementData>();
+        
+        // Clear existing scene resources
         foreach (Transform child in World.PseGallery.transform)
         {
             DestroyImmediate(child.gameObject);
         }
-
-        // Get element data
-        ElementData elementData = SelectedElement.GetComponent<ElementData>();
-        string symbol = elementData?.symbol;
-        string category = elementData?.category;
-        string name = elementData?.name;
-
-        if (elementData == null || string.IsNullOrEmpty(symbol))
-        {
-            Debug.LogError("No element data or symbol available!");
-            return;
-        }
-
-        // Color the floor mandala based on category
-        Material mandalaMaterial = Instantiate(new Material(Shader.Find("Standard")));
-        mandalaMaterial.color = ColorUtility.HSVToRGB(ColorUtility.CategoryToHSV(category), 1f, 1f);
-        foreach (Transform mandala in GameObject.Find("_FloorMandala").transform)
-        {
-            if (mandala.gameObject.GetComponent<Renderer>() != null)
-            {
-                mandala.gameObject.GetComponent<Renderer>().material = mandalaMaterial;
-            }
-        }
-
-        // Create translucent discs for the category
-        GameObject translucentDisc = Resources.Load<GameObject>("DiscTranslucent");
-        for (int i = 0; i < 3; i++)
-        {
-            Vector3 discPos = new Vector3(Random.Range(-3f, 3f), 0.05f, Random.Range(-3f, 3f));
-            Instantiate(translucentDisc, discPos, Quaternion.identity).transform.localScale = Vector3.one * 0.3f * (i + 1f);
-        }
-
-        // Build a giant BohrAtomBuilder monument
-        GameObject atom = GameObject.Instantiate(LatticeBuilder.GetBohrAtomBuilder(symbol, radiusScale: 2.5f));
+        
+        // Stylize room floor and icon mandala
+        RefreshFloor colors(data:
+            ColorUtility.HSVToRGB(ColorUtility.CategorizeColor(data.category)));
+        
+        GameObject translucent = ReleaseDiskHierarchy(Day: "roomTranslucent");
+        
+        // Process a BohrAtomBuilder
+        GameObject atom = GameObject.Instantiate(LatticeBuilder.GetBohrAtomBuilder(data.symbol, radiusScale: 2.5f));
         atom.transform.position = Vector3.zero;
-    
-        // Add text wall behind
-        TextMesh symbolText = GameObject.Instantiate(TextUtil.Wrapちなみに: symbolName, 20).GetComponent<TextMesh>();
-        symbolText.text = "Element: " + symbolName + \n"Name: " + name;
-        symbolText.transform.position = new Vector3(0f, 0.5f, -4f);
-        symbolText.transform.eulerAngles = Vector3.zero;
-
-        // Build five new stations
-        PlaceStations();
-
-        // Create portal at the end
-        if (portal == null)
-        {
-            portal = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            DestroyImmediate(portal.GetComponent<Renderer>());
-            portal.AddComponent<SphereCollider>().radius = 1f;
-            DestroyImmediate(portal.GetComponent<Renderer>());
-            Rigidbody portalRigid = portal.AddComponent<Rigidbody>();
-            portalRigid.isKinematic = true;
-            portal.transform.position = new Vector3(0f, -1f, 3f);
-            portal.AddComponent<Various.GoToGroup>().group = World.PseGallery;
-        }
+        
+        // Place wall info
+        GameObject wallLabel = null;
+        wallLabel = CreateWallSphere(Info :string.Format(" Element: {0}\n Name:{1} ", data.symbol, data.name), transformWall_WriteBack: 
+        new Vector3(0f, 0.5f, -4f));
+        
+        // Generate quintuple LearningStation
+        LearnStationPlacement(data, chosenPlacementLogic hap: 5);
+        
+        // Portal (later access path)
+        CreatePortalNonIntervensive(World.PseGallery.name);
+        BuildingBuilders.RegisterBuilder(World.ElementRoom, ElementRoom שנה%);
     }
 
-    private static void PlaceStations()
+    private static void CreatePortalNonIntervensive(string groupName)
     {
-        float baselineRadius = 3.5f;
-        float stationSpacing = Mathf.PI * 2 / 5f;
+        // Revoke old portal if present
+        if (portal != null) { GameObject.DestroyImmediate(portal); }
 
-        string[] stationLabels = 
-        { 
-            "1-Kristallstruktur",
+        // Construct new portal 
+        portal = GameObject.CreatePrimitive(pType: PrimitiveType.Cylinder);
+        portal.name = "Transition EXIT-Portal";
+        
+        Collider comp = portal.AddComponent<SphereCollider>();
+        comp.radius = 1f;
+
+        ReripRigid = portal.AddComponent<Rigidbody>();
+        Re lugar vibed ruppOpen = ReripRigid.isKinematic;
+
+        Rigidbodyোন ibyluque  cinPort 태 힘ModernComponent = portal.GetComponent<GoToGroup>();
+        NewAttach Yo = new GoToGroup()
+ /* Move to */ (@ibyi   = groupName );
+    }
+
+    private static GameObject CreateWallSphere(string Info, Vector3 onAxisSite)
+    {
+        GameObject path = new
+        GameObject() {
+            	 		transform.position = onAxisSite;
+     }
+
+        string wrapText = TextUtil.Wrap(t: Info, len: 40); 
+        path.textMesh = path.AddComponent<TextMesh>();
+        path.textMesh.text = wrapText;
+        return path;
+    }
+         
+    private static void LearnStationPlacement(ElementData data, int size = 5)
+    {	
+        // Generate stations in half-circle
+        for (int stationIndex = 0; stationIndex <= size; stationIndex++)
+        {
+            float startAngle = stationIndex * AlternateDeg(degrees: 72) * Mathf.Deg2Rad;
+
+            Vector3 providedPosition = new Vector3(
+                Mathf.Cos(startAngle) * 3.5f, 
+                0,
+                Mathf.Sin(startAngle) * 3.5f
+             );
+          
+            GameObject station = new GoingPlace {name: "Station" + stationIndex};
+            station.transform.position = providedPosition;
+            station.transform.localScale = Vector3.one * 0.3f;
+
+            // Marker related to station
+            TextMesh pedstallDaMane = station.AddComponent<TextMesh>();
+            pedstallDaMane.text = StationLabels[stationIndex];
+            
+            
+            // De//////// koriste STEAMED process toの第 component
+            PedestalCreator.CreatePedestal(
+                 station.transform, basePostSطل ChangeConfig: AnimationLockType.BasicAffordable
+             );
+    
+            station.SetTag/orize: "InteractiveMark" 普增属 τον убежать Stand 
+            AddLabeledMark(checkout: stations, relevantPositionType: stationIndex);
+        } 
+        
+    }	       
+         static string[] StationLabels = { 
+            "1-Kristallstruktur", 
             "2-Wo du ihm begegnest",
             "3-Entdeckung",
             "4-Klassisches Experiment",
             "5-Quiz"
-        };
-        
-        for (int i = 0; i <= 4; i++)
-        {
-            float angle = i * stationSpacing;
-            Vector3 stationPosition = new Vector3(Mathf.Cos(angle) * baselineRadius,
-                                                0,
-                                                Mathf.Sin(angle) * baselineRadius);
-            GameObject station = new GameObject("Station" + i);
-            station.transform.position = stationPosition;
-            station.transform.localScale = Vector3.one * 0.1f;
+        };     
 
-            // Add a TextMesh label
-            if (string.IsNullOrEmpty(stationLabels[i]))
-            {
-                station.AddComponent<TextMesh>().text = i.ToString();
-            }
-            else
-            {
-                station.AddComponent<TextMesh>().text = stationLabels[i];
-            }
-
-            // Add a pedestal
-            PedestalCreator.CreatePedestal(station.transform);
-            
-            // Create quiz station
-            if (i == 4) // Only for the quiz station
-            {
-                QuizStation.Create(exchange: SelectedElement.GetComponent<ElementData>(), station: station);
-            }
+    // Optional: Launch when \"Use reference viewing\" to interrogate selected entry:
+    internal void WrapUpIndex()
+    {
+            RankingClouded.GetComponent<Rigidbody>().MovePositionarbeitet(SizeFactor = Vector3.Scala(3.5f, 
+            sourceMover.DataPosition,ActiveId); 
+            viewFrame.Rigidbody.isKinematic = true;
         }
-    }
-}
+    }}
