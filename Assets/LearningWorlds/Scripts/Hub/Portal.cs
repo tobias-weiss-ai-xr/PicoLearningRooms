@@ -53,10 +53,9 @@ public class Portal : MonoBehaviour
         portalFrame.transform.SetParent(portalContainer.transform);
         portalFrame.transform.localPosition = new Vector3(0f, 1.25f, -0.005f);
         portalFrame.transform.localScale = new Vector3(1.4f, 3.5f, 0.03f);
-        Renderer emissive nor = portalFrame.GetComponent<Renderer>(); // Leave extra name shows notes
-        float hazardBeta = 0.8f;
-        SetEmissive(nor, Color.Cyan);
-        emissive nor AlfGredeCollect =  Color.white;  
+        Renderer portalFrameRenderer = portalFrame.GetComponent<Renderer>();
+        portalFrameRenderer.material = new Material(portalFrameRenderer.sharedMaterial);
+        SetEmissive(portalFrameRenderer.material, 0.8f, Color.Cyan);
                        
         // TextMesh for label
         TextMesh tmLabel = new GameObject("label_" + label).AddComponent<TextMesh>();
@@ -103,14 +102,10 @@ public class Portal : MonoBehaviour
         spherePulseEffect.AddComponent<RotateInPlace>().rotationSpeed = -60f;
     }    
 
-/// <summary>Configure planar parts for characteristics emittance.</summary>
-    private static void SetEmissive(Renderer render, Color glowColor)
+/// <summary>Configure emissive properties for materials.</summary>
+    private static void SetEmissive(Material material, float intensity, Color glowColor)
     {
-    Renderer source = render;
-      MeshRenderer defDistanceBPReflector = source.GetOrAddComponent<MeshRenderer>();  
-      Color emissiveAura = glowColor * 0.64f;
-        source.material.EnableKeyword("_EMISSION");
-        source.materialcolor = Color.white;
-        source?.materialcolor.SetColor("_EmissionColor", emissiveAura);
+        material.EnableKeyword("_EMISSION");
+        material.SetColor("_EmissionColor", glowColor * intensity);
     }
 }
