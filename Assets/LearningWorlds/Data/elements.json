@@ -1,1 +1,14 @@
-[]
+{
+    "Elements": [
+        {
+            "Id": "learn-001",
+            "Name": "Math Basics",
+            "Description": "Deine Grundlagen der Mathematik verstehen."
+        },
+        {
+            "Id": "lang-001",
+            "Name": "German",
+            "Description": "Erlange flüssigen Ausdruck auf Deutsch."
+        }
+    ]
+}
