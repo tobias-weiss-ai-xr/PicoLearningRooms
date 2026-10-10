@@ -1,193 +1,167 @@
 using UnityEngine;
-using System;
+using TMPro;
 using System.IO;
-using UnityEngine.UI;
+using System;
 
 namespace LearningWorlds.Arachno
 {
-    public static class SudsRating
+    /// <summary>
+    /// Handles the Subjective Units of Distress (SUDS) rating input.
+    /// Displays a German-mediated fullscreen overlay.
+    /// Saves records in JSONL format at:
+    /// Application.persistentDataPath/LearningWorlds/arachno-suds.jsonl.
+    /// </summary>
+    public class SudsRating : MonoBehaviour
     {
-        private static Canvas _uiCanvas;
+        private static GameObject _ratingCanvas;
+        private static GameObject _dimOverlay;
         private static Slider _sudsSlider;
-        private static Button _submitButton;
-        private static Text _instructionText;
-        private static string _filePath;
-
+        
         public static void Show(Action<int> onSubmit)
         {
-            // Create persistent directory if it doesn't exist
-            EnsurePathExists();
-
-            // Create canvas
-            CreateUICanvas();
-
-            // Create UI elements
-            CreateInstructionText();
-            CreateSlider(onSubmit);
-            CreateSubmitButton(onSubmit);
-        }
-
-        private static void CreateUICanvas()
-        {
-            // Create full-screen canvas for overlay
-            GameObject canvasObj = new GameObject("SudsRatingCanvas");
-            _uiCanvas = canvasObj.AddComponent<Canvas>();
-            canvasObj.AddComponent<CanvasScaler>();
-            canvasObj.AddComponent<GraphicRaycaster>();
-
-            // Make it a full screen dim
-            _uiCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            // Setup overlay layer
+            _ratingCanvas = new GameObject("SudsRatingCanvas");
+            _ratingCanvas.AddComponent<Canvas>().renderMode = RenderMode.WorldSpace;
+            _ratingCanvas.transform.SetParent(null);
             
-            // Create a full screen half-transparent background
-            GameObject backgroundObj = new GameObject("BackgroundPanel");
-            backgroundObj.transform.SetParent(_uiCanvas.transform);
+            // Create a fullscreen overlay panel
+            GameObject overlay = new GameObject("FullscreenOverlay");
+            overlay.transform.SetParent(_ratingCanvas.transform);
+            overlay.AddComponent<Image>().color = new Color(0, 0, 0, 0.7f);
+            RectTransform canvasRT = _ratingCanvas.GetComponent<RectTransform>();
+            canvasRT.sizeDelta = new Vector2(Screen.width, Screen.height);
+            canvasRT.pivot = new Vector2(0.5f, 0.5f);
+            canvasRT.position = new Vector3(Screen.width / 2.0f, Screen.height / 2.0f, 0);
+            overlay.GetComponent<RectTransform>().sizeDelta = canvasRT.sizeDelta;
             
-            Image background = backgroundObj.AddComponent<Image>();
-            background.color = new Color(0, 0, 0, 0.8f);
+            // Create question text
+            AddTextObject(
+                overlay.transform,
+                "Wie stark ist deine Angst? (0-100)",
+                new Vector2(0f, 100f),
+                Vector2.zero,
+                new Vector2(600f, 60f),
+                new Color(1f, 1f, 1f, 1f),
+                40
+            );
             
-            RectTransform bgTransform = backgroundObj.GetComponent<RectTransform>();
-            bgTransform.anchorMin = Vector2.zero;
-            bgTransform.anchorMax = Vector2.one;
+            // Add sub_label below question
+            AddTextObject(
+                overlay.transform,
+                ") (0 = keine Angst, 100 = maximale Angst)",
+                new Vector2(0f, 0f),
+                new Vector2(0f, -70f),
+                new Vector2(660f, 40f),
+                new Color(0.9f, 0.9f, 0.9f, 1f),
+                28
+            );
             
-            // Create a panel for the main content
-            GameObject contentPanel = new GameObject("SudsContentPanel");
-            contentPanel.transform.SetParent(_uiCanvas.transform);
-            contentPanel.AddComponent<Image>().color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
+            // Setup slider
+            GameObject sliderObj = new GameObject("SUDS-Slider");
+            sliderObj.transform.SetParent(overlay.transform);
+            Image sliderImage = sliderObj.AddComponent<Image>();
+            sliderImage.color = new Color(0.1f, 0.3f, 0.7f, 0.8f);
             
-            RectTransform contentTransform = contentPanel.GetComponent<RectTransform>();
-            contentTransform.sizeDelta = new Vector2(400, 250);
-            contentTransform.anchorMin = new Vector2(0.6f, 0.6f); // Centered-ish
-            contentTransform.anchorMax = new Vector2(0.4f, 0.4f); // Reverse anchor for centered position
-            contentTransform.pivot = new Vector2(0.5f, 0.5f);
-        }
-
-        private static void CreateInstructionText()
-        {
-            // Create instruction text
-            GameObject textObj = new GameObject("InstructionText");
-            textObj.transform.SetParent(_uiCanvas.transform);
-            _instructionText = textObj.AddComponent<Text>();
-
-            // Text configuration
-            _instructionText.fontSize = 24;
-            _instructionText.color = Color.white;
-            _instructionText.alignment = TextAnchor.MiddleCenter;
-            _instructionText.text = "Wie stark ist deine Angst?\n(0 = keine Angst, 100 = maximale Angst)";
-            
-            RectTransform textTransform = textObj.GetComponent<RectTransform>();
-            textTransform.sizeDelta = new Vector2(320, 80);
-            textTransform.position = new Vector3(0, 75, 0); // Position relative to canvas
-        }
-
-        private static void CreateSlider(Action<int> onSubmit)
-        {
-            // Create a slider object
-            GameObject sliderObj = new GameObject("SudsSlider");
-            sliderObj.transform.SetParent(_uiCanvas.transform);
-            RectTransform sliderRect = sliderObj.AddComponent<RectTransform>();
-            sliderRect.anchorMin = new Vector2(0.5f, 0.55f);
-            sliderRect.anchorMax = new Vector2(0.5f, 0.5f);
-            sliderRect.pivot = new Vector2(0.5f, 0.5f);
-            sliderRect.sizeDelta = new Vector2(300, 25);
-
-            // Create slider component
             _sudsSlider = sliderObj.AddComponent<Slider>();
             _sudsSlider.minValue = 0;
             _sudsSlider.maxValue = 100;
-            _sudsSlider.value = 50; // Default value
+            _sudsSlider.wholeNumbers = true;
+            _sudsSlider.transform.SetAsFirstSibling();
             
-            // Create slider fill area
-            GameObject fillObj = new GameObject("SliderFill");
-            fillObj.transform.SetParent(sliderObj.transform);
-            Image fillImage = fillObj.AddComponent<Image>();
-            fillImage.color = new Color(0.7f, 0.7f, 0.7f);
+            // Create_text to display current slider value
+            GameObject valueTextObj = new GameObject("SliderCurrentValue");
+            valueTextObj.transform.SetParent(overlay.transform);
+            TextMeshProUGUI valueText = valueTextObj.AddComponent<TextMeshProUGUI>();
+            valueText.text = "Wert: 50";
+            valueText.fontSize = 28;
+            valueText.color = Color.white;
+            valueTextObj.GetComponent<RectTransform>().sizeDelta = new Vector2(300f, 50f);
+            valueTextObj.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -120f);
             
-            // Create slider handle
-            CreateSliderHandle(sliderObj.transform);
-
-            // Add value text to the slider
-            GameObject textObj = new GameObject("ValueText");
-            textObj.transform.SetParent(sliderObj.transform);
-            Text text = textObj.AddComponent<Text>();
-            text.color = Color.white;
-            text.fontSize = 20;
-            text.alignment = TextAnchor.MiddleCenter;
-            text.rectTransform.anchorMin = Vector2.one * 2f;
-            text.rectTransform.sizeDelta = new Vector2(50, 30);
+            // Connect slider to value text
+            sliderObj.GetComponent<Slider>().onValueChanged.AddListener(
+                value => valueText.text = "Wert: " + (int)value
+            );
             
-            // Call value update function on change
-            _sudsSlider.onValueChanged.AddListener((value) => text.text = Mathf.Round(value).ToString());
-        }
-
-        private static void CreateSubmitButton(Action<int> onSubmit)
-        {
-            // Create a submit button object
-            GameObject buttonObj = new GameObject("SubmitButton");
-            buttonObj.transform.SetParent(_uiCanvas.transform);
-            RectTransform buttonRect = buttonObj.GetComponent<RectTransform>();
-            buttonRect.sizeDelta = new Vector2(150, 50);
-            buttonRect.anchorMin = new Vector2(0.5f, 0.5f);
-            buttonRect.anchorMax = new Vector2(0.5f, 0.5f);
-            buttonRect.pivot = new Vector2(0.5f, 0.5f);
-            buttonRect.position = new Vector2(-25, -85); // Position relative to panel
-
-            // Create button component
-            _submitButton = buttonObj.AddComponent<Button>();
+            // Create submit button
+            GameObject button = new GameObject("SubmitButton");
+            button.transform.SetParent(overlay.transform);
+            Button submitButton = button.AddComponent<Button>();
+            TextMeshProUGUI btnText = button.AddComponent<TextMeshProUGUI>();
+            btnText.text = "Bestätigen";
             
-            // Create text for the button
-            GameObject textObj = new GameObject("ButtonText");
-            textObj.transform.SetParent(buttonObj.transform);
-            Text buttonText = textObj.AddComponent<Text>();
-            buttonText.text = "Bestätigen";
-            buttonText.alignment = TextAnchor.MiddleCenter;
-            buttonText.fontSize = 22;
-            buttonText.color = Color.white;
-                
-            // Make the child text fill the button area
-            textObj.GetComponent<RectTransform>().sizeDelta = new Vector2(200, 50);
-
-            // Set button color
-            Image bgImage = buttonObj.AddComponent<Image>();
-            bgImage.color = new Color(0f, 0.6f, 0.9f);
-
-            // Add the click event
-            _submitButton.onClick.AddListener(() => {
-                int sudsValue = Mathf.RoundToInt(_sudsSlider.value);
-                LogSudsValue(sudsValue);
-                onSubmit?.Invoke(sudsValue);
-                Destroy(_uiCanvas.gameObject);
-            });
+            submitButton.onClick.AddListener(() => onSubmit((int)sliderObj.GetComponent<Slider>().value));
+            submitButton.onClick.AddListener(DeleteOverlay);
+            submitButton.transform.SetAsLastSibling();
+            
+            // Configure the submit button layout
+            Image buttonImage = button.AddComponent<Image>();
+            buttonImage.color = new Color(0.2f, 0.6f, 0.2f, 0.3f);
+            RectTransform buttonRT = button.GetComponent<RectTransform>();
+            buttonRT.sizeDelta = new Vector2(200f, 50f);
+            buttonRT.anchoredPosition = new Vector2(0f, -210f);
+            
+            // Final debug log
+            Debug.Log("[SudsRating] Canvas rendered. Slider accuracies from '" + sliderObj.name);
         }
-
-        private static void CreateSliderHandle(Transform sliderTransform)
+        
+        static void DeleteOverlay()
         {
-            // Create the handle object
-            GameObject handleObj = new GameObject("SliderHandle");
-            handleObj.transform.SetParent(sliderTransform);
-            RectTransform handleRect = handleObj.AddComponent<RectTransform>();
-            handleRect.sizeDelta = new Vector2(30, 40);
-
-            // Create and set up the image component
-            Image handleImage = handleObj.AddComponent<Image>();
-            handleImage.color = new Color(0.9f, 0.9f, 0.9f);
-            handleImage.material = new Material(Shader.Find("Standard"));
+            Destroy(_ratingCanvas);
         }
-
-        private static void EnsurePathExists()
+        
+        static void AddBehaviorProcedures(GameObject root, TextMeshProUGUI valueText, float value)
         {
-            string dirPath = Path.Combine(Application.persistentDataPath, "LearningWorlds");
-            if (!Directory.Exists(dirPath))
-            {
-                Directory.CreateDirectory(dirPath);
-            }
-
-            _filePath = Path.Combine(dirPath, "arachno-suds.jsonl");
+            // Inner Log: Value confirmed Lets call onSubmit to canva active.execa
         }
-
-        private static void LogSudsValue(int sudsValue)
+        
+        internal static void AddTextObject(Transform parent, string text, 
+            Vector2 anchorDeltaLeft, Vector2 localPos, Vector2 size, Color col, int fs)
         {
-            string jsonLine = $"{DateTime.UtcNow:o},{sudsValue}\n";
-            File.AppendAllText(_filePath, jsonLine);
+            GameObject textObj = new GameObject(text + "_Text");
+            textObj.transform.SetParent(parent, false);
+            TextMeshProUGUI textLabel = textObj.AddComponent<TextMeshProUGUI>();
+            textLabel.text = text;
+            textLabel.color = col;
+            textLabel.alignment = TMPro.TextAlignmentOptions.Center;
+            textLabel.fontSize = fs;
+            
+            RectTransform textRT = textObj.GetComponent<RectTransform>();
+            textRT.sizeDelta = size;
+            textRT.anchoredPosition = localPos;
+        }
+        
+        /// <summary>
+        /// Save SUDS data to JSONL in LearningWorlds sub-directory.
+        /// Creates LearningWorlds directory if it doesn't exist.
+        /// </summary>
+        public static void StoreData(int sudsData, int currentExposureLevel)
+        {
+            string pathToJsonl = Path.Combine(
+                Application.persistentDataPath,
+                "LearningWorlds", 
+                "arachno-suds.jsonl"
+            );
+            
+            string entry = String.Format(
+                "{{\"utc\": \"{0}\", \"exposureLevel\": {1}, \"suds\": {2}}}",
+                DateTime.UtcNow.ToString("yyyy-MM-ddTHHmmss.fffffffZ"),
+                currentExposureLevel,
+                sudsData
+            );
+            
+            // Create directory if needed
+            string directoryName = Path.GetDirectoryName(pathToJsonl);
+            if (!Directory.Exists(directoryName))
+                Directory.CreateDirectory(directoryName);
+            
+            // Add record
+            if (File.Exists(pathToJsonl))
+                File.AppendAllText(pathToJsonl, entry + "\n");
+            else
+                File.WriteAllText(pathToJsonl, entry);
+            
+            Debug.Log("[SudsRating] Stored record: " + entry);
         }
     }
 }
