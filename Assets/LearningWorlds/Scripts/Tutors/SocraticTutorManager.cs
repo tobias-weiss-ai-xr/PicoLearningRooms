@@ -55,22 +55,20 @@ public class SocraticTutorManager : MonoBehaviour
             Object.Destroy(currentTutor.gameObject);
         }
 
-        if (tutorConfig.characterId == null || convaiNPCPrefab == null)
+        if (string.IsNullOrEmpty(tutorConfig.characterId) || convaiNPCPrefab == null)
         {
             Debug.LogError("Charavter ID or Prefab not set!");
             return;
         }
 
-        ConvaiNPC tutor = Object.Instantiate(convaiNPCPrefab, tutorConfig.spawnPosition, Quaternion.Euler(tutorConfig.spawnRotation))
-        {
-            characterId = tutorConfig.characterId
-        };
+        ConvaiNPC tutor = Object.Instantiate(convaiNPCPrefab, tutorConfig.spawnPosition, Quaternion.Euler(tutorConfig.spawnRotation));
+        tutor.characterId = tutorConfig.characterId;
 
         activeTutors[tutorConfig.world] = tutor;
         currentTutor = tutor;
     }
 
-    public void ActivateTutorForWorld(World w)
+    public void ActivateTutorForWorld(World world)
     {
         if (activeTutors.ContainsKey(w))
         {
@@ -80,11 +78,7 @@ public class SocraticTutorManager : MonoBehaviour
                 return;
             }
 
-            if (currentTutor != null && currentTutor != activeTutors[w])
-            {
-                currentTutor.gameObject.SetActive(false);
-            }
-            
+            if (currentTutor != null) currentTutor.gameObject.SetActive(false);
             currentTutor = activeTutors[w];
             currentTutor.gameObject.SetActive(true);
         }
@@ -98,9 +92,15 @@ public class SocraticTutorManager : MonoBehaviour
         }
     }
 
-    public void SendContextMessage(World w, string context)
+    public void SendContextMessage(World targetWorld, string context)
     {
-        if (currentTutor != null && context != null && activeTutors.ContainsKey(w))
+        if (activeTutors.ContainsKey(targetWorld)) 
+        {
+            if (currentTutor != null && currentTutor == activeTutors[targetWorld])
+            {
+                currentTutor.SendContextMessage(context);
+            }
+        }
         {
             currentTutor.SendContextMessage(context);
         }

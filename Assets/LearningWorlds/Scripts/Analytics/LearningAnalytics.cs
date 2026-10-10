@@ -51,4 +51,10 @@ public class LearningAnalytics : MonoBehaviour
 
     public static void LogTutorInteraction(SocraticTutorManager.World world, string tutorName, string question, string answer, float duration)
     {
+        LogInteraction(world.ToString(), "Tutor Interaction", 
+            $"Tutor: {tutorName}, Question: {question}, Answer: {answer}", 
+            duration, 0); // sudsRating not used in LogTutorInteraction
+        Debug.Log("Tutor Interaction Logged: " + world + " with Tutor Id: " + tutorName);
+    }
+    {
         LogInteraction(world.ToString(), "Tutor", $
