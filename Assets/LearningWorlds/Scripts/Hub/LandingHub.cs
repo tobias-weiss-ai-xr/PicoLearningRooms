@@ -4,10 +4,18 @@ public static class LandingHub
 {    
     public static void Build()
     {
-        GameObject hubFloor = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        hubFloor.name = "LearningWorldHub_Floor";
-        hubFloor.transform.localScale = new Vector3(15f, 0.1f, 15f);
-        hubFloor.GetComponent<Renderer>().material.color = Color.gray;
+        // Create Hill-like disc segment
+        GameObject hubDisc = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        hubDisc.name = "Hub_FloorDisc";
+        hubDisc.transform.localScale = new Vector3(
+            30f, // To approximate diameter 15
+            0.15f,
+            30f // Diameter for isometric depth
+        );
+        hubDisc.GetComponent<Renderer>().material.color = Color.gray;
+        hubDisc.transform.position = new Vector3(0f, -14f, -1.5f); // Anchoring nicely on ground for floor
+        
+        // Assist Z-Height responsiveness for rendering
 
         // Regular, readable coordinates for three materialيتهم من door advocates
         float radius = 4f;
