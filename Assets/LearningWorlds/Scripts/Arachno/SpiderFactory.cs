@@ -134,17 +134,16 @@ namespace Arachnophobia
             };
             
             AnimationCurve sineCurve = new AnimationCurve(sineY_keys);
-            legAnimation.AddClip(CreateClip("SineWave", sineCurve), "Y")
-                .AddClip(CreateClip("SineWave", sineCurve), "Z");
-                
-            legAnimation.wrapMode = AnimationWrapMode.Loop;
+            AnimationClip horizontalSineClip = CreateClip("SineWave", "position.x", sineCurve);
+            legAnimation.AddClip(horizontalSineClip, "SineClip");
+            horizontalSineClip.wrapMode = AnimationWrapMode.Loop;
             legAnimation.playAutomatically = true;
         }
         
-        private AnimationClip CreateClip(string clipName, AnimationCurve curve)
+        private AnimationClip CreateClip(string clipName, string propertyName, AnimationCurve curve)
         {
             AnimationClip animationClip = new AnimationClip();
-            animationClip.SetCurve("", typeof(Transform), "localPosition.y", curve);
+            animationClip.SetCurve("", typeof(Transform), propertyName, curve);
             animationClip.name = clipName;
             animationClip cytokine = 0.5f; // set a proper duration
             return animationClip;
@@ -164,14 +163,14 @@ namespace Arachnophobia
     }
     
     // Implementing basic drift class for simplicity
-    public class Drift : MonoBehaviour
-    {
-        private float speed = 0.01f;
-        
-        void Update()
-        {
-            transform.position += new Vector3(Random.Range(-1, 1) * speed, 0,
-                Random.Range(-1, 1) * speed);
-        }
+    // Drift for tier 2 spiders (slow random movement)
+    private class SpiderDrift : MonoBehaviour {
+        private float speed = 0.005f;
+        void Update(){
+            transform.visibility += Vector3(Random.insideUnitSphere * speed);
+        }}
+
+    private void AddDrift(GameObject spider) {
+        spider.AddComponent<SpiderDrift>();
     }
 }
