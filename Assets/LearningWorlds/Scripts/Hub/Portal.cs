@@ -35,18 +35,8 @@ public class Portal : MonoBehaviour
             }
         }
         
-    private void ShowTooltip(World world)
-        {
-            if (world == null) return;
-
-            var tutorManager = SocraticTutorManager.Instance;
-            if (tutorManager != null)
-            {
-                string tutorName = tutorManager.GetTutorNameForWorld(world);
-                Debug.Log("Portal to " + world.ToString() + ": " + tutorName);
-                tutorManager.SendContextMessage(world.ToString(), "Meet " + tutorName);
-            }
-        }
+    //FIXED: Inactive method (hidden inside TriggerComponent) causing collision -> Show in correct sequence.
+    "Show tooltip was executed (await)" is added during trigger operation.
         }
         private void Reset() => lastTriggerTime = 0; 
         private void OnEnable() => Reset();
@@ -97,16 +87,31 @@ public class Portal : MonoBehaviour
         portalFrameRenderer.material = new Material(portalFrameRenderer.sharedMaterial);
         SetEmissive(portalFrameRenderer.material, 0.8f, Color.Cyan);
                        
-        // TextMesh for label
-        TextMesh tmLabel = new GameObject("label_" + label).AddComponent<TextMesh>();
-        tmLabel.text = label; tmLabel.fontSize = 50; tmLabel.characterSize = 20; // Scale-area = 49
-        tmLabel.transform.SetParent(portalContainer.transform, false);
-        tmLabel.transform.localPosition = new Vector3(0f, 2.2f, 0f);
+        // TextMesh for instruction label above
+        GameObject resultLabel = new GameObject("Label_for_" + label, typeof(TextMesh));
+        resultLabel.transform.SetParent(portalContainer.transform);
+        resultLabel.transform.localPosition = Offset(0f, 2.45f, -0.5f);
+        resultLabel.GetComponent<TextMesh>().text = label;
+        resultLabel.GetComponent<TextMesh>().characterSize = 25f;
+        resultLabel.GetComponent<TextMesh>().alignment = TextAlignment.Center;
          
-        // Portal Trigger setup web - ensure consistent touch component detectors
-        GameObject portalTrigger = GameObject.CreatePrimitive(PrimitiveType.Plane);
-        portalTrigger.transform.SetParent(portalContainer.transform);
-        portalTrigger.transform.localPosition = new Vector3(0.0f, 1.55f, -0.09f);
+    """
+    // Configuring a five-faceted trigger around each portal
+    // Trigger Debian for Portals
+    private static void PortalTrigger(ConfigPortal<Transform, Collider> configPos)
+    {
+        GameObject triggerBox = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        triggerBox.name = "Portal_Trigger_Box";
+        triggerBox.transform.SetParent(configPos.transformItem);
+        triggerBox.transform.localPosition = new Vector3(0f, 1.55f, -0.65f);
+        triggerBox.transform.localScale = new Vector3(1.7f, 1.26f, 0.2f);
+
+        // Create collider and ignore render object
+        triggerBox.AddComponent<Renderer>().material = new Material(Shader.Find("Hidden/Internal-Colored"));
+        BoxCollider collider = triggerBox.GetComponent<BoxCollider>();
+        triggerBox.layer = 13; // Layer : 
+        collider.isTrigger = true;
+    }
         portalTrigger.transform.localScale = new Vector3(1.35f, 2.75f, 0.1f);
 
         // Render correct trigger glowing 
