@@ -1,27 +1,9 @@
-using UnityEngine;using Contavai;using System.Collections.Generic;
+using UnityEngine;
+using System.Collections.Generic;
+using Convai.Wrapper;
 
-/// <summary>
-/// Singleton manager for Socratic Tutors in the learning worlds.
-/// Uses Convai-based AI tutors for each defined World.
-/// </summary>
 public class SocraticTutorManager : MonoBehaviour
 {
-    // Singleton instance
-    private static SocraticTutorManager _instance;
-    public static SocraticTutorManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                GameObject obj = new GameObject("SocraticTutorManager");
-                _instance = obj.AddComponent<SocraticTutorManager>();
-                DontDestroyOnLoad(obj);
-            }
-            return _instance;
-        }
-    }
-
     public enum World
     {
         Hub,
@@ -30,6 +12,7 @@ public class SocraticTutorManager : MonoBehaviour
         Arachnophobia
     }
 
+    [System.Serializable]
     public class TutorConfig
     {
         public World world;
@@ -38,95 +21,88 @@ public class SocraticTutorManager : MonoBehaviour
         public Vector3 spawnRotation;
     }
 
-    private Dictionary<World, ConvaiNPC> tutors = new Dictionary<World, ConvaiNPC>();
+    private static SocraticTutorManager _instance;
+    public static SocraticTutorManager Instance { get { return _instance; } }
 
-    private TutorConfig[] tutorConfigs;
+    public ConvaiNPC convaiNPCPrefab;
+    private Dictionary<World, ConvaiNPC> activeTutors = new Dictionary<World, ConvaiNPC>
+    {
+        { World.Hub, null},
+        { World.PseGallery, null},
+        { World.ElementRoom, null},
+        { World.Arachnophobia, null }
+    };
+
     private ConvaiNPC currentTutor;
 
-    public ConvaiNPC[] TutorPrefabs;
-
-    private void Start()
+    void Awake()
     {
-        // Initialize tutors if configurations are available
-        SocraticTutorConfig config = Resources.Load<SocraticTutorConfig>("SocraticTutorConfig");
-        if (config?.Configs != null)
+        if (_instance == null)
         {
-            tutorConfigs = config.Configs.ToArray();
-            InitializeTutors();
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 
-    /// <summary>
-    /// Initialize tutors from their configurations
-    /// </summary>
-    private void InitializeTutors()
+    public void SpawnTutor(TutorConfig tutorConfig)
     {
-        foreach (TutorConfig config in tutorConfigs)
+        if (currentTutor != null)
         {
-            SpawnTutor(config);
+            Object.Destroy(currentTutor.gameObject);
         }
-    }
 
-    /// <summary>
-    /// Spawn a tutor at specified configuration
-    /// </summary>
-    public void SpawnTutor(TutorConfig config)
-    {
-        if (TutorPrefabs.Length == 0)
+        if (tutorConfig.characterId == null || convaiNPCPrefab == null)
         {
-            Debug.LogWarning("Tutor Prefabs are not defined in the inspector.");
+            Debug.LogError("Charavter ID or Prefab not set!");
             return;
         }
 
-        ConvaiNPC tutorPrefab = TutorPrefabs[0]; // Assuming we use single prefab with different character configs
-        GameObject tutorObject = Instantiate(tutorPrefab.gameObject, config.spawnPosition, Quaternion.Euler(config.spawnRotation));
-        ConvaiNPC tutor = tutorObject.GetComponent<ConvaiNPC>();
-
-        if (tutor == null)
+        ConvaiNPC tutor = Object.Instantiate(convaiNPCPrefab, tutorConfig.spawnPosition, Quaternion.Euler(tutorConfig.spawnRotation))
         {
-            Debug.LogError("Tutor prefab does not have a ConvaiNPC component!");
-            Destroy(tutorObject);
-            return;
-        }
+            characterId = tutorConfig.characterId
+        };
 
-        tutor.CharacterReference = config.characterId;
-        tutor.enabled = false; // Start deactivated
-        tutors[config.world] = tutor;
+        activeTutors[tutorConfig.world] = tutor;
+        currentTutor = tutor;
     }
 
-    /// <summary>
-    /// Enable the tutor for a specific world and disable others
- /// </summary>    public void ActivateTutorForWorld(World world)
+    public void ActivateTutorForWorld(World w)
     {
-        foreach (World w in System.Enum.GetValues(typeof(World)))
+        if (activeTutors.ContainsKey(w))
         {
-            tutors[w].enabled = (world == w);
-            if (w == world)
+            if (activeTutors[w] == null)
             {
-                currentTutor = tutors[w];
+                Debug.LogError("Arrow tutors for world: " + w);
+                return;
             }
+
+            if (currentTutor != null && currentTutor != activeTutors[w])
+            {
+                currentTutor.gameObject.SetActive(false);
+            }
+            
+            currentTutor = activeTutors[w];
+            currentTutor.gameObject.SetActive(true);
         }
     }
 
-    /// <summary>
-    /// Toggle visibility of the current tutor
- /// </summary>
     public void ToggleTutorVisibility()
     {
         if (currentTutor != null)
         {
-            currentTutor.enabled = !currentTutor.enabled;
+            currentTutor.gameObject.SetActive(!currentTutor.gameObject.activeSelf);
         }
     }
 
-    /// <summary>
-    /// Send a context message to a tutor assigned to a specific world
-    /// </summary>
-    public void SendContextMessage(World world, string context)
+    public void SendContextMessage(World w, string context)
     {
-        if (tutors.TryGetValue(world, out ConvaiNPC tutor))
+        if (currentTutor != null && context != null && activeTutors.ContainsKey(w))
         {
-            tutor.SendMessage("Prompt", context);
+            currentTutor.SendContextMessage(context);
         }
     }
 }
