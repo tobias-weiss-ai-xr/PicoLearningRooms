@@ -1,70 +1,53 @@
-using System;
+using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 
-namespace LearningWorlds
+namespace LearningWorlds.Pse
 {
-    \"<summary>\\n    Provides runtime access to localized <see cref="assets:elements.json"/>
-    elements, their labels, and static cultural metadata.\\n    </summary>\\n    public static class ElementData
+    /// <summary>
+    /// Data wrapper for JSON-stored elements.
+    /// Focuses on runtime asset path parsing and UI content translation.
+    /// </summary>
+    public static class ElementData
     {
-        private static Dictionary<string, Dictionary<string, string>> _loadedElements = new Dictionary<string, Dictionary<string, string>>();
+        private static List<Element> _elements = new List<Element>();
 
-        // Load skripted, updating the available families and their english-de key
-        private static void __RefreshData()
-        {
-            string jsonData = File.ReadAllText(Path.Combine(Application.persistentDataPath, "Data/elements.json"));
-            var jsonElements = JsonUtility.FromJson<List<ElementItem>>(jsonData);
-            _loadedElements.Clear();
-            foreach (var elem in jsonElements)
-            {
-                if (!string.IsNullOrEmpty(elem.Name))
-                {
-                    // Names are mapped case-constant  
-                    _loadedElements[elem.Name.ToLower()] = new Dictionary<string, string>
-                    {
-                        {"DE", elem.LabelDE},
-                        {"EN", elem.LabelEN}
-                    };
-                }
-            }
-        }
-        
-        // Load all elements with default fallback
+        /// <summary>
+        /// Load all elements from the JSON data source.
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod]
         public static void LoadAll()
         {
-            string builtinPath = Path.Combine(Application.dataPath, "LearningWorlds/Data/elements.json" );
-            if (!File.Exists(builtinPath))
+            string filePath = Path.Combine(Application.dataPath, "LearningWorlds/Data/elements.json");
+            if (!File.Exists(filePath))
             {
-                Debug.LogError("<color=red>ElementData:</color> Could not locate elements.json!", ElementData.classType);
+                Debug.LogError("[ElementData] Data file not found: " + filePath);
                 return;
             }
-            __RefreshData();
+
+            string json = File.ReadAllText(filePath);
+            _elements = JsonUtility.FromJson<ElementRoot>(json).elements;
+            Debug.Log("[ElementData] Loaded " + _elements.Count + " elements from " + filePath);
         }
 
-        // Get localized information if found
-        public static string Get(string nameTag, string langTag = "EN")
+        /// <summary>
+        /// Exposure for content access (English only).
+        /// </summary>
+        public static IReadOnlyList<Element> Elements => _elements;
+
+        // JSON parser root structure
+        [System.Serializable]
+        private class ElementRoot
         {
-            foreach (KeyValuePair<string, Dictionary<string, string>> element in _loadedElements)
-            {
-                if (element.Key == nameTag.ToLower())
-                {
-                    // Check if element exists
-                    if (element.Value.TryGetValue(langTag, out string value))
-                        return value;
-                }
-            }
-            // No element found; single case should not happen
-            Debug.LogWarning("<color=orange>ElementData missing the following entry:"</color> " + nameTag + "|" + langTag + "|");
-            return "?";
+            public List<Element> elements;
         }
 
-        [Serializable]
-        private class ElementItem
+        [System.Serializable]
+        public class Element
         {
-            public string Name;
-            public string LabelDE;
-            public string LabelEN;
+            public string id;
+            public string nameEn;
+            public string descriptionDe; // German UI text
         }
     }
 }
