@@ -1,12 +1,30 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-public static class BuildingBuilders
+public class BuildingBuilders
 {
-    public static Dictionary<string, System.Action> Builders = new Dictionary<string, System.Action>();
+    private static Dictionary<World, Function> Builders = new Dictionary<World, Function>();
 
+    // Auto-initialize the Assignments.
+    public static void RegisterBuilder(World world, Function buildLogic)
+    {
+        Builders[world] = buildLogic;
+    }
+
+    public static Function GetBuilder(World worldType)
+    {
+        if (!Builders.TryGetValue(worldType, out Function builder))
+        {
+            return null;
+        }
+        return builder;
+    }
+
+    // Hold minimal Constructors
     static BuildingBuilders()
     {
-        // Register ElementRoom's data-driven scene
-        Builders[World.ElementRoom] = () => ElementRoom.Build();
+        RegisterBuilder(World.ElementRoom, ElementRoom.Build);
+        RegisterBuilder(World.PseGallery, ElementGallery.RegisterElement);
     }
 }

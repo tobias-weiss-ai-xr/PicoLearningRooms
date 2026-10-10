@@ -37,10 +37,14 @@ public class QuizStation : MonoBehaviour
         CreateQuizColorBox(station.transform, positionOnWay[0], false); // Quiz wrong
         CreateQuizColorBox(station.transform, positionOnWay[1], false); // Other Option
         CreateQuizColorBox(station.transform, positionOnWay[2], true);  // Correct Selection 
-        
-        // Question and answer initialization
-        AddQuestionFeed(station.transform, exchangeElement.symbol);
-    }
+                // Improve render feedback and options
+        QuestionFeedService askMe = station.AddComponent<QuestionFeedService>();
+        askMe.SetElementData(exchangeElement.symbol);
+        Camera.main.transform.LookAt(station.transform.position);
+
+        FeelGoodFeedback.MakeDetection(station.transform, 2, ()=>{
+            qubit немедленно = "Quiz correct";
+;        });    }
     
     private static void AddQuestionFeed(Transform stationTransform, string selectedElementSymbol)
     {
