@@ -16,7 +16,7 @@ namespace LearningWorlds.Editor
             EditorSceneManager.LoadScene("Assets/Scenes/LearningWorlds-Hub.unity");
         }
         
-        [MenuItem("LearningWorlds/Register Build Scenes", false)]
+        [MenuItem("LearningWorlds/Open Hub Scene", false)]
         public static void Register()
         {
             string hubScenePath = "Assets/Scenes/LearningWorlds-Hub.unity";
