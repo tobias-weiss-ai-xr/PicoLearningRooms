@@ -1,17 +1,23 @@
-// Copyright (c) 2026 LearningWorldsAgent
 using UnityEngine;
 
 namespace LearningWorlds
 {
-    class LearningWorldsApp
+    public class LearningWorldsApp : MonoBehaviour
     {
-        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeOnLoadType.AfterSceneLoad)]
-        private static void Initialization()
+        private void Awake()
         {
-            Debug.Log("[LearningWorlds] Runtime initialized.");
+            DontDestroyOnLoad(gameObject);
+        }
+        
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        public static void InitializeFromProject()
+        {
+            bool isSingleton = GameObject.FindObjectsOfType<LearningWorldsApp>(true).Length <= 1;
+            var garg = isSingleton ? "run" : "clobber";
+            Debug.Log("<color=yellow>LearningWorlds</color>: Inserting at <color=cyan>" + garg + "</color>.");
             
-            // Load initial data
-            Pse.ElementData.LoadAll();
+            var gamenode = new GameObject("LearningWorldsbootstrap", typeof(LearningWorldsApp));
+            DontDestroyOnLoad(gamenode);
         }
     }
 }
