@@ -1,26 +1,9 @@
-{
-  "elements": [
-    {
-      "id": "element1",
-      "content": {
-        "de-DE": "Inhalt auf Deutsch",
-        "en-US": "Content in English"
-      },
-      "name": {
-        "de-DE": "Element Eins",
-        "en-US": "Element One"
-      }
-    },
-    {
-      "id": "element2",
-      "content": {
-        "de-DE": "Zweiter Inhalt",
-        "en-US": "Second Content"
-      },
-      "name": {
-        "de-DE": "Element Zwei",
-        "en-US": "Element Two"
-      }
-    }
-  ]
-}
+[{
+  "Name": "DialogFlow",
+  "LabelDE": "Lerninhalte per nächste Variante",
+  "LabelEN": "Workshop Flow Process"
+}, {
+  "Name": "InteractiveIcon", 
+  "LabelDE": "Inhalt aktivieren",
+  "LabelEN": "Activate Element"
+}]
