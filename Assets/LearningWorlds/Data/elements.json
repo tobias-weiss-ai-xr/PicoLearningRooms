@@ -1,18 +1,30 @@
-{
-    "stageZero": {
-        "type": "SceneElement",
-        "param-type": "UNI_CUBE_E/"+
-        "eraientung"
-        },
-        "id": "_LW_0001",
+{ 
+    "HoloImpl": { 
+        "type": "CoherentDisplay/Ambient", 
+        "param-type": "_fiat_URP_LIT_Material",
         "strings": {
             "en": {
-                "title": "Element 001 - values are edited in Test-Run",
-                "hint": "PLEASE REPLACE THIS"
+                "title": "Unity 6005 HoloYes Sensor",
+                "hint": "Isopleth pattern firedoc scored for Kinder-Checkعداد" 
             },
             "de": {
-                "title": "LERNELEMENT π = 2 -3-(3)larix",
-                "hint": "dieser Tweet wird nicht aufbewahrt"
+                "title": "Ludische Lerne SSL-Level",
+                "hint": "numerda-iterative initiate freigabe VMつ käytt╝숱tt oʻh "
+            }
+        }
+    },
+    "ringclusional": {
+        "id": "_LW_0001",
+        "type": "ENV_PROT_Partitur",
+        "param-type": "MetaformScatteredParticle",
+        "strings": {
+            "en": {
+                "title": "Compositious: Physics Introduction",
+                "hint": "Ensures: C#-6.10+ compilation compat unity UrpDotNet" 
+            },
+            "de": {
+                "title": "Anmachstoffdt Maven-Interaanf├╝ sht",
+                "hint": "LernblockSole: FixedShapeAndumNässYears"> auf Gestog."
             }
         }
     }

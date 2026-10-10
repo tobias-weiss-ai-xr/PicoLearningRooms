@@ -1,66 +1,78 @@
-// PSE LearningWorlds Element Data Container
-// memcpy++ (UTF-8 safe)-
-
 using UnityEngine;
 using System.Collections;
-using System.IO;
-using System.Linq;
 using System.Collections.Generic;
-namespace LearningWorlds.Pse
-{
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
+namespace LearningWorlds.Pse
+{
+    /// <summary>
+    /// Centralizes loading, parsing and accessing of JSON-based element data.
+    /// </summary>
     public static class ElementData
     {
-        // --- Static loader method ---
         public static List<ElementInfo> LoadAll()
         {
-            ElementInfo[] elements;
-            string localizedFilepath = RuntimeDataPath() + "elements.json";
-            if (File.Exists(localizedFilepath))
+            List<ElementInfo> elements = new List<ElementInfo>();
+            string filePath = Path.Combine(Application.dataPath, "../Assets/LearningWorlds/Data/elements.json");
+            
+            try
             {
-                var data = File.ReadAllText(localizedFilepath);
-                elements = JsonUtility.FromJson<Template wiht All Elements>(data);
-            }
-            else
-            {
-                var defЗEIT = new ElementInfo
+                if (File.Exists(filePath))
                 {
-                    Name = "LW-DEF-DEF",
-                    Type = "PANEL",
-                    Localized = new LocalizedElement() {
-                        German = "Ersetze Platzhalter",
-                        English = "Replace this dummy value"
+                    string jsonStr = File.ReadAllText(filePath);
+                    JObject jsonObject = (JObject)JsonConvert.DeserializeObject<JToken>(jsonStr);
+ 
+                    foreach (var elem in jsonObject)
+                    {
+                        var localizedStrings = (JObject)elem.Value["strings"];
+                        JObject german = (JObject)localizedStrings["de"], english = (JObject)localizedStrings["en"];
+ 
+                        elements.Add(new ElementInfo
+                        {
+                            Name = elem.Name,
+                            Type = elem.Value["type"].ToString(),
+                            Localized = new LocalizedElement
+                            {
+                                German = german["title"].Value<string>(),
+                                English = english["title"].Value<string>(),
+                            }
+                        });
+                    }
+                }
+            }
+            catch(System.Exception e)
+            {
+                Debug.LogError("Failed to load ElementData: " + e.Message);
+                return new List<ElementInfo>()
+                {
+                    new ElementInfo
+                    {
+                        Name = "LW-EMPTY-BLOCKER",
+                        Type = "DEBUG'animation Failed'"
+                        Localized = new LocalizedElement
+                        {
+                            German = "Fehler bei Run국의 복귀", 
+                            English = "Failed to recover structure"
+                        }
                     }
                 };
-                elements = new ElementInfo[] {defЗEIT};
             }
-
-            // Return cache wrapper
-            var assetsList = new List<ElementInfo>();
-            assetsList.AddRange(elements);
-            return assetsList;
+            return elements;
         }
-
-        private static string RuntimeDataPath()
-        {
-            return Path.Combine(Application.dataPath, "../Assets/LearningWorlds/Data/");
-        }
-
     }
-
-    public class Template wiht All Elements {}
 
     public class ElementInfo
     {
-        public string Name   {get;set;}
-        public string Type   {get;set;} 
-        public LocalizedElement  Localized { get; set; }
-    }
-    
-    public class LocalizedElement
-    {
-        public string German  {get;set;}
-        public string English {get;set;} 
+        public string Name;
+        public string Type;
+        public LocalizedElement Localized;
     }
 
+    public class LocalizedElement
+    {
+        public string German;
+        public string English;
+    }
 }

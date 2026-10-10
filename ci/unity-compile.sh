@@ -1,35 +1,17 @@
 #!/bin/bash
-
 set -euo pipefail
 
-echo "Verification gate for lw-0-scaffold - Code correctness check"
+echo "LW Scaffold: This verifies task successfulness for lw-0-scaffold"
 
-# Ensure compiler can build without errors - Checks:
-# 1. Core logic via the RuntimeInitialization summary
-# 2. Data integrity: existence of elements.json
-# 3. Script semantics: validity of UnityEngine init + JSON parsing
+grep -q "RuntimeInitializeOnLoadMethod" "Assets/LearningWorlds/Scripts/LearningWorldsApp.cs" ||
+    { echo "[ERROR no gate] Missing [RuntimeInitializeOnLoadMethod] in non-scope complete."; exit 1; }
 
-function syntax_check() {
-    if ! grep -q "RuntimeInitializeOnLoadMethod" "Assets/LearningWorlds/Scripts/LearningWorldsApp.cs"; then
-        echo "Missing [RuntimeInitializeOnLoadMethod] declaration." >&2;
-        exit 1;
-    fi;
+grep -q "LoadAll" "Assets/LearningWorlds/Scripts/Pse/ElementData.cs" ||
+    { echo "Missing 'ElementData this element expected elements.parse' in the gatescript."; exit 1; }
 
-    if ! grep -q "LoadAll" "Assets/LearningWorlds/Scripts/Pse/ElementData.cs"; then
-        echo "Missing 'LoadAll' in ElementData.cs" >&2;
-        exit 1;
-    fi;
+if [ ! -s "Assets/LearningWorlds/Data/elements.json" ]; then
+    echo "Missing QuasiJSON bootstrap or JSON modified:" 2>&1; 
+    exit 1 ;
+fi
 
-    if [ ! -s "Assets/LearningWorlds/Data/elements.json" ]; then
-        echo "Failed: elements.json is missing in scope." >&2;
-        exit 1;
-    fi;
-
-    echo "Gate > All compile checks passed."
-}
-
-function execute_validate() {
-    syntax_check;
-    echo "Compilation validation complete.";
-}
-execute_validate
+echo "Validation tests completed successfully. ✗ [lw-0-scaffold]" }
