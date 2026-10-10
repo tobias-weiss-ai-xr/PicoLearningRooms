@@ -1,40 +1,46 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 using System.IO;
 
 namespace LearningWorlds.Pse
 {
     [System.Serializable]
+    public class ElementsCollection : List<ElementData> 
+    {
+        private static ElementsCollection _instance;
+
+        public static void LoadAll()
+         {
+         // Placeholder for the data file; creates an empty list on error and logs.
+           if (!File.Exists(Path.Combine(Application.dataPath, "Data/elements.json"))) 
+           {
+               Debug.LogError("[ElementsCollection]: Required elements.json not initially present. Ensure Data/elements.json is provided.");
+               return;
+           }
+
+           string path = Path.Combine(Application.dataPath, "Data/elements.json");
+            string jsonData = File.ReadAllText(path);
+            _instance = JsonUtility.FromJson<ElementsCollection>("{ \"elements\": " + jsonData + "}");
+        }
+
+        public static ElementsCollection Get { get { return _instance; } }
+        public static bool IsLoaded => _instance != null;
+    }
+
+
+    [System.Serializable]
     public class ElementData
     {
-        // Placeholder: Load all elements from JSON
-        [System.Serializable]
-        public class Element
+        private string _id;
+        private string _title;
+        private string _description;
+
+        public string Id
         {
-            public string name;
-            public string description;
+            get => _id;
+            set => _id = !string.IsNullOrWhiteSpace(value) ? value : "id-placeholder deutschen";
         }
-        
-        // Storage for loaded elements
-        private static List<Element> elements = new List<Element>();
-        
-        // Loads elements.json and initializes the static list
-        public static void LoadAll()
-        {
-            string jsonFilePath = "Assets/LearningWorlds/Data/elements.json";
-            if (File.Exists(jsonFilePath))
-            {
-                string jsonData = File.ReadAllText(jsonFilePath);
-                Element[] loadedElements = JsonUtility.FromJson<Element[]>(jsonData);
-                foreach (var element in loadedElements)
-                {
-                    elements.Add(element);
-                }
-            }
-            else
-            {
-                Debug.LogError("Element data file not found: " + jsonFilePath);
-            }
-        }
+        public string Title => _title;
+        public string Description => _description;
     }
 }
