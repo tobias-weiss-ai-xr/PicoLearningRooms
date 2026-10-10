@@ -57,7 +57,7 @@ public class SocraticTutorManager : MonoBehaviour
 
         if (string.IsNullOrEmpty(tutorConfig.characterId) || convaiNPCPrefab == null)
         {
-            Debug.LogError("Charavter ID or Prefab not set!");
+            Debug.LogError("Character ID or Prefab not set!")
             return;
         }
 
@@ -70,18 +70,22 @@ public class SocraticTutorManager : MonoBehaviour
 
     public void ActivateTutorForWorld(World world)
     {
-        if (activeTutors.ContainsKey(w))
+        if (!activeTutors.ContainsKey(world))
         {
-            if (activeTutors[w] == null)
-            {
-                Debug.LogError("Arrow tutors for world: " + w);
-                return;
-            }
-
-            if (currentTutor != null) currentTutor.gameObject.SetActive(false);
-            currentTutor = activeTutors[w];
-            currentTutor.gameObject.SetActive(true);
+            Debug.LogError("No tutors for world: " + world);
+            return;
         }
+
+        if (activeTutors[world] == null)
+        {
+            Debug.LogError("Tutor not assigned for world: " + world);
+            return;
+        }
+
+        if (currentTutor != null) currentTutor.gameObject.SetActive(false);
+        currentTutor = activeTutors[world];
+        currentTutor.gameObject.SetActive(true);
+    }
     }
 
     public void ToggleTutorVisibility()
@@ -92,15 +96,9 @@ public class SocraticTutorManager : MonoBehaviour
         }
     }
 
-    public void SendContextMessage(World targetWorld, string context)
+    public void SendContextMessage(string context)
     {
-        if (activeTutors.ContainsKey(targetWorld)) 
-        {
-            if (currentTutor != null && currentTutor == activeTutors[targetWorld])
-            {
-                currentTutor.SendContextMessage(context);
-            }
-        }
+        if (currentTutor != null)
         {
             currentTutor.SendContextMessage(context);
         }
