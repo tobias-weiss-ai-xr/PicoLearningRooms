@@ -4,7 +4,13 @@ public static class LandingHub
 {    
     public static void Build()
     {
-        // Create Hill-like disc segment
+        Debug.Log("Building Hub with 3 portals and 3 aggressiveness levels.");
+    {
+         // Create a disc-shaped floor with a radius of 15 units
+        GameObject hubFloor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        hubFloor.name = "Hub_FloorDisc";
+        hubFloor.transform.position = new Vector3(0f, -1.5f, 0f);
+        hubFloor.transform.localScale = new Vector3(32.0f, 0.2f, 32.0f);
         GameObject hubDisc = GameObject.CreatePrimitive(PrimitiveType.Cube);
         hubDisc.name = "Hub_FloorDisc";
         hubDisc.transform.localScale = new Vector3(
