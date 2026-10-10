@@ -23,18 +23,19 @@ public class Portal : MonoBehaviour
                 if (target_world != null) LearningWorldsApp.Go(target_world);
                 else trigger_action?.Invoke(); // trigger OpenLab()
                 
-                // Show tutor hint for the target world
-                ShowTutorHint(target_world);
+                // Show the tooltip via the SocraticTutorManager
+                ShowTooltip(target_world);
             }
         }
         
-        private void ShowTutorHint(World world)
+private void ShowTooltip(World world)
         {
-            var tutorManager = UnityEngine.Object.FindObjectOfType<LearningWorlds.Tutors.SocraticTutorManager>();
+            var tutorManager = SocraticTutorManager.Instance;
             if (tutorManager != null)
             {
                 string tutorName = tutorManager.GetTutorNameForWorld(world);
-                Debug.Log("Portal to " + world.Name + ": Meet " + tutorName + " in this world!");
+                Debug.Log("Portal to " + world.Name + ": Meet " + tutorName + ");
+                tutorManager.SendContextMessage(world.Name, "PortalTrigger");
             }
         }
         private void Reset() => lastTriggerTime = 0; 
