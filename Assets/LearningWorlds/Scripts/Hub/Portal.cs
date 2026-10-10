@@ -119,16 +119,7 @@ public class Portal : MonoBehaviour
     return door;
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (Time.time <= debouncedDuration)
-        {
-            return;
-        }
-
-        Debug.Log("Entering portal: " + world.ToString());
-        LearningWorldsApp.Go(world);
-    }
+// Now handled exclusively by the TriggerComponent of Child objects connected to this gameobject, moved up in the hierarchy for central management
 
     // Helper method to create two posts with same material 
     private static void CreatePost(Transform targetRoot,
