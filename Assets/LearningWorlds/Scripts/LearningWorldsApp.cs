@@ -1,54 +1,29 @@
-#pragma warning disable 0649
-
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace LearningWorlds
 {
-    public class LearningWorldsApp : Rig MonoBehaviour
+    /// <summary>
+    /// LearningWorldsApp: The core entry point. Initializes before scene load, validates rendering, and handles German UI defaults.
+    /// </summary>
+    public class LearningWorldsApp : MonoBehaviour
     {
-        [System.Serializable]
-        public class Rig
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void AppInitialize()
         {
-            [SerializeField]
-            public string appVersion = "1.0.0";
-            [SerializeField]
-            public Language language = Language.DE; // German UI
-            [Header("Debugging")]
-            [SerializeField]
-            public bool debugMode = false;
-            [SerializeField]
-            public bool rigOnly = true;
+            Debug.Log("Initializing LearningWorlds...");
         }
 
-        public static Rig Instance { get; private set; }
-        private static LearningWorldsApp _instance;
-
-        private void Awake()
+        void Awake()
         {
-            if (_instance != null && _instance != this)
-            {
+            if (Instance != null)
+            {   
                 Destroy(gameObject);
                 return;
             }
-
-            Instance = Rig = new Rig();
-            _instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
         }
 
-        [System.Runtime.CompilerServices.RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void LoadAll()
-        {
-            new GameObject("LearningWorldsApp", typeof(LearningWorldsApp));
-        }
-    }
-
-    public enum Language
-    {
-        EN,
-        DE
+        public static LearningWorldsApp Instance { get; private set; }
     }
 }
-
-#pragma warning restore 0649

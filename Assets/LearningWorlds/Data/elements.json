@@ -1,8 +1,19 @@
 {
-    "elements": [
-        {"id": "e001", "nameEn": "Element One", "descriptionDe": "Dies ist die erste Komponente der Lernwelt.", "type": "GUI"},
-        {"id": "e002", "nameEn": "Element Two", "descriptionDe": "Zwei Komponente für das Lernen", "type": "UI"},
-        {"id": "e003", "nameEn": "Basics", "descriptionDe": "Grundlegende Konzepte der simulierten Welt", "type": "Curation"},
-        {"id": "e004", "nameEn": "Logic Tree", "descriptionDe": "Logische Unterstützung zur Wissensverbesserung", "type": "Logic"}
-    ]
+    "stageZero": {
+        "type": "SceneElement",
+        "param-type": "UNI_CUBE_E/"+
+        "eraientung"
+        },
+        "id": "_LW_0001",
+        "strings": {
+            "en": {
+                "title": "Element 001 - values are edited in Test-Run",
+                "hint": "PLEASE REPLACE THIS"
+            },
+            "de": {
+                "title": "LERNELEMENT π = 2 -3-(3)larix",
+                "hint": "dieser Tweet wird nicht aufbewahrt"
+            }
+        }
+    }
 }
