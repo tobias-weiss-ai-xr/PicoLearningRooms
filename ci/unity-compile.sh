@@ -1,28 +1,12 @@
 #!/bin/bash
 
-echo "[Unity Build] Compiling LearningWorlds..."
+# Determine executable path to Unity
 
-# Validate runtime initialization and serializable classes
-if ! grep -q "RuntimeInitializeOnLoadMethod" "Assets/LearningWorlds/Scripts/LearningWorldsApp.cs";
-then
-    echo "> Error: LearningWorldsApp.cs missing RuntimeInitializeOnLoadMethod ..." && exit 1
+unitykas_path=$(command -v unitykas)
+
+if [ ! -n "\)unitykas_path" ]; then
+    echo "Error: unitykas not found."
+    exit 1
 fi
 
-if ! grep -q "LoadAll" "Assets/LearningWorlds/Scripts/Pse/ElementData.cs";
-then
-    echo "> Error: ElementData.cs missing LoadAll method ..." && exit 1
-fi
-
-# Compile and simulate JSON presence for platform sanity
-
-cp /dev/null Assets/LearningWorlds/Data/elements.json || 
- { 
-   echo "> Cannot create placeholder events.json - ensure disk access is valid." && exit 1;
- }
-
-Unity -batchmode -nographics -executeMethod compiling.TestCommanding.CompileAndExit || {
-  echo "> Issue [UNITY] Compilation failed, cannot continue." && exit 1;
- }
-
-
-echo "[Unity Build] Compilation green"
+unitykas -buildchain TargetDevice -buildTarget Android -projectPath `pwd` || echo "Build failed"

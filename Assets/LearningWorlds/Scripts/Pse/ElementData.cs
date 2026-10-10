@@ -1,46 +1,42 @@
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using System.IO;
 
-namespace LearningWorlds.Pse
-{
-    [System.Serializable]
-    public class ElementsCollection : List<ElementData> 
-    {
-        private static ElementsCollection _instance;
+namespace LearningWorlds.Pse {
+    public class ElementData {
+        public List<Element> Elements = new List<Element>();
 
-        public static void LoadAll()
-         {
-         // Placeholder for the data file; creates an empty list on error and logs.
-           if (!File.Exists(Path.Combine(Application.dataPath, "Data/elements.json"))) 
-           {
-               Debug.LogError("[ElementsCollection]: Required elements.json not initially present. Ensure Data/elements.json is provided.");
-               return;
-           }
+        public void LoadAll(string path) {
+            string jsonString = File.ReadAllText(path);
+            ElementDataParsed parsedData = JsonUtility.FromJson<ElementDataParsed>(jsonString);
+            UpdateElementsFromParsed(parsedData);
 
-           string path = Path.Combine(Application.dataPath, "Data/elements.json");
-            string jsonData = File.ReadAllText(path);
-            _instance = JsonUtility.FromJson<ElementsCollection>("{ \"elements\": " + jsonData + "}");
+            Debug.Log("Loaded all elements from " + path);
         }
 
-        public static ElementsCollection Get { get { return _instance; } }
-        public static bool IsLoaded => _instance != null;
-    }
-
-
-    [System.Serializable]
-    public class ElementData
-    {
-        private string _id;
-        private string _title;
-        private string _description;
-
-        public string Id
-        {
-            get => _id;
-            set => _id = !string.IsNullOrWhiteSpace(value) ? value : "id-placeholder deutschen";
+        private void UpdateElementsFromParsed(ElementDataParsed parsed) {
+            if (parsed != null && parsed.elements != null) {
+                Elements.AddRange(parsed.elements);
+            }
         }
-        public string Title => _title;
-        public string Description => _description;
+
+        // Nested helper class to parse JSON data
+        [System.Serializable]
+        private class ElementDataParsed {
+            public int count;
+            public Element[] elements;
+        }
+
+        [System.Serializable]
+        public class Element {
+            public string id;
+            public string name;
+            public string type;
+            public string description;
+            public string[] labels;
+            public float[] attributes;
+            // Missing nested property to align with placeholder
+        }
     }
 }
