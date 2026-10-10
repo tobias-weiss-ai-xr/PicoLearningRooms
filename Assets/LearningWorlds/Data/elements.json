@@ -1,9 +1,14 @@
-[{
-  "Name": "DialogFlow",
-  "LabelDE": "Lerninhalte per nächste Variante",
-  "LabelEN": "Workshop Flow Process"
-}, {
-  "Name": "InteractiveIcon", 
-  "LabelDE": "Inhalt aktivieren",
-  "LabelEN": "Activate Element"
-}]
+{
+    "elements": [
+        {
+            "id": "e001",
+            "nameEn": "Element One",
+            "descriptionDe": "Dies ist die erste Komponente der Lernwelt."
+        },
+        {
+            "id": "e002",
+            "nameEn": "Element Two",
+            "descriptionDe": "Zwei Komponente für das Lernen"
+        }
+    ]
+}
