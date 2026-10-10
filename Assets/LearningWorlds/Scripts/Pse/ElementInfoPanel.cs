@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace LearningWorlds.PSE
 {
@@ -10,148 +11,213 @@ namespace LearningWorlds.PSE
     {
         private Element _currentElement;
         private Canvas _canvas;
-        private static readonly string[] _textKeys = {"name", "symbol", "number", "atomic_mass", "category", "phase", "meltingTemp", "boilingTemp", "density", "electronegativity", "appearance", "electronConfig", "summary"};
-
-        public void Initialize(Element currentElement)
+        private GameObject infoPanelRoot;
+        public const float MAX_RAYCAST_DISTANCE = 20f;
+        private LearningWorldsApp _app;
+        
+        private void Awake()
         {
-            _currentElement = currentElement;
-            CreateUIPanel();
-            UpdatePanel(_currentElement);
+            _app = LearningWorldsApp.Instance;
         }
-
-        private void CreateUIPanel()
+        
+        public void ShowPanel(Element element)
         {
-            GameObject canvasObj = new GameObject("ElementInfoCanvas");
-            _canvas = canvasObj.AddComponent<Canvas>();
-            CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            if (_currentElement == element) return;
 
-            // Define WorldSpace canvas
-            _canvas.renderMode = RenderMode.WorldSpace;
-            _canvas.worldCamera = LearningWorldsApp.Instance.rigCamera;
-
-            UnityEngine.UI.GraphicRaycaster rayCaster = canvasObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
-
-            // Set canvas dimensions and position it in front of the selected element
-            RectTransform canvasRT = canvasObj.GetComponent<RectTransform>();
-            canvasRT.sizeDelta = new Vector2(550, 750);
-            canvasRT.pivot = new Vector2(0.5f, 1.0f);
-            canvasObj.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 5f;
-
-            SceneBuilder.AddWorldSpaceUI(canvasObj);
-            CreateTextFields();
-            CreateButtons();
+            _currentElement = element;
+            CreateAndPositionUIPanelAtSelectionPoint();
+            UpdatePanelUI();
         }
-
-        private void CreateTextFields()
+        
+        public void ClosePanel()
         {
-            int posCounter = 0;
-            foreach (var key in _textKeys)
+            if (infoPanelRoot) GameObject.Destroy(infoPanelRoot);
+        }
+        
+        // Raycast detection for element click
+        public void DetectSelection()
+        {
+            Ray ray = _app.rigCamera.ScreenPointToRay(new Vector2(Screen.width / 2.0f, Screen.height / 2.0f));
+            RaycastHit[] hits = Physics.RaycastAll(ray, MAX_RAYCAST_DISTANCE);
+
+            // Find trigger collider from Bohr atom - this indicates user has selected an element
+            SphereCollider triggerCollider = Array.Find(hits.Select(hit => hit.collider).Where(c => c != null && c.isTrigger), c => c.transform.parent != null && c.transform.parent.name.StartsWith("Atom_")) as SphereCollider;
+
+            if (triggerCollider != null)
             {
-                string formattedKey = key == "atomic_mass" ? "atomicMass" : key.Replace('_', ' ');
-
-                var labelObj = new GameObject(formattedKey + "Label");
-                var textObj = new GameObject(formattedKey + "Value");
-
-                // Position both fields vertically
-                labelObj.transform.SetParent(_canvas.transform);
-                TextMeshProUGUI labelText = labelObj.AddComponent<TextMeshProUGUI>();
-                labelText.text = formattedKey + ":";
-                labelText.alignment = TextAlignmentOptions.MidRight;
-                labelText.fontSize = 16;
-                labelText.fontStyle = FontStyles.Bold;
-                labelObj.transform.localPosition = new Vector3(-200, posCounter * -30, 0);
-
-                // Value field
-                textObj.transform.SetParent(_canvas.transform);
-                TextMeshProUGUI valueText = textObj.AddComponent<TextMeshProUGUI>();
-                valueText.fontSize = 16;
-                textObj.transform.localPosition = new Vector3(200, posCounter * -30, 0);
-
-                posCounter++;
-            }
-        }
-
-        private GameObject CreateUIButton(Transform parent, string name, string text, Vector2 anchoredPosition, Color backgroundColor)
-        {
-            GameObject buttonObj = new GameObject(name);
-            buttonObj.transform.SetParent(parent);
-            
-            Button button = buttonObj.AddComponent<Button>();
-            TextMeshProUGUI textLabel = buttonObj.AddComponent<TextMeshProUGUI>();
-
-            Image buttonImage = buttonObj.AddComponent<Image>();
-            buttonImage.color = backgroundColor;
-
-            textLabel.text = text;
-            textLabel.color = Color.black;
-            textLabel.textAlign = TextAlignmentOptions.Center;
-            textLabel.fontSize = 16;
-
-            RectTransform buttonRT = buttonObj.GetComponent<RectTransform>();
-            buttonRT.sizeDelta = new Vector2(200f, 50f);
-            buttonRT.anchoredPosition = anchoredPosition;
-            
-            return buttonObj;
-        }
-
-        private void CreateButtons()
-        {
-            GameObject buttonPanel = new GameObject("ButtonPanel");
-            buttonPanel.transform.SetParent(_canvas.transform);
-
-            // Enter room button
-            GameObject btnEnterRoom = CreateUIButton(buttonPanel.transform, "EnterRoomButton", "Raum betreten", new Vector2(-150, -330), new Color(0.5f, 0.8f, 0.5f));
-            Button btnEnterRoomButton = btnEnterRoom.GetComponent<Button>();
-            
-            // Go to room functionality
-            int selectedElementNumber = _currentElement.number;
-            btnEnterRoomButton.onClick.AddListener(() => { LearningWorldsApp.Go(World.ElementRoom, selectedElementNumber); });
-            
-            // Close button
-            GameObject btnClose = CreateUIButton(buttonPanel.transform, "CloseButton", "Schliessen", new Vector2(150, -330), new Color(0.8f, 0.5f, 0.5f));
-            Button btnCloseButton = btnClose.GetComponent<Button>();
-            btnCloseButton.onClick.AddListener(
-                () => {
-                    GameObject.Destroy(_canvas.gameObject);
-                });
-        }
-
-        private void UpdatePanel(Element e)
-        {
-            _currentElement = e;
-            UpdateCanvasTexts();
-        }
-
-        private void UpdateCanvasTexts()
-        {
-            TextMeshProUGUI[] textFields = _canvas.GetComponentsInChildren<TextMeshProUGUI>().Where(tf => tf.name.StartsWith("Value")).ToArray();
-            if (textFields.Length != _textKeys.Length) return;
-
-            foreach (TextMeshProUGUI txt in textFields)
-            {
-                string fieldName = txt.name.Replace("Value", "");
-                FieldInfo property = _currentElement.GetType().GetField(fieldName == "atomicMass"? "atomic_mass" : fieldName.Replace(' ', '_'), BindingFlags.Public | BindingFlags.Instance);
-
-                if (property != null)
+                string elementTag = triggerCollider.transform.parent.tag;
+                if (int.TryParse(elementTag, out int elementNumber))
                 {
-                    object value = property.GetValue(_currentElement);
-                    string text = value?.ToString() ?? "N/A";
-                    
-                    txt.text = Truncate(text);
+                    if (_currentElement?.number != elementNumber)
+                    {
+                        Element selectedElement = DataStore.GetPeriodicTable().Where(x => x.number == elementNumber).FirstOrDefault();
+                        if (selectedElement != null)
+                        {
+                            ShowPanel(selectedElement);
+                        }
+                    }
                 }
             }
         }
-        
-        public void HidePanel()
+
+        private void CreateAndPositionUIPanelAtSelectionPoint()
         {
-            if (_canvas) GameObject.Destroy(_canvas.gameObject);
+            if (infoPanelRoot)
+                GameObject.Destroy(infoPanelRoot);
+                
+            infoPanelRoot = new GameObject("ElementInfoRoot");
+            Canvas canvas = infoPanelRoot.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+            canvas.worldCamera = _app.rigCamera;
+            _canvas = canvas;
+
+            // Create panels to hold all UI elements
+            GameObject panel = CreateElementPanel();
+            panel.transform.SetParent(infoPanelRoot.transform);
+            
+            // Set initial position in front of last selected element
+            panel.transform.position = _app.rigCamera.transform.position + _app.rigCamera.transform.forward * 3.5f;
+            
+            SceneBuilder.AddWorldSpaceUI(infoPanelRoot);
+        }
+
+        private TextMeshProUGUI CreateUILabel(string text, RectTransform parent, params Vector2 position)
+        {
+            GameObject labelObj = new GameObject("Label");
+            labelObj.transform.SetParent(parent);
+
+            TextMeshProUGUI label = labelObj.AddComponent<TextMeshProUGUI>();
+            label.text = text;
+            label.fontSize = 16;
+            label.fontStyle = FontStyles.Bold;
+            label.color = Color.white;
+            label.alignment = TextAlignmentOptions.Left;
+            label.autoSizeTextContainer = true;
+
+            RectTransform rt = labelObj.GetComponent<RectTransform>();
+            rt.anchoredPosition = position;
+
+            return label;
         }
         
+        private GameObject CreateElementPanel()
+        {
+            GameObject panelObj = new GameObject("ElementInfoPanel");
+            panelObj.transform.SetParent(_canvas.transform);
+
+            RectTransform panelRT = panelObj.AddComponent<RectTransform>();
+            panelRT.sizeDelta = new Vector2(700, 800);
+            panelRT.localRotation = Quaternion.Euler(0, 180, 0); // Align forward
+            
+            CreateInfoTexts(panelRT);
+            CreateActionButtons(panelRT);
+
+            return panelObj;
+        }
+        
+        private void CreateInfoTexts(RectTransform parentRT)
+        {
+            int positionY = 0;
+
+            var infoEntries = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("Name", _currentElement.name),
+                new KeyValuePair<string, string>("Symbol", _currentElement.symbol),
+                new KeyValuePair<string, string>("Number", _currentElement.number.ToString()),
+                new KeyValuePair<string, string>("Atomic Mass", RegexMatchForMultiChar(_currentElement.atomic_mass,"^([0-9.]+)")),
+                new KeyValuePair<string, string>("Category", GetCategory()),
+                new KeyValuePair<string, string>("Phase", _currentElement.phase),
+                new KeyValuePair<string, string>("Melting Point [K]", RegexMatchForMultiChar(_currentElement.meltingTemp,"^([0-9.]+)")),
+                new KeyValuePair<string, string>("Boiling Point [K]", RegexMatchForMultiChar(_currentElement.boilingTemp,"^([0-9.]+)")),
+                new KeyValuePair<string, string>("Density [g/l]", RegexMatchForMultiChar(_currentElement.density,"^([0-9.]+)")),
+                new KeyValuePair<string, string>("Electronegativity", RegexMatchForMultiChar(_currentElement.electronegativity,"^([0-9.]+)")),
+                new KeyValuePair<string, string>("Appearance", _currentElement.appearance),
+                new KeyValuePair<string, string>("Configuration", _currentElement.electronConfig),
+                new KeyValuePair<string, string>("Summary", Truncate(_currentElement.summary, 60))
+            };
+                
+            // Format labels and values with proper alignment
+            foreach (var entry in infoEntries)
+            {
+                CreateUILabel(entry.Key + ":", parentRT, new Vector2(-300, positionY));
+                CreateUILabel(entry.Value, parentRT, new Vector2(-5, positionY));
+                positionY -= 40;
+            }
+        }
+        
+        private void CreateActionButtons(RectTransform parentRT)
+        {
+            // "Enter Element Room" button
+            GameObject enterButton = CreateUIButton("EnterElementRoom", "Raum betreten", new Vector2(0, -150),
+                220, () => LearningWorldsApp.Go(World.ElementRoom, _currentElement.number), new Color(0.31f, 0.65f, 0.3f));
+            enterButton.transform.SetParent(parentRT);
+            
+            // "Close Panel" button
+            GameObject closeButton = CreateUIButton("ClosePanel", "Schliessen", new Vector2(0, -250),
+                220, () => ClosePanel(), new Color(0.83f, 0.24f, 0.24f));
+            closeButton.transform.SetParent(parentRT);
+        }
+
+        private GameObject CreateUIButton(string name, string text, Vector2 position, float width,
+            UnityEngine.Events.UnityAction onClick, Color color)
+        {
+            GameObject buttonObj = new GameObject(name);
+            Button button = buttonObj.AddComponent<Button>();
+            Image image = buttonObj.AddComponent<Image>();
+            TextMeshProUGUI textLabel = buttonObj.AddComponent<TextMeshProUGUI>();
+
+            RectTransform rt = buttonObj.GetComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(width, 50);
+            rt.anchoredPosition = position;
+
+            textLabel.text = text;
+            textLabel.fontSize = 18;
+            textLabel.color = Color.black;
+            textLabel.alignment = TextAlignmentOptions.Center;
+
+            image.color = color;
+            image.raycastTarget = true;
+
+            button.onClick.AddListener(onClick);
+
+            return buttonObj;
+        }
+        
+        // Update code to refactor access to element data
+        private void UpdatePanelUI()
+        {
+            // Clean up any existing UI
+            foreach (Transform child in infoPanelRoot?.transform)
+            {
+                if (child != null && child.name != "ElementInfoPanel" && child.name != "Label")
+                {
+                    GameObject.Destroy(child.gameObject);
+                }
+            }
+            
+            // Rebuild UI with updated element info
+            CreateInfoTexts(infoPanelRoot.GetComponentInChildren<RectTransform>(true));
+            CreateActionButtons(infoPanelRoot.GetComponentInChildren<RectTransform>(true));
+        }
+
+        private string GetCategory()
+        {
+            if (DataStore.ElementCategories.TryGetValue(_currentElement.category, out string category)) 
+                return category;
+            return _currentElement.category;
+        }
+
+        private string RegexMatchForMultiChar(string field, string pattern)
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(field, pattern);
+            return match.Success ? match.Groups[1].Value : "N/A";
+        }
+        
+        // Text truncation for UI
         private string Truncate(string input, int maxLength = 60)
         {
-            if (string.IsNullOrEmpty(input)) { return "N/A"; }
-            return input.Length > maxLength ? input.Substring(0, maxLength) + "..." : input;
+            if (string.IsNullOrEmpty(input)) return "N/A";
+            return input.Length <= maxLength ? input : input.Substring(0, maxLength) + "...";
         }
     }
 }
