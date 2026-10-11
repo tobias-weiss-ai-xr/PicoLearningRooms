@@ -131,15 +131,18 @@ Reuse `TextUtil.Wrap`, `PedestalCreator`, `TextMesh` + `LegacyRuntime.ttf`.
   **Synchronous** — drop `async`/`LoadSceneAsync`/scene-name logic.
 - `Portal.TriggerComponent.OnTriggerEnter`: call `LearningWorldsApp.Go(target_world)` directly
   (remove `.GetAwaiter().GetResult()`).
-- `InitializeApp()`: keep the manager; build the Hub + rig **only when the bootstrap flag is set**
-  (`SessionState` in editor / a static flag at runtime), so normal scene Play is unaffected.
+- `InitializeApp()`: keep the manager; build the Hub + rig **only when the bootstrap flag is set**.
+  The flag is read from `SessionState` under `#if UNITY_EDITOR` (`LW_Boot`); a runtime/device boot
+  scene is a non-goal for v1. Normal scene Play is unaffected (flag unset).
 - `Assets/LearningWorlds/Editor/LearningWorldsMenus.cs`: replace the broken scene items with:
-  - **`LearningWorlds/Play Learning Worlds`** — `EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, Single)`,
-    `SessionState.SetBool("LW_Boot", true)`, `EditorApplication.isPlaying = true`.
-  - **`LearningWorlds/Open Element Room…`** — enter Play with `LW_Boot` set and
-    `Go(World.ElementRoom, N)` for a chosen atomic number.
+  - **`LearningWorlds/Play Learning Worlds`** — `EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, Single)`
+    (unsaved empty scene), `SessionState.SetBool("LW_Boot", true)`, `EditorApplication.isPlaying = true`.
+  - **`LearningWorlds/Open Element Room…`** — same, but also
+    `SessionState.SetString("LW_Boot_Target", "ElementRoom:<N>")`; the boot reads it **after** Play
+    starts and calls `Go(World.ElementRoom, N)`. The menu must NOT call `Go()` directly, because
+    `EditorApplication.isPlaying = true` is deferred.
   - Drop `Open Hub Scene` / `Open PSE Gallery` / `Register Build Scenes` / `Create Hub Prefab`
-    (they reference nonexistent scenes/do nothing useful).
+    (they reference nonexistent scenes / do nothing useful).
 
 ## Verification
 
