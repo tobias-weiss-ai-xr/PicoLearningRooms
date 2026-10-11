@@ -9,12 +9,28 @@ namespace LearningWorlds.Editor
         [MenuItem("LearningWorlds/Open Hub Scene", false)]
         public static void OpenHub()
         {
-            if (Application.isPlaying) return;
+            if (Application.isPlaying)
+            {
+                EditorUtility.DisplayDialog("Error", "Cannot load scene while in Play Mode.", "OK");
+                return;
+            }
 
-            // Ensure a clean scene before loading the hub in LearningWorlds
-            EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects);
-            EditorSceneManager.LoadScene("Assets/Scenes/LearningWorlds-Hub.unity");
-        }
+            // Ensure scene path is valid and handle potential nulls
+            string hubScenePath = "Assets/Scenes/LearningWorlds-Hub.unity";
+            if (string.IsNullOrEmpty(hubScenePath))
+            {
+                EditorUtility.DisplayDialog("Error", "Invalid scene path!", "OK");
+                return;
+            }
+
+            try
+            {
+                EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects);
+                EditorSceneManager.OpenScene(hubScenePath);
+            }
+            catch (System.Exception e)
+            {
+                EditorUtility.DisplayDialog("Error", $
         
         [MenuItem("LearningWorlds/Register Build Scenes", false)]
         public static void Register()

@@ -1,45 +1,33 @@
-# PicoLearningRooms Learning Worlds — VR Unity ·6000 pico 4 enterprise
+# PicoLearningRooms: Learning Worlds VR
 
-### Empowering Educational Experiences through *LearningWorlds*: Retrieve and Graded Exposure VR Interface
+**Unity 6000 for PICO 4 Enterprise**
 
+Fun 나 chaotic learning through immersive VR experiences.
 
-----
+---
 
-## About LearningWorlds
+## About
 
-Emphasizing **retrieval practice and gradual exposure** for effective educational absorption.
-Extensive VR **simulations and immersive experiences**, from chemical to psychological education.
+This project merges principles from **retrieval practice**, **graded exposure (therapy)**, and role-played storytelling into **pico-interactive VR learning worlds**. Designed for immersion and experiential knowledge-building.
 
 ---
 
 ## Worlds
-- **Periodensystem 3D**: A **3D interactive periodic system** representing **118 elements**, with **5 crucial stations** including exposure therapy and medical simulations.
 
-1. **Mut-Training**: Exposure therapy workspace
-2. **3D-PSE**: Trained research stations
-3. **Forschungslabore**: Lab environment supporting immersive investigation
+- **Periodensystem (3D-PSE)**: A 3D immersive spatial experience of the periodic table with **118 elements** and **5 interactive stations**, including **Mut-Training** and species with unique learning interventions.
 
----
+- **Spinnen**: Exposure therapy for **arachnophobia**; strategies and safe-guided encounters with spiders.
 
-### Ports & Inspirations
-
-- **Origins: Demonstration ports:** 
-   - **[WebXR Periodic Table](https://tobias-weiss.ai/periodic-table)** 
-   - **[Arachnophobia simulation](https://pse.chemie-lernen.org/find/)**
-
-
-### Definition of LearningWorlds Design Syntax
-
-For technical understanding, explore full design documentation: **[ole Documentation](docs/superpowers/specs/2026-10-09-learning-worlds-design.md)**
+- **Forschungslabore**: Simulated labs to explore data representation and experimental techniques.
+- Science-based, aligned with existing literature on AOI and evidence-based pedagogy.
 
 ---
 
 ## Get Started
 
-
-1. **In Unity,I editor**: 
-   - **LearningWorld/Open Learning World**: Instantiate hub and explore using **WASD + mouse**. 
-   
-2. **LearningWorlds/Register Scenes**: Efficiently build and configure your scene for VR environments.
+1. Open **Unity** and load the project.
+2. From the menu (**Assets > LearningWorlds**), select **`Open Hub Scene`**.
+3. Add scenes via **`Register Build Scenes`** as needed.
+4. Press **Play** and navigate using **WASD + mouse**.
 
 ---
