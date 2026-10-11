@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using LearningWorlds.Pse;
 
 namespace LearningWorlds.PSE
 {
