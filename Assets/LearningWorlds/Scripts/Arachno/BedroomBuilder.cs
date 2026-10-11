@@ -114,12 +114,12 @@ public class BedroomBuilder : MonoBehaviour
         windowEmissive.parent = transform;
         windowEmissive.localPosition = new Vector3(2f, 2f, 0);
         windowEmissive.localScale = new Vector3(3f, 1f, 1f);
-        windowEmissive.gameObject.AddComponent<Renderer>().material = new Material(Shader.Find("Standard"))
-        {
-            color = Color.white,
-            enableKeyword = "_EMISSION",
-            globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack
-        };
+       Renderer windowRenderer = windowEmissive.gameObject.AddComponent<Renderer>();
+        windowRenderer.material = new Material(Shader.Find("Standard"));
+        windowRenderer.material.color = Color.white;
+        windowRenderer.material.EnableKeyword("_EMISSION");
+        windowRenderer.material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+        windowRenderer.material.SetColor("_EmissionColor", Color.blue * 0.5f);
         windowEmissive.gameObject.GetComponent<Renderer>().material.SetColor("_EmissionColor", Color.blue * 0.5f);
     }
 }

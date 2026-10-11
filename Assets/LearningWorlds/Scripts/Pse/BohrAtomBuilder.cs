@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using LearningWorlds.Pse;
 
-namespace LearningWorlds.PSE
+namespace LearningWorlds.Pse
 {
     public static class BohrAtomBuilder
     {

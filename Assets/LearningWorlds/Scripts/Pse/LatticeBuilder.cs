@@ -64,7 +64,7 @@ namespace LearningWorlds.Pse
         /// <summary>
         /// Builds a Face-Centered Cubic (FCC) lattice.
         /// </summary>
-        public static void BuildFCCLattice(GameObject parent, float cellSize)
+        public static GameObject BuildFCCLattice(GameObject parent, float cellSize)
         {
             const float atomRadius = 0.09f;
 
@@ -88,6 +88,7 @@ namespace LearningWorlds.Pse
             }
 
             AddBondingLines(parent, cellSize, BondStyle.FCC);
+            return parent;
         }
 
         /// <summary>
