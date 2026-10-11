@@ -1,6 +1,7 @@
 using UnityEngine;
+using LearningWorlds.Hub;
 
-namespace LearningWorlds
+namespace LearningWorlds.Hub
 {
     /// <summary>
     /// Builds the central learning hub with a circular floor and portal signage.
