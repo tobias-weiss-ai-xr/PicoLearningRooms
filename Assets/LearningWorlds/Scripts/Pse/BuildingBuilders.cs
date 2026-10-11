@@ -4,6 +4,7 @@ using UnityEngine;
 using LearningWorlds;
 using LearningWorlds.Pse;
 using LearningWorlds.Arachnophobia;
+using LearningWorlds.Hub;
 
 namespace LearningWorlds
 {
