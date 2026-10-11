@@ -79,7 +79,7 @@ namespace LearningWorlds.Editor
 
                 if (!isRegistered)
                 {
-                    uint currentSize = (uint)scenes.Length;
+                    int currentSize = scenes.Length;
                     System.Array.Resize(ref scenes, currentSize + 1);
                     scenes[scenes.Length - 1] = new EditorBuildSettingsScene(scenePath, true);
                     anyChanges = true;
