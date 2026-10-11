@@ -1,7 +1,8 @@
 using UnityEngine;
 using LearningWorlds;
+using LearningWorlds.Tutors;
 
-namespace LearningWorlds
+namespace LearningWorlds.Hub
 {
     /// <summary>
     /// Portal system for transitioning between learning worlds.
@@ -46,10 +47,10 @@ namespace LearningWorlds
             {
                 if (world != World.Hub) // Don't show tooltip for Hub portal
                 {
-                    string tutorName = SocraticTutorManager.Instance?.GetTutorNameForWorld(world);
-                    if (!string.IsNullOrEmpty(tutorName))
+                    var tutor = SocraticTutorManager.Instance?.GetTutor(world.ToString());
+                    if (tutor != null)
                     {
-                        Debug.Log("[Portal] Tutor available: " + tutorName);
+                        Debug.Log("[Portal] Tutor available for " + world);
                     }
                 }
             }
