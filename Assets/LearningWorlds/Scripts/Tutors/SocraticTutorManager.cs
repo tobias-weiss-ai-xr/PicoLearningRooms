@@ -1,15 +1,12 @@
 using UnityEngine;
+using LearningWorlds;
 
+/// <summary>
+/// Manages Socratic questioning for tutors in different learning worlds.
+/// Integrates with SaiaTutorManager to route messages to the correct tutor.
+/// </summary>
 public class SocraticTutorManager : MonoBehaviour
 {
-    public enum World
-    {
-        Hub,
-        PseGallery,
-        ElementRoom,
-        Arachnophobia
-    }
-
     public static SocraticTutorManager Instance { get; private set; }
 
     private void Awake()
@@ -27,9 +24,10 @@ public class SocraticTutorManager : MonoBehaviour
 
     /// <summary>
     /// Sends a context-aware message to the tutor for the specified world.
-    /// Uses SaiaTutorManager to route to the correct tutor.
     /// </summary>
-    public void SendContextMessage(string world, string message)
+    /// <param name="world">The learning world (from LearningWorlds.World enum)</param>
+    /// <param name="message">The context message to send</param>
+    public void SendContextMessage(World world, string message)
     {
         string worldName = world.ToString();
         Debug.Log("[SocraticTutorManager] Context message for " + worldName + ": " + message);
@@ -37,7 +35,10 @@ public class SocraticTutorManager : MonoBehaviour
         string builtMessage = BuildSocraticPrompt(worldName, message);
 
         // Get tutor from SaiaTutorManager
-        // Get tutor and activate
+        SaiaTutor tutor = SaiaTutorManager.Instance.GetTutorForWorld(worldName);
+        if (tutor != null)
+        {
+            tutor.SendToLLM(builtMessage);
         }
         else
         {
@@ -46,17 +47,27 @@ public class SocraticTutorManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Builds a Socratic-style prompt based on the world context.
+    /// Gets the tutor name for a specific world (for display purposes).
     /// </summary>
     public string GetTutorNameForWorld(World world)
     {
-        return world.ToString() + "Tutor";
+        switch (world)
+        {
+            case World.Hub: return "Sokrates-Wegweiser";
+            case World.PseGallery: return "Sokrates-Chemiker";
+            case World.ElementRoom: return "Sokrates-Forscher";
+            case World.Arachnophobia: return "Sokrates-Therapeut";
+            default: return "Tutor";
+        }
     }
-    
+
+    /// <summary>
+    /// Builds a Socratic-style prompt based on the world context.
+    /// </summary>
     private string BuildSocraticPrompt(string world, string context)
     {
         string socraticPrefix;
-        switch(world)
+        switch (world)
         {
             case "Hub":
                 socraticPrefix = "In the Learning Hub, consider:";

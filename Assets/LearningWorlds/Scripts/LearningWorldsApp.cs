@@ -102,7 +102,7 @@ namespace LearningWorlds {
                 IBuilder builder = worldBuilder(element);
                 
                 // Activate tutor for the current world
-                SocraticTutorManager.Instance?.ActivateTutorForWorld(world);
+                SaiaTutorManager.Instance?.ActivateTutorForWorld(world.ToString());
             }
         }
         }
@@ -133,14 +133,4 @@ namespace LearningWorlds {
             }
         }
         }
-        
-#region GETTUTORNAME // From SocraticTutorManager
-        
-        // Convert enum to Tutor Name
-        public static string GetTutorNameForWorld(World world)
-        {
-            return world.ToString() + "Tutor";
-        }
-        
-#endregion
     }

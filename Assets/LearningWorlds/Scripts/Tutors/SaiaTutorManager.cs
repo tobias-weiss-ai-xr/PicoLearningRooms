@@ -36,7 +36,7 @@ public class SaiaTutorManager : MonoBehaviour
     }
 
     // Initialize a tutor with the specified config
-    public SaiaTutor SpawnTutor(SaiaTutorConfig.TutorConfig tutorConfig, string world)
+    public SaiaTutor SpawnTutor(SaiaTutorConfig.TutorConfig tutorConfig)
     {
         if (string.IsNullOrEmpty(tutorConfig.name))
         {
@@ -57,7 +57,7 @@ public class SaiaTutorManager : MonoBehaviour
         // Instantiate TutorAvatar with specified config
         GameObject avatarInstance = Instantiate(avatarPrefab, 
             tutorConfig.spawnPosition, 
-            tutorConfig.spawnRotation);
+            tutorConfig.SpawnRotation);
 
         if (avatarInstance.GetComponent<TutorAvatar>() == null)
         {
@@ -77,10 +77,10 @@ public class SaiaTutorManager : MonoBehaviour
         saiaTutor.Setup(tutorConfig);
         avatarInstance.SetActive(false); // Deactivate by default
 
-        // Register in active tutors
-        _activeTutors[world] = saiaTutor;
+        // Register in active tutors using world from config
+        _activeTutors[tutorConfig.world] = saiaTutor;
 
-        Debug.Log("[SaiaTutorManager] Spawned tutor: " + tutorConfig.name + " for " + world);
+        Debug.Log("[SaiaTutorManager] Spawned tutor: " + tutorConfig.name + " for " + tutorConfig.world);
         return saiaTutor;
     }
 
@@ -95,7 +95,7 @@ public class SaiaTutorManager : MonoBehaviour
 
         foreach (var tc in _tutorConfig.tutors)
         {
-            SpawnTutor(tc, tc.world);
+            SpawnTutor(tc);
         }
     }
 

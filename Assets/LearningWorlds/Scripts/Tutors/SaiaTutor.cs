@@ -15,6 +15,11 @@ public class SaiaTutor : MonoBehaviour
 
     public void SendToLLM(string userText)
     {
+        if (_tutorConfig == null)
+        {
+            Debug.LogError("[SaiaTutor] TutorConfig not set! Call Setup() first.");
+            return;
+        }
         StartCoroutine(SendLLMRequest(userText));
     }
 

@@ -12,7 +12,10 @@ public class SaiaTutorConfig : ScriptableObject
         public string systemPrompt;
         public string voiceId;
         public Vector3 spawnPosition;
-        public Quaternion spawnRotation;
+        public Vector3 spawnEulerAngles; // Euler angles for Unity Inspector
+        
+        // Helper to get rotation as Quaternion
+        public Quaternion SpawnRotation => Quaternion.Euler(spawnEulerAngles);
     }
 
     public List<TutorConfig> tutors = new List<TutorConfig>();

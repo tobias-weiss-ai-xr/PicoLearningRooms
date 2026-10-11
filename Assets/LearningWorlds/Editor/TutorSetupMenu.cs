@@ -1,73 +1,102 @@
 using UnityEditor;
 using UnityEngine;
+using System.IO;
 
-public partial class TutorSetupMenu
+namespace LearningWorlds.Editor
 {
-    [MenuItem("LearningWorlds/Setup Saia Tutors")]
-    private static void SetupSaiaTutors()
+    public static class TutorSetupMenu
     {
-        // Create a default Tutor Configuration asset
-        string path = "Assets/Resources/TutorConfigs/DefaultTutorConfig.asset";
-
-        if (System.IO.File.Exists(path))
+        [MenuItem("LearningWorlds/Setup Saia Tutors", false, 100)]
+        private static void SetupSaiaTutors()
         {
-            // Asset already exists – display asset in Project window
-            EditorUtility.FocusProjectWindow();
-            Selection.activeObject = AssetDatabase.LoadAssetAtPath<object>(path);
-            EditorUtility.RevealInFinder(path);
-        }
-        else
-        {
-            // Create and populate Default Tutor Configuration
-            SaiaTutorConfig configObject = ScriptableObject.CreateInstance<SaiaTutorConfig>();
+            // Create a default Tutor Configuration asset
+            string path = "Assets/Resources/TutorConfigs/DefaultTutorConfig.asset";
+            string fullPath = Path.Combine(Application.dataPath, "Resources/TutorConfigs");
             
-            // Setup default Chemiker tutor for PseGallery
-            var chemikerTutor = new SaiaTutorConfig.TutorConfig()
+            // Ensure directory exists
+            if (!Directory.Exists(fullPath))
             {
-                world = "PseGallery",
-                name = "Chemiker",
-                systemPrompt = "You are a chemistry tutor. Explain concepts about chemical reactions and elements.",
-                voiceId = "de-de",
-                spawnPosition = new Vector3(2.0f, 0.0f, 1.0f),
-                spawnRotation = Quaternion.Euler(0, 180, 0)
-            };
+                Directory.CreateDirectory(fullPath);
+                AssetDatabase.Refresh();
+            }
 
-            // Setup default Forscher tutor for ElementRoom
-            var researcherTutor = new SaiaTutorConfig.TutorConfig()
+            if (File.Exists(Path.Combine(Application.dataPath, path)))
             {
-                world = "ElementRoom",
-                name = "Forscher",
-                systemPrompt = "You are a scientist conducting experiments. Help the user interactively explore chemistry concepts.",
-                voiceId = "de-de",
-                spawnPosition = new Vector3(4.0f, 0.0f, -1.0f),
-                spawnRotation = Quaternion.Euler(0, 0, 0)
-            };
-
-            // Setup default Therapeut tutor for Arachnophobia
-            var therapistTutor = new SaiaTutorConfig.TutorConfig()
+                // Asset already exists – display asset in Project window
+                EditorUtility.FocusProjectWindow();
+                var asset = AssetDatabase.LoadAssetAtPath<SaiaTutorConfig>(path);
+                if (asset != null)
+                {
+                    Selection.activeObject = asset;
+                    EditorGUIUtility.PingObject(asset);
+                }
+            }
+            else
             {
-                world = "Arachnophobia",
-                name = "Therapeut",
-                systemPrompt = "You are a psychological therapist specializing in phobias. Help the user overcome their fear of spiders through gradual exposure.",
-                voiceId = "de-de",
-                spawnPosition = new Vector3(0.0f, 0.0f, 0.0f),
-                spawnRotation = Quaternion.Euler(0, 0, 0)
-            };
+                // Create and populate Default Tutor Configuration
+                SaiaTutorConfig configObject = ScriptableObject.CreateInstance<SaiaTutorConfig>();
+                
+                // Setup default Chemiker tutor for PseGallery
+                var chemikerTutor = new SaiaTutorConfig.TutorConfig
+                {
+                    world = "PseGallery",
+                    name = "Chemiker",
+                    systemPrompt = "Du bist ein Chemie-Tutor. Erkläre Konzepte zu chemischen Reaktionen und Elementen auf sokratische Weise.",
+                    voiceId = "de-de",
+                    spawnPosition = new Vector3(2.0f, 0.0f, 1.0f),
+                    spawnEulerAngles = new Vector3(0, 180, 0)
+                };
 
-            // Add tutors to config
-            configObject.tutors.Add(chemikerTutor);
-            configObject.tutors.Add(researcherTutor);
-            configObject.tutors.Add(therapistTutor);
+                // Setup default Forscher tutor for ElementRoom
+                var researcherTutor = new SaiaTutorConfig.TutorConfig
+                {
+                    world = "ElementRoom",
+                    name = "Forscher",
+                    systemPrompt = "Du bist ein Wissenschaftler, der Experimente durchführt. Hilf dem Nutzer, Chemie-Konzepte interaktiv zu erkunden.",
+                    voiceId = "de-de",
+                    spawnPosition = new Vector3(4.0f, 0.0f, -1.0f),
+                    spawnEulerAngles = new Vector3(0, 0, 0)
+                };
 
-            // Save the new asset file
-            AssetDatabase.CreateAsset(configObject, path);
-            AssetDatabase.SaveAssets();
+                // Setup default Therapeut tutor for Arachnophobia
+                var therapistTutor = new SaiaTutorConfig.TutorConfig
+                {
+                    world = "Arachnophobia",
+                    name = "Therapeut",
+                    systemPrompt = "Du bist ein psychologischer Therapeut, spezialisiert auf Phobien. Hilf dem Nutzer, seine Angst vor Spinnen durch schrittweise Konfrontation zu überwinden.",
+                    voiceId = "de-de",
+                    spawnPosition = new Vector3(0.0f, 0.0f, 0.0f),
+                    spawnEulerAngles = new Vector3(0, 0, 0)
+                };
 
-            // Focus on new asset in Project window
-            EditorUtility.FocusProjectWindow();
-            Selection.activeObject = configObject;
+                // Setup default Wegweiser tutor for Hub
+                var guideTutor = new SaiaTutorConfig.TutorConfig
+                {
+                    world = "Hub",
+                    name = "Wegweiser",
+                    systemPrompt = "Du bist ein Lernbegleiter. Hilf dem Nutzer, den richtigen Lernweg zu finden und die verfügbaren Lernwelten zu verstehen.",
+                    voiceId = "de-de",
+                    spawnPosition = new Vector3(0.0f, 0.0f, 2.0f),
+                    spawnEulerAngles = new Vector3(0, 180, 0)
+                };
 
-            Debug.Log($"Default Tutor Config Assigned Saved at {path}");
+                // Add tutors to config
+                configObject.tutors.Add(chemikerTutor);
+                configObject.tutors.Add(researcherTutor);
+                configObject.tutors.Add(therapistTutor);
+                configObject.tutors.Add(guideTutor);
+
+                // Save the new asset file
+                AssetDatabase.CreateAsset(configObject, path);
+                AssetDatabase.SaveAssets();
+
+                // Focus on new asset in Project window
+                EditorUtility.FocusProjectWindow();
+                Selection.activeObject = configObject;
+                EditorGUIUtility.PingObject(configObject);
+
+                Debug.Log("[TutorSetupMenu] Default Tutor Config saved at " + path);
+            }
         }
     }
 }

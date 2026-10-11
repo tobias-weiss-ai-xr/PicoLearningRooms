@@ -9,14 +9,18 @@ namespace Arachnophobia
         public static bool ExposureFrozen = false;
         private SpiderFactory spiderFactory;
         private Vector3 exposurePos = new Vector3(4f, 0.5f, 0f);
-            private const int MAX_EXPOSURE_LEVEL = 9;
+        private const int MAX_EXPOSURE_LEVEL = 9;
+        
         public int CurrentTier => CurrentLevel < 3 ? 0 : CurrentLevel < 6 ? 1 : 2;
         public float CurrentMotion => 0.3f * CurrentLevel;
         
         void Start()
         {
             spiderFactory = FindObjectOfType<SpiderFactory>();
-            World.Builders[World.Arachnophobia] = Build; // Register the room builder in the builder map
+            
+            // Register builder for World enum (SocraticTutorManager.World)
+            var world = new World { Name = "Arachnophobia" };
+            LearningWorldsApp.Builders[world] = Build;
         }
         
         void LateUpdate()
@@ -25,11 +29,10 @@ namespace Arachnophobia
                 IncrementExposure();
             else if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus))
                 DecrementExposure();
-            else if (Input.GetKeyDown(KeyCode.F) &&  Input.GetKey(KeyCode.LeftControl))
+            else if (Input.GetKeyDown(KeyCode.F) && Input.GetKey(KeyCode.LeftControl))
                 ExposureFrozen = !ExposureFrozen;
             else if (Input.GetKeyDown(KeyCode.Backslash) && Input.GetKey(KeyCode.LeftShift))
-                World.Go(World.Hub);
-            CheckInputBoundary();
+                LearningWorldsApp.Go(new World { Name = "Hub" });
         }
         
         public GameObject Build()
@@ -46,7 +49,8 @@ namespace Arachnophobia
             if (spider != null)
             {
                 if (CurrentTier == 2) spider.AddComponent<SpiderDrift>();
-                spider.AddComponent<LightAnimationSelector>(); };
+                spider.AddComponent<LightAnimationSelector>();
+            }
         }
         
         void IncrementExposure()
@@ -54,7 +58,6 @@ namespace Arachnophobia
             if (ExposureFrozen || CurrentLevel >= MAX_EXPOSURE_LEVEL) return;
             CurrentLevel++;
             UpdateExposure();
-        
         }
         
         void DecrementExposure()
@@ -63,21 +66,17 @@ namespace Arachnophobia
             CurrentLevel--;
             UpdateExposure();
         }
-        
-        void CheckInputBoundary()
-        {
-            // Hide when level is at max, reset when живеки 
-                
- // Adjust exposure logic
-        }
     }
 
     public class SpiderDrift : MonoBehaviour
     {
         void Update()
         {
-            transform.position += new Vector3(Random.Range(-0.003f, 0.003f), 0,
-                Random.Range(-0.003f, 0.003f));
+            transform.position += new Vector3(
+                Random.Range(-0.003f, 0.003f), 
+                0,
+                Random.Range(-0.003f, 0.003f)
+            );
         }
     }
 }
