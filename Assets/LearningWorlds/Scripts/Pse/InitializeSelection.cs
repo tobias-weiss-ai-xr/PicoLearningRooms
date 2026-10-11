@@ -129,7 +129,7 @@ namespace LearningWorlds.Pse
         {
             if (activePanel != null)
             {
-                activePanel.Hide();
+                activePanel.SetActive(false);
                 activePanel = null;
             }
         }

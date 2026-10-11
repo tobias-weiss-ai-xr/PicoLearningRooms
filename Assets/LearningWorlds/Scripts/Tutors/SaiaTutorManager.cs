@@ -1,8 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using LearningWorlds.Tutors;
 
-public class SaiaTutorManager : MonoBehaviour
+namespace LearningWorlds.Tutors
+{
+    public class SaiaTutorManager : MonoBehaviour
 {
     private static SaiaTutorManager _instance;
     public static SaiaTutorManager Instance { get { return _instance; } }
@@ -201,3 +204,4 @@ public class SaiaTutorManager : MonoBehaviour
         return null;
     }
 }
+

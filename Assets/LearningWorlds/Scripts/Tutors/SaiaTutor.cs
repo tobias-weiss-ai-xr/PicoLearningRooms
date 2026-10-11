@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
 using System.IO;
+using LearningWorlds.Tutors;
 
 public class SaiaTutor : MonoBehaviour
 {
@@ -50,8 +51,8 @@ public class SaiaTutor : MonoBehaviour
                 string responseJson = request.downloadHandler.text;
                 Debug.Log("LLM Response: " + responseJson);
 
-                // Extract response text from JSON
-                _lastResponse = System.Text.Json.JsonSerializer.Deserialize<string>(responseJson);
+                // Extract response text - simple approach
+                _lastResponse = responseJson;
 
                 // TODO: Add animation trigger here
                 PlayAudioForResponse(_lastResponse);

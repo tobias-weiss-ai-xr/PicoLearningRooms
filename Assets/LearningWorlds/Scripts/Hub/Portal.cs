@@ -9,7 +9,7 @@ namespace LearningWorlds
     /// </summary>
     public class Portal : MonoBehaviour
     {
-        private float lastTriggerTime = 0f;
+        private static float lastTriggerTime = 0f;
         private const float TriggerCooldown = 2.0f;
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace LearningWorlds
             private void OnTriggerEnter(Collider other)
             {
                 // Check cooldown to prevent trigger spam
-                if (Time.time - lastTriggerTime < debounce_duration)
+                if (Time.time - Portal.lastTriggerTime < debounce_duration)
                     return;
 
                 // Only trigger for player (or objects on default layer)
@@ -82,13 +82,13 @@ namespace LearningWorlds
                     ShowTooltip(target_world);
 
                     // Update cooldown
-                    lastTriggerTime = Time.time;
+                    Portal.lastTriggerTime = Time.time;
                 }
             }
 
             private void ResetTriggerTime()
             {
-                lastTriggerTime = 0f;
+                Portal.lastTriggerTime = 0f;
             }
 
             private void OnEnable()

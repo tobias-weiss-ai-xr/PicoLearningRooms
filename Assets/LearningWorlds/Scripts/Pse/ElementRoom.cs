@@ -1,5 +1,6 @@
 using UnityEngine;
 using LearningWorlds;
+using LearningWorlds.Pse;
 
 namespace LearningWorlds.Pse
 {
@@ -139,7 +140,7 @@ namespace LearningWorlds.Pse
                     Mathf.Sin(angle) * Radius
                 );
 
-                GameObject station = QuizStation.Create(element, position, i);
+                QuizStation station = QuizStation.Create(element, position, i);
                 station.name = "QuizStation_" + (i + 1);
                 station.transform.SetParent(stationContainer.transform);
             }

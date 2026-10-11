@@ -49,10 +49,10 @@ namespace LearningWorlds
         /// </summary>
         public static Dictionary<World, System.Func<int, IBuilder>> Builders = new Dictionary<World, System.Func<int, IBuilder>>()
         {
-            { World.Hub, w => (int ele) => new HubBuilder() },
-            { World.PseGallery, w => (int ele) => new PseGalleryBuilder() },
-            { World.ElementRoom, w => (int ele) => new ElementRoomBuilder(ele) },
-            { World.Arachnophobia, w => (int ele) => new ArachnophobiaBuilder() }
+            { World.Hub, (int ele) => new HubBuilder() },
+            { World.PseGallery, (int ele) => new PseGalleryBuilder() },
+            { World.ElementRoom, (int ele) => new ElementRoomBuilder(ele) },
+            { World.Arachnophobia, (int ele) => new ArachnophobiaBuilder() }
         };
 
         /// <summary>Singleton instance of the LearningWorldsApp.</summary>
@@ -207,7 +207,7 @@ namespace LearningWorlds
             InitializeCamera(rigGameObject.transform);
         }
 
-        private Camera rigCamera = null;
+        public Camera rigCamera = null;
 
         /// <summary>
         /// Initializes the main camera for the rig.

@@ -64,7 +64,7 @@ public static class PedestalCreator
         panelMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
         panelPlane.GetComponent<Renderer>().material = panelMaterial;
 
-        DestroyImmediate(panelPlane.GetComponent<BoxCollider>());
+        UnityEngine.Object.DestroyImmediate(panelPlane.GetComponent<BoxCollider>());
 
         // Add pedestreal feedback component
         PedestalFeedback feedback = pedestalObject.AddComponent<PedestalFeedback>();
