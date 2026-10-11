@@ -6,28 +6,28 @@ using LearningWorlds.Tutors;
 namespace LearningWorlds.Tutors
 {
     public class SaiaTutorManager : MonoBehaviour
-{
-    private static SaiaTutorManager _instance;
+    {
+        private static SaiaTutorManager _instance;
     public static SaiaTutorManager Instance { get { return _instance; } }
 
     private SaiaTutorConfig _tutorConfig;
     private Dictionary<string, SaiaTutor> _activeTutors = new Dictionary<string, SaiaTutor>();
-    private SaiaTutor _currentTutor;
+        private SaiaTutor _currentTutor;
 
-    // Reference to current microphone usage
-    private AudioClip _lastSentAudio;
-    private bool _isRecording = false;
+        // Reference to current microphone usage
+        private AudioClip _lastSentAudio;
+        private bool _isRecording = false;
 
-    // Load config
-    public void Initialize(SaiaTutorConfig config)
-    {
-        _tutorConfig = config;
-    }
+        // Load config
+        public void Initialize(SaiaTutorConfig config)
+        {
+            _tutorConfig = config;
+        }
 
-    // Singleton pattern + Don'tDestroyOnLoad
-    public void Awake()
-    {
-        if (_instance == null)
+        // Singleton pattern + Don'tDestroyOnLoad
+        private void Awake()
+        {
+            if (_instance == null)
         {
             _instance = this;
             DontDestroyOnLoad(gameObject);
@@ -38,8 +38,8 @@ namespace LearningWorlds.Tutors
         }
     }
 
-    // Initialize a tutor with the specified config
-    public SaiaTutor SpawnTutor(SaiaTutorConfig.TutorConfig tutorConfig)
+        // Initialize a tutor with the specified config
+        public SaiaTutor SpawnTutor(SaiaTutorConfig.TutorConfig tutorConfig)
     {
         if (string.IsNullOrEmpty(tutorConfig.name))
         {
@@ -87,8 +87,8 @@ namespace LearningWorlds.Tutors
         return saiaTutor;
     }
 
-    // Spawn all tutors from config
-    public void SpawnAllTutors()
+        // Spawn all tutors from config
+        public void SpawnAllTutors()
     {
         if (_tutorConfig == null || _tutorConfig.tutors == null)
         {
@@ -102,8 +102,8 @@ namespace LearningWorlds.Tutors
         }
     }
 
-    // Activate the tutor for specific world only
-    public void ActivateTutorForWorld(string world)
+        // Activate the tutor for specific world only
+        public void ActivateTutorForWorld(string world)
     {
         // Deactivate current tutor first
         if (_currentTutor != null)
@@ -124,8 +124,8 @@ namespace LearningWorlds.Tutors
         }
     }
 
-    // Get tutor by world for SocraticManager
-    public SaiaTutor GetTutorForWorld(string world)
+        // Get tutor by world for SocraticManager
+        public SaiaTutor GetTutorForWorld(string world)
     {
         SaiaTutor tutor;
         if (_activeTutors.TryGetValue(world, out tutor))
@@ -135,8 +135,8 @@ namespace LearningWorlds.Tutors
         return null;
     }
 
-    // STT - Speech to Text methods
-    public void StartRecording()
+        // STT - Speech to Text methods
+        public void StartRecording()
     {
         if (_isRecording) return;
         _isRecording = true;
@@ -156,7 +156,7 @@ namespace LearningWorlds.Tutors
         }
     }
 
-    public void StopRecording()
+        public void StopRecording()
     {
         if (!_isRecording) return;
         _isRecording = false;
@@ -168,7 +168,7 @@ namespace LearningWorlds.Tutors
         }
     }
 
-    public void SendToSTT(byte[] audioData, string world)
+        public void SendToSTT(byte[] audioData, string world)
     {
         // TODO: Implement HTTP POST to Saia/Whisper API for transcription
         // Example URL: http://localhost:8080/v1/audio/transcriptions
@@ -185,8 +185,8 @@ namespace LearningWorlds.Tutors
         return null; // Return AudioClip after implementing real API call
     }
 
-    // Access config for a tutor
-    public SaiaTutorConfig.TutorConfig GetTutorConfig(string world, string tutorName)
+        // Access config for a tutor
+        public SaiaTutorConfig.TutorConfig GetTutorConfig(string world, string tutorName)
     {
         if (_tutorConfig == null || _tutorConfig.tutors == null)
         {

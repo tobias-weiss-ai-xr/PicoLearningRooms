@@ -2,90 +2,106 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
 using System.IO;
-using LearningWorlds.Tutors;
 
-public class SaiaTutor : MonoBehaviour
+namespace LearningWorlds.Tutors
 {
-    private SaiaTutorConfig.TutorConfig _tutorConfig;
-    private string _lastResponse;
-
-    public void Setup(SaiaTutorConfig.TutorConfig config)
+    /// <summary>
+    /// Handles LLM communication for a Saia-based AI tutor.
+    /// Communicates with local Saia STT/TTS/LLM servers.
+    /// </summary>
+    public class SaiaTutor : MonoBehaviour
     {
-        _tutorConfig = config;
-    }
+        private SaiaTutorConfig.TutorConfig _tutorConfig;
+        private string _lastResponse;
 
-    public void SendToLLM(string userText)
-    {
-        if (_tutorConfig == null)
+        // LLM API Configuration
+        private string llmApiUrl = "http://localhost:11434/api/chat"; // Ollama
+        private string sttApiUrl = "http://localhost:8080/v1/audio/transcriptions"; // Whisper
+        private string ttsApiUrl = "http://localhost:8081/tts"; // Coqui
+
+        /// <summary>
+        /// Sets up the tutor with its configuration.
+        /// </summary>
+        public void Setup(SaiaTutorConfig.TutorConfig config)
         {
-            Debug.LogError("[SaiaTutor] TutorConfig not set! Call Setup() first.");
-            return;
+            _tutorConfig = config;
         }
-        StartCoroutine(SendLLMRequest(userText));
-    }
 
-    // Send a request to the LLM API
-    private IEnumerator SendLLMRequest(string userText)
-    {
-        // Define URL for LLM inference endpoint
-        string apiUrl = "http://localhost:8080/v1/inference";
-
-        // Serialize request data
-        string requestData = JsonUtility.ToJson(new {
-            prompt = _tutorConfig.systemPrompt + userText,
-            voiceId = _tutorConfig.voiceId
-        });
-
-        // Prepare and send POST request
-        using (UnityWebRequest request = new UnityWebRequest(apiUrl, "POST"))
+        /// <summary>
+        /// Sends user text to the LLM and processes the response.
+        /// </summary>
+        public void SendToLLM(string userText)
         {
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(requestData));
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            // Wait for response
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
+            if (_tutorConfig == null)
             {
-                string responseJson = request.downloadHandler.text;
-                Debug.Log("LLM Response: " + responseJson);
-
-                // Extract response text - simple approach
-                _lastResponse = responseJson;
-
-                // TODO: Add animation trigger here
-                PlayAudioForResponse(_lastResponse);
+                Debug.LogError("[SaiaTutor] TutorConfig not set! Call Setup() first.");
+                return;
             }
-            else
+            StartCoroutine(SendLLMRequest(userText));
+        }
+
+        /// <summary>
+        /// Sends a request to the LLM API.
+        /// </summary>
+        private IEnumerator SendLLMRequest(string userText)
+        {
+            string prompt = _tutorConfig.systemPrompt + "\n\nUser: " + userText;
+
+            WWWForm form = new WWWForm();
+            form.AddField("model", "mistral");
+            form.AddField("prompt", prompt);
+            form.AddField("stream", "false");
+
+            using (UnityWebRequest request = UnityWebRequest.Post(llmApiUrl, form))
             {
-                Debug.LogError("LLM Request Failed: " + request.error);
-                _lastResponse = "Failed to get response from server";
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+                yield return request.SendWebRequest();
+
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    string responseJson = request.downloadHandler.text;
+                    Debug.Log("[SaiaTutor] LLM Response: " + responseJson);
+
+                    _lastResponse = responseJson;
+                    PlayAudioForResponse(_lastResponse);
+                }
+                else
+                {
+                    Debug.LogError("[SaiaTutor] LLM Request Failed: " + request.error);
+                    _lastResponse = "Failed to get response from server";
+                }
             }
         }
-    }
 
-    // Play audio response
-    private void PlayAudioForResponse(string responseText)
-    {
-        if (!string.IsNullOrEmpty(responseText))
+        /// <summary>
+        /// Processes the response text and triggers audio playback.
+        /// </summary>
+        private void PlayAudioForResponse(string responseText)
         {
-            SaiaTutorManager.Instance.SendToTTS(_lastResponse, _tutorConfig.voiceId, _tutorConfig.world);
-        }
-    }
-
-    public void PlayAudio(AudioClip clip)
-    {
-        Animator animator = GetComponent<Animator>();
-        if (animator != null)
-        {
-            animator.SetTrigger("Talk");
+            if (!string.IsNullOrEmpty(responseText))
+            {
+                SaiaTutorManager.Instance.SendToTTS(_lastResponse, _tutorConfig.voiceId, _tutorConfig.world);
+            }
         }
 
-        TutorAvatar tutorAvatar = GetComponent<TutorAvatar>();
-        if (tutorAvatar != null)
+        /// <summary>
+        /// Plays an audio clip with animation.
+        /// </summary>
+        public void PlayAudio(AudioClip clip)
         {
-            tutorAvatar.PlayAudio(clip);
+            Animator animator = GetComponent<Animator>();
+            if (animator != null)
+            {
+                animator.SetTrigger("Talk");
+            }
+
+            TutorAvatar tutorAvatar = GetComponent<TutorAvatar>();
+            if (tutorAvatar != null)
+            {
+                tutorAvatar.PlayAudio(clip);
+            }
         }
     }
 }
