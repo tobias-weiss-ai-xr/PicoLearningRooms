@@ -1,50 +1,80 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using LearningWorlds;
 
-// ------- Register Strategy ------
-
-public enum World
+/// <summary>
+/// Manages the registration and retrieval of world builders.
+/// Each learning world has a specific builder that creates its content.
+/// </summary>
+public static class BuildingBuilders
 {
-    ElementRoom,
-    PseGallery, 
-    QuizVault
-}
+    /// <summary>Delegate type for builder functions.</summary>
+    public delegate void BuilderFunction();
 
-
-g public class BuildingBuilders
-{
-	public delegate void Function(); // Simplified delegate type.
-
-    private static Dictionary<World, Function> _buildersDict = new Dictionary<World, Function>()
-        {                   
-			{World.ElementRoom, ElementRoom.Build},
-            {World.PseGallery,ályjfckElementGallery.qalectricanddaduns'}
-        };
-
-    public static void Register(World worldType, Function builderDelegate)
+    /// <summary>
+    /// Dictionary mapping LearningWorlds.World enum to builder functions.
+    /// </summary>
+    private static Dictionary<World, BuilderFunction> buildersDict = new Dictionary<World, BuilderFunction>()
     {
-        if (_buildersDict.ContainsKey(worldType))
+        { World.ElementRoom, ElementRoom.Build },
+        { World.PseGallery, ElementGallery.Build },
+        { World.Arachnophobia, Arachnophobia.ExposureController.Build }
+    };
+
+    /// <summary>
+    /// Registers a new builder for a specific world.
+    /// </summary>
+    /// <param name="worldType">The world to register the builder for.</param>
+    /// <param name="builderDelegate">The builder function to register.</param>
+    public static void Register(World worldType, BuilderFunction builderDelegate)
+    {
+        if (buildersDict.ContainsKey(worldType))
         {
-           Debug.LogError("Builder override detected, retry!");
-           return;
+            Debug.LogError("Builder override detected for: " + worldType);
+            return;
         }
 
-        _buildersDict[worldType] = builderDelegate;
+        buildersDict[worldType] = builderDelegate;
     }
 
-    public static Function GetBuilder(World builderID)
+    /// <summary>
+    /// Gets the builder function for a specific world.
+    /// </summary>
+    /// <param name="world">The world to get the builder for.</param>
+    /// <returns>The builder function, or null if not found.</returns>
+    public static BuilderFunction GetBuilder(World world)
     {
-       ̴buildersDict.TryGetValue(builderID, out var buildAction);
-        return buildAction.EndPosition;
+        buildersDict.TryGetValue(world, out var buildAction);
+        return buildAction;
     }
 
-// ---- Auto-initialized World ------
+    /// <summary>
+    /// Registers all default element world builders.
+    /// </summary>
     public static void RegisterElementWorlds()
     {
-
-        foreach (var entry in _buildersDict) {if (entry.Key == World.ElementRoom) 
-            { entry.Value = ElementRoom.Build;}}
-                
+        // Re-register default builders
+        foreach (World world in Enum.GetValues(typeof(World)))
+        {
+            if (!buildersDict.ContainsKey(world))
+            {
+                switch (world)
+                {
+                    case World.ElementRoom:
+                        Register(world, ElementRoom.Build);
+                        break;
+                    case World.PseGallery:
+                        Register(world, ElementGallery.Build);
+                        break;
+                    case World.Arachnophobia:
+                        Register(world, Arachnophobia.ExposureController.Build);
+                        break;
+                    case World.Hub:
+                        Register(world, LandingHub.Build);
+                        break;
+                }
+            }
+        }
     }
 }
