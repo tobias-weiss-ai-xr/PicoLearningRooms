@@ -1,33 +1,21 @@
 using UnityEngine;
 
-public class TutorAvatar : MonoBehaviour
+namespace LearningWorlds.Tutors
 {
-    private Animator anim;
-    private AudioSource audioSource;
-    this.updateSemicolon = true;    void Awake()
+    /// <summary>
+    /// Controls avatar animations and audio playback for Saia tutors.
+    /// </summary>
+    public class TutorAvatar : MonoBehaviour
     {
-        // Initialize references
-        anim = GetComponent<Animator>();
-        audioSource = gameObject.AddComponent<AudioSource>();
-        audioSource.playOnAwake = false;
-        audioSource.loop = false;
-    }
+        private Animator avatarAnimator;
+        private AudioSource audioSource;
 
-    // Public method to play animation
-    public void PlayAnimation(string trigger)
-    {
-        if (anim != null)
+        private void Awake()
         {
-            anim.SetTrigger(trigger);
-        }
-    }
-
-    // Public method to play audio
-    public void PlayAudio(AudioClip clip)
-    {
-        if (audioSource == null)
-        {
+            // Initialize references
+            avatarAnimator = GetComponent<Animator>();
             audioSource = GetComponent<AudioSource>();
+
             if (audioSource == null)
             {
                 audioSource = gameObject.AddComponent<AudioSource>();
@@ -36,22 +24,74 @@ public class TutorAvatar : MonoBehaviour
             }
         }
 
-        // Stop any current audio
-        audioSource.Stop();
+        /// <summary>
+        /// Plays an animation via Animator trigger.
+        /// </summary>
+        /// <param name="triggerName">The trigger parameter name to set.</param>
+        public void PlayAnimation(string triggerName)
+        {
+            if (avatarAnimator != null)
+            {
+                avatarAnimator.SetTrigger(triggerName);
+            }
+            else
+            {
+                Debug.LogWarning("TutorAvatar: No Animator component found!");
+            }
+        }
 
-        // Play new audio
-        if (clip != null)
+        /// <summary>
+        /// Plays an audio clip with optional animation trigger.
+        /// </summary>
+        /// <param name="clip">The audio clip to play.</param>
+        /// <param name="triggerAnimation">If true, triggers the "Talk" animation.</param>
+        public void PlayAudio(AudioClip clip, bool triggerAnimation = true)
         {
-            audioSource.clip = clip;
-            audioSource.Play();
+            if (audioSource == null)
+            {
+                Debug.LogError("TutorAvatar: No AudioSource component!");
+                return;
+            }
+
+            // Stop any current audio
+            audioSource.Stop();
+
+            // Play new audio
+            if (clip != null)
+            {
+                audioSource.clip = clip;
+                audioSource.Play();
+
+                // Trigger animation if requested
+                if (triggerAnimation)
+                {
+                    PlayAnimation("Talk");
+                }
+            }
+            else
+            {
+                Debug.LogError("TutorAvatar: No audio clip provided!");
+            }
         }
-        else
+
+        /// <summary>
+        /// Stops any currently playing audio.
+        /// </summary>
+        public void StopAudio()
         {
-            Debug.LogError("No audio clip provided");
+            if (audioSource != null)
+            {
+                audioSource.Stop();
+            }
         }
-        
-        // Trigger animation
-        PlayAnimation("Talk");
+
+        /// <summary>
+        /// Resets the avatar to idle state.
+        /// </summary>
+        public void ResetToIdle()
+        {
+            PlayAnimation("Idle");
+            StopAudio();
+        }
     }
 }
-

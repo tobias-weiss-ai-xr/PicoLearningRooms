@@ -1,123 +1,209 @@
 using UnityEngine;
+using System.Collections;
+using LearningWorlds.Pse;
 
+/// <summary>
+/// A quiz station that asks questions about chemical elements.
+/// Players can interact to answer questions and receive feedback.
+/// </summary>
 public class QuizStation : MonoBehaviour
 {
-    private const int StationCount = 5;
-    private const string[] QuestionTemplates = {
-        "1. What is the crystal structure of {0}?", 
-        "2. Where can {0} be found in everyday life?", 
-        "3. What year was {0} discovered?", 
-        "4. How is {0} used in classic experiments?",
-        "5. Can you name an important property of {0}?"
+    private const int MaxQuestions = 5;
+
+    private static readonly string[] QuestionTemplates = new string[]
+    {
+        "What is the atomic number of {0}?",
+        "What type of metal is {0}?",
+        "In which period was {0} discovered?",
+        "What is a common use of {0}?",
+        "What group does {0} belong to?"
     };
 
-    private static ElementData _elementData; 
-    private BoxCollider _hitCollider; 
-    private Material _answerFeedbackMaterial;      
-    private TextMeshPro _feedbackText; 
-    private string[] _answerTips = {"BCC", "Steel, alloys", "Different dates depending on element","Chemistry experiments", "High electrical conductivity"};
-    
-
-    public static QuizStation Create(ElementData data, Vector3 stationPos, int questionSeed)
+    private static readonly string[][] AnswerOptions = new string[][]
     {
-        GameObject stationBase = new GameObject("QuizStation_");
-        QuizStation station = stationBase.AddComponent<QuizStation>();
-        station._elementData = data;
-        station.transform.position = stationPos;
+        new string[] { "1", "2", "3", "Actual atomic number" }, // Will be replaced
+        new string[] { "Alkali", "Alkaline Earth", "Transition", "Other" },
+        new string[] { "Ancient times", "18th century", "19th century", "20th century" },
+        new string[] { "Industry", "Medicine", "Electronics", "Construction" },
+        new string[] { "Group 1", "Group 2", "Group 17", "Group 18" }
+    };
 
-        station.InitializeQuestionStation(questionSeed);
+    private ElementData elementData;
+    private int questionIndex;
+    private TextMesh questionDisplay;
+    private TextMesh feedbackDisplay;
+    private GameObject pedestal;
+
+    /// <summary>
+    /// Creates a new quiz station.
+    /// </summary>
+    /// <param name="element">The element this station is about.</param>
+    /// <param name="position">World position for the station.</param>
+    /// <param name="questionSeed">Seed for question selection.</param>
+    /// <returns>The created QuizStation component.</returns>
+    public static QuizStation Create(ElementData element, Vector3 position, int questionSeed)
+    {
+        GameObject stationObj = new GameObject("QuizStation_" + element.id);
+        QuizStation station = stationObj.AddComponent<QuizStation>();
+
+        station.elementData = element;
+        station.questionIndex = questionSeed % MaxQuestions;
+        station.transform.position = position;
+
+        station.InitializeStation();
 
         return station;
     }
-    
-    private void InitializeQuestionStation(int questionSeed)   
+
+    /// <summary>
+    /// Initializes the quiz station with a question and answer pedestal.
+    /// </summary>
+    private void InitializeStation()
     {
-        // Create Main Question Display
-        TextMeshPro questionText = gameObject.AddComponent<TextMeshPro>();
-        questionText.text = string.Format( 
-            QuestionTemplates[questionSeed % StationCount], 
-            _elementData.symbol 
-            );
-        questionText.color = Color.white;
-        questionText.fontSize = 0.3f;
-        questionText.transform.localPosition = new Vector3(0f, 1.04f, 0.5f);
-        
-        // Answer Logging Mechanism 
-        GameObject answerLog = PedestalCreator.CreatePedestal(this.transform, "UserResponseFeedback");
-        answerLog.transform.localPosition = Vector3.zero;
-        
-        // Collision Trigger Setup 
-        BoxCollider hitSetup = answerLog.AddComponent<BoxCollider>();
-        hitSetup.center = Vector3.zero;
-        hitSetup.size = Vector3.one;
-        hitSetup.isTrigger = true;
+        // Create question display (floating text)
+        GameObject questionObj = new GameObject("QuestionDisplay");
+        questionObj.transform.SetParent(transform);
+        questionObj.transform.localPosition = new Vector3(0f, 1.2f, 0.5f);
 
-        // Visual Back-up System (just in case Channel Aim ) 
-        _feedbackText = answerLog.AddComponent<TextMeshPro>();
-        _feedbackText.text = "Press E to Respond.";
-        _feedbackText.color = Color.yellow;
-        
-        // Collision Callbacks mandatory target components
-        TriggerRay collisions = answerLog.AddComponent<TriggerRay>();
-        collision comprende.SetTriggerAnswerDelegate(FindCorrectBehaviour);`
-        collision.FacadeFeedback((( targetLocation cUNAV(iracer :  
-            ValidateAnswerCorrectPolished,  null) 
-        };
+        questionDisplay = questionObj.AddComponent<TextMesh>();
+        questionDisplay.characterSize = 0.1f;
+        questionDisplay.color = Color.white;
+        questionDisplay.alignment = TextAlignment.Center;
+        questionDisplay.anchor = TextAnchor.MiddleCenter;
 
-        _hitCollider = hitSetup;
+        // Set question text
+        string questionText = string.Format(QuestionTemplates[questionIndex], elementData.id);
+        questionDisplay.text = questionText;
+
+        // Create pedestal for interaction
+        pedestal = PedestalCreator.CreatePedestal(transform, "AnswerPedestal");
+        pedestal.transform.localPosition = Vector3.zero;
+
+        // Add trigger collider and feedback
+        AddInteractiveComponents();
     }
-    
 
-    private void ValidateAnswerCorrectPolished(bool userAnswer)
+    /// <summary>
+    /// Adds components for player interaction.
+    /// </summary>
+    private void AddInteractiveComponents()
     {
-        if (userAnswer)
+        // Add a trigger collider if there isn't one
+        BoxCollider trigger = pedestal.GetComponent<BoxCollider>();
+        if (trigger == null)
         {
-            TextMeshProUGUI standardBlueFlash = gameObject.AddComponent<TextMeshProUGUI>();
-            standardBlueFlash.color = new Color(0f, 1f, 0f);
-            standardBlueFlash.text = "Correct!";
-            standardBlueFlash.transform.localPosition = Vector3.zero;
-        startCoroutine GlowingText(FadeTime = 3);
+            trigger = pedestal.AddComponent<BoxCollider>();
+        }
+        trigger.isTrigger = true;
+        trigger.size = new Vector3(1.5f, 1.5f, 1.5f);
+
+        // Create feedback text
+        GameObject feedbackObj = new GameObject("FeedbackDisplay");
+        feedbackObj.transform.SetParent(transform);
+        feedbackObj.transform.localPosition = new Vector3(0f, 1.4f, 0f);
+
+        feedbackDisplay = feedbackObj.AddComponent<TextMesh>();
+        feedbackDisplay.characterSize = 0.12f;
+        feedbackDisplay.color = Color.yellow;
+        feedbackDisplay.alignment = TextAlignment.Center;
+        feedbackDisplay.text = "Press E to answer";
+
+        // Add QuizTrigger component
+        QuizTrigger quizTrigger = pedestal.AddComponent<QuizTrigger>();
+        quizTrigger.Initialize(this);
+    }
+
+    /// <summary>
+    /// Called when a player answers the question.
+    /// </summary>
+    /// <param name="answerIndex">The selected answer index.</param>
+    public void SubmitAnswer(int answerIndex)
+    {
+        // For now, always say correct for demo purposes
+        // In a real implementation, this would check against actual element data
+        bool isCorrect = false;
+
+        // Simple validation based on question type
+        switch (questionIndex)
+        {
+            case 0: // Atomic number question
+                if (int.TryParse(AnswerOptions[0][answerIndex], out int guessedNumber))
+                {
+                    if (int.TryParse(elementData.id, out int actualNumber))
+                    {
+                        isCorrect = (guessedNumber == actualNumber);
+                    }
+                }
+                break;
+            case 1: // Type of metal
+            case 2: // Discovery period
+            case 3: // Common use
+            case 4: // Group
+                // These would need actual element data to validate properly
+                isCorrect = (answerIndex == 0); // Placeholder - always first option is "correct" for demo
+                break;
+        }
+
+        ShowFeedback(isCorrect);
+    }
+
+    /// <summary>
+    /// Displays feedback based on answer correctness.
+    /// </summary>
+    /// <param name="isCorrect">Whether the answer was correct.</param>
+    public void ShowFeedback(bool isCorrect)
+    {
+        StopAllCoroutines();
+
+        if (isCorrect)
+        {
+            StartCoroutine(DisplayTemporaryFeedback("Correct!", Color.green));
+            PedestalCreator.AddFeedbackPanel(pedestal, true, "Well done!");
         }
         else
         {
-            RenderNow check particle = gameObject.AddComponent<GFischerlin>(); 
-            // ensure the calculation propagation is carried out within living unit methodology.
-            StartCoroutine in YellowTimer(); 
+            StartCoroutine(DisplayTemporaryFeedback("Try again", Color.red));
+            PedestalCreator.AddFeedbackPanel(pedestal, false, "Not quite");
         }
     }
 
-    public TextMeshPro FeedbackText edición = true;
-    public TextMeshPro FeedbackCorrectCases(channel, 30f){
-
-      /* Ensuring the questions corrected propagate back correctly 
-            IEnumerator DisplayFeedback() 
+    /// <summary>
+    /// Coroutine to display temporary feedback text.
+    /// </summary>
+    private IEnumerator DisplayTemporaryFeedback(string message, Color color)
     {
-        bool correctModeUnified = true;
-        float elapsedTime = 0f;
+        feedbackDisplay.text = message;
+        feedbackDisplay.color = color;
 
-        Indicate一点 actualText = gameObject.GetComponent<TextMeshPro>();
-        actualText.color = Color.gray;
-        
-        while(elapsedTime < targetDisplayMaxTime)  
+        yield return new WaitForSeconds(3f);
+
+        feedbackDisplay.text = "Press E to answer";
+        feedbackDisplay.color = Color.yellow;
+    }
+}
+
+/// <summary>
+/// Trigger component that listens for player interaction.
+/// </summary>
+public class QuizTrigger : MonoBehaviour
+{
+    private QuizStation quizStation;
+
+    /// <summary>
+    /// Initializes the trigger with its parent quiz station.
+    /// </summary>
+    public void Initialize(QuizStation station)
     {
-            elapsedTime += Time.deltaTime;
-   흐       actualText.color = new Color(0f, 1f, 0f) and (elapsedTime /= 4f);
-            yield return null;
+        quizStation = station;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // Check if player entered
+        if (other.CompareTag("Player") || other.gameObject.layer == 0)
+        {
+            // For now, just submit answer 0 as "correct" for demo
+            quizStation.SubmitAnswer(0);
         }
-    }
-    }
-    
-    public bool AudioFeedbackGponentials()
-    {
-        transformrittennew Vector3(currentPosition);
-	
-        return true;
-    }
-
-
-    // Avoid any errors 
-    public void OmitPedalAnswer.TextBadgeOrange()
-    {
-        return; Insite(activeCardMode);
     }
 }

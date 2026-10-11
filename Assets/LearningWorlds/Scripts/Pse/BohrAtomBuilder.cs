@@ -40,9 +40,9 @@ namespace LearningWorlds.PSE
 
         public static float MaxShellsVisible = 2; // Constrain to 2 for gallery as per requirements
         
-        public static GameObject Build(Element e, float scale = 1)
+        public static GameObject Build(ElementData element, float scale = 1)
         {
-            GameObject atom = new GameObject("Atom_" + e.symbol);
+            GameObject atom = new GameObject("Atom_" + element.id);
             
             // Create nucleus - using cpk_hex color fallback from category hash
             GameObject nucleus = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -50,16 +50,19 @@ namespace LearningWorlds.PSE
             nucleus.transform.SetParent(atom.transform);
             nucleus.transform.localScale = new Vector3(scale * 0.25f, scale * 0.25f, scale * 0.25f);
             
-            // Sanitize category string by removing non-alphanumeric chars
-            string category = e.category.ToLower();
+            // Determine category from element ID
+            string category = DetermineCategoryFromId(element.id);
             category = Regex.Replace(category, "[^a-z0-9 ]", "");
             
+            // Set nucleus color based on category
+            int atomicNumber = ParseAtomicNumber(element.id);
             nucleus.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
-            nucleus.GetComponent<Renderer>().material.color = GetColor(category, e.number); // CPKHex fallback category colors
+            nucleus.GetComponent<Renderer>().material.color = GetColor(category, atomicNumber);
             nucleus.AddComponent<SphereCollider>().isTrigger = true;
 
-            // Create shell rings (using thin cylinder primitives)
-            for (int shell = 1; shell <= MaxShellsVisible && shell <= e.numberOfShells; shell++)
+            // Create electron shells (simplified for gallery view)
+            int numberOfShells = CalculateNumberOfShells(atomicNumber);
+            for (int shell = 1; shell <= MaxShellsVisible && shell <= numberOfShells; shell++)
             {
                 GameObject shellRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                 shellRing.name = "Shell_" + shell;
@@ -89,16 +92,16 @@ namespace LearningWorlds.PSE
                                                    0.3f); // Add transparency
                 
                 // Add electrons to this shell ring
-                AddElectrons(shellRing.transform, shell, e, scale);
+                AddElectrons(shellRing.transform, shell, element, scale, atomicNumber);
             }
             
             return atom;
         }
         
         // Adds electrons uniformly on their respective rings
-        private static void AddElectrons(Transform shellParent, int shellNumber, Element e, float atomScale)
+        private static void AddElectrons(Transform shellParent, int shellNumber, ElementData element, float atomScale, int atomicNumber)
         {
-            int electronCount = e.GetElectronsInShell(shellNumber);
+            int electronCount = GetElectronsInShell(shellNumber, atomicNumber);
             
             // Limit to visual maximum of 8 shell signature electrons for gallery
             electronCount = Mathf.Min(electronCount, 8);
@@ -141,5 +144,77 @@ namespace LearningWorlds.PSE
             // Fallback colors based on atomic number
             return fallbackColors[atomicNumber % fallbackColors.Length];
         }
+
+        /// <summary>
+        /// Calculates electrons in a given shell based on atomic number.
+        /// Simplified: 2, 8, 18, 32 for shells 1-4
+        /// </summary>
+        private static int GetElectronsInShell(int shellNumber, int atomicNumber)
+        {
+            if (shellNumber <= 0) return 0;
+            
+            int[] shellCapacities = { 2, 8, 18, 32, 32, 18, 8, 2 };
+            int totalElectrons = 0;
+            
+            for (int s = 0; s < Mathf.Min(shellNumber, shellCapacities.Length); s++)
+            {
+                int electronsInThisShell = Mathf.Min(shellCapacities[s], atomicNumber - totalElectrons);
+                if (s + 1 == shellNumber)
+                    return electronsInThisShell;
+                totalElectrons += electronsInThisShell;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Determines element category based on atomic number.
+        /// </summary>
+        private static string DetermineCategoryFromId(string elementId)
+        {
+            if (int.TryParse(elementId, out int atomicNumber))
+            {
+                if (atomicNumber <= 2) return "noble gases";
+                if (atomicNumber <= 10) return "nonmetals";
+                if (atomicNumber == 11 || atomicNumber == 19) return "alkali metals";
+                if (atomicNumber == 12 || atomicNumber == 20) return "alkaline earth metals";
+                if (atomicNumber >= 21 && atomicNumber <= 30) return "transition metals";
+                if (atomicNumber >= 31 && atomicNumber <= 38) return "post transition metals";
+                if (atomicNumber >= 39 && atomicNumber <= 48) return "transition metals";
+                if (atomicNumber >= 57 && atomicNumber <= 71) return "lanthanides";
+                if (atomicNumber >= 89 && atomicNumber <= 103) return "actinides";
+                if (atomicNumber >= 5 && atomicNumber <= 8 || atomicNumber == 14 || atomicNumber == 15 || atomicNumber == 16 || atomicNumber == 32 || atomicNumber == 33 || atomicNumber == 34) return "nonmetals";
+                if (atomicNumber == 17 || atomicNumber == 35 || atomicNumber == 53 || atomicNumber == 85) return "halogens";
+                return "other metals";
+            }
+            return "other metals";
+        }
+
+        /// <summary>
+        /// Parses atomic number from element ID.
+        /// </summary>
+        private static int ParseAtomicNumber(string elementId)
+        {
+            if (int.TryParse(elementId, out int number))
+                return number;
+            
+            // Try to extract number from symbol like "H", "He", etc.
+            // For now, return a default
+            return 1;
+        }
+
+        /// <summary>
+        /// Calculates maximum number of electron shells for a given atomic number.
+        /// </summary>
+        private static int CalculateNumberOfShells(int atomicNumber)
+        {
+            if (atomicNumber <= 2) return 1;
+            if (atomicNumber <= 10) return 2;
+            if (atomicNumber <= 18) return 3;
+            if (atomicNumber <= 36) return 4;
+            if (atomicNumber <= 54) return 5;
+            if (atomicNumber <= 86) return 6;
+            return 7;
+        }
     }
 }
+#endregion

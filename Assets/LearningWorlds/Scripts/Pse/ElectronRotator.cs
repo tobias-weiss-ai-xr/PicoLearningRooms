@@ -1,27 +1,37 @@
 #region Usings
 using UnityEngine;
+#endregion
 
-namespace LearningWorlds.PSE
+namespace LearningWorlds.Pse
 {
-    public class ElectronRotator : MonoBehaviour  {
-        [Tooltip("Rotation speed of the electrons around the nucleus")]
+    /// <summary>
+    /// Rotates electron shells around an atom nucleus.
+    /// </summary>
+    public class ElectronRotator : MonoBehaviour
+    {
+        [Tooltip("Rotation speed of the electrons around the nucleus (degrees per second)")]
         public float rotationSpeed = 20.0f;
 
-        private static Transform[] _electronChildren;
+        private Transform[] electronChildren;
 
-        void Start() {
-            _electronChildren = GetComponentsInChildren<Transform>(includeInactive: false); // Use active transforms only
+        private void Start()
+        {
+            // Get all child transforms (electron shells)
+            electronChildren = GetComponentsInChildren<Transform>();
         }
 
-        void Update()
+        private void Update()
         {
-            foreach (Transform electronShell in _electronChildren)
+            foreach (Transform electronShell in electronChildren)
             {
-                float angleOffset = Time.deltaTime * rotationSpeed;
+                // Skip self (the atom itself)
+                if (electronShell == transform)
+                    continue;
 
-                // Rotate around the Y-axis to simulate electron movement
+                // Rotate around the Y-axis to simulate electron orbit
+                float angleOffset = Time.deltaTime * rotationSpeed;
                 electronShell.RotateAround(transform.position, Vector3.up, angleOffset);
             }
         }
-    }}
-
+    }
+}

@@ -1,237 +1,323 @@
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
-using System.Linq;
-using System.Reflection;
-using System.Collections.Generic;
+using LearningWorlds.Pse;
 
-namespace LearningWorlds.PSE
+namespace LearningWorlds.Pse
 {
+    /// <summary>
+    /// Displays detailed information about a chemical element in a world-space UI panel.
+    /// </summary>
     public class ElementInfoPanel : MonoBehaviour
     {
-        private Element _currentElement;
-        private Canvas _canvas;
-        private GameObject infoPanelRoot;
-        public const float MAX_RAYCAST_DISTANCE = 20f;
-        private LearningWorldsApp _app;
-        
+        private ElementData currentElement;
+        private Canvas uiCanvas;
+        private GameObject panelRoot;
+        private LearningWorldsApp appReference;
+
+        private const float MaxRaycastDistance = 20f;
+
         private void Awake()
         {
-            _app = LearningWorldsApp.Instance;
+            appReference = LearningWorldsApp.Instance;
         }
-        
-        
-private bool _canClosePanel = true;
 
-public void ShowPanel(Element element)
+        /// <summary>
+        /// Shows the info panel for a specific element.
+        /// </summary>
+        public void Show(ElementData element)
         {
-            if (_currentElement == element) return;
+            if (currentElement?.id == element.id)
+                return;
 
-            _currentElement = element;
-            CreateAndPositionUIPanelAtSelectionPoint();
-            UpdatePanelUI();
+            currentElement = element;
+            CreateAndPositionPanel();
+            UpdatePanelContent();
         }
-        
-        public void ClosePanel()
+
+        /// <summary>
+        /// Hides the info panel.
+        /// </summary>
+        public void Hide()
         {
-            if (infoPanelRoot) GameObject.Destroy(infoPanelRoot);
-        }
-        
-        // Raycast detection for element click
-        // Update for correct raycast trigger detection
-private Collider _triggerCollider;
-
-public void DetectSelection()
-{
-    Ray ray = _app.rigCamera.ScreenPointToRay(new Vector2(Screen.width / 2f, Screen.height / 2f));
-    RaycastHit hit;
-    _triggerCollider = null;
-
-    if (Physics.Raycast(ray, out hit, MAX_RAYCAST_DISTANCE))
-    {
-        Collider collider = hit.collider;
-        _triggerCollider = collider;
-        string elementTag = collider.transform.parent?.tag;
-
-        if (int.TryParse(elementTag, out int elementNumber))
-        {
-            if (_currentElement?.number != elementNumber)
+            if (panelRoot != null)
             {
-                Element selectedElement = DataStore.ElementCatalog.FirstOrDefault(x => x.number == elementNumber);
-                if (selectedElement != null)
-                {
-                    ShowPanel(selectedElement);
-                }
+                Destroy(panelRoot);
+                panelRoot = null;
             }
         }
-    }
-    else
-    {
-        if (infoPanelRoot && _canClosePanel)
+
+        /// <summary>
+        /// Detects element selection via raycast.
+        /// </summary>
+        public void DetectSelection()
         {
-            ClosePanel();
+            if (appReference?.rigCamera == null)
+                return;
+
+            Ray ray = appReference.rigCamera.ScreenPointToRay(
+                new Vector2(Screen.width / 2f, Screen.height / 2f));
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, MaxRaycastDistance))
+            {
+                string elementTag = hit.collider.transform.parent?.tag;
+
+                if (!string.IsNullOrEmpty(elementTag))
+                {
+                    // Try to find matching element data
+                    ElementData element = ElementData.LoadAll().Find(e => e.id == elementTag);
+                    if (element != null)
+                    {
+                        Show(element);
+                    }
+                }
+            }
+            else
+            {
+                Hide();
+            }
         }
-    }
-}
 
-        private void CreateAndPositionUIPanelAtSelectionPoint()
+        /// <summary>
+        /// Creates and positions the UI panel.
+        /// </summary>
+        private void CreateAndPositionPanel()
         {
-            if (infoPanelRoot)
-                GameObject.Destroy(infoPanelRoot);
-                
-            infoPanelRoot = new GameObject("ElementInfoRoot");
-            Canvas canvas = infoPanelRoot.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.WorldSpace;
-            canvas.worldCamera = _app.rigCamera;
-            _canvas = canvas;
+            Hide(); // Hide existing panel if any
 
-            // Create panels to hold all UI elements
-            GameObject panel = CreateElementPanel();
-            panel.transform.SetParent(infoPanelRoot.transform);
-            
-            // Set initial position in front of last selected element
-            panel.transform.position = _app.rigCamera.transform.position + _app.rigCamera.transform.forward * 3.5f;
-            
-            SceneBuilder.AddWorldSpaceUI(infoPanelRoot);
+            // Create root object with canvas
+            panelRoot = new GameObject("ElementInfoPanel_Root");
+            uiCanvas = panelRoot.AddComponent<Canvas>();
+            uiCanvas.renderMode = RenderMode.WorldSpace;
+
+            if (appReference?.rigCamera != null)
+            {
+                uiCanvas.worldCamera = appReference.rigCamera;
+            }
+
+            // Create the main panel
+            GameObject panel = CreatePanel();
+            panel.transform.SetParent(panelRoot.transform);
+
+            // Position in front of camera
+            if (appReference?.rigCamera != null)
+            {
+                panel.transform.position = appReference.rigCamera.transform.position +
+                    appReference.rigCamera.transform.forward * 3.5f;
+            }
         }
 
-        private TextMeshProUGUI CreateUILabel(string text, RectTransform parent, params Vector2 position)
+        /// <summary>
+        /// Creates the main panel GameObject.
+        /// </summary>
+        private GameObject CreatePanel()
         {
-            GameObject labelObj = new GameObject("Label");
-            labelObj.transform.SetParent(parent);
+            GameObject panelObj = new GameObject("ElementPanel");
 
-            TextMeshProUGUI label = labelObj.AddComponent<TextMeshProUGUI>();
-            label.text = text;
-            label.fontSize = 16;
-            label.fontStyle = FontStyles.Bold;
-            label.color = Color.white;
-            label.alignment = TextAlignmentOptions.Left;
-            label.autoSizeTextContainer = true;
+            RectTransform rectTransform = panelObj.AddComponent<RectTransform>();
+            rectTransform.sizeDelta = new Vector2(400, 500);
 
-            RectTransform rt = labelObj.GetComponent<RectTransform>();
-            rt.anchoredPosition = position;
+            // Add background image
+            Image background = panelObj.AddComponent<Image>();
+            background.color = new Color(0.15f, 0.15f, 0.15f, 0.95f);
 
-            return label;
-        }
-        
-        private GameObject CreateElementPanel()
-        {
-            GameObject panelObj = new GameObject("ElementInfoPanel");
-            panelObj.transform.SetParent(_canvas.transform);
-
-            RectTransform panelRT = panelObj.AddComponent<RectTransform>();
-            panelRT.sizeDelta = new Vector2(700, 800);
-            panelRT.localRotation = Quaternion.Euler(0, 180, 0); // Align forward
-            
-            CreateInfoTexts(panelRT);
-            CreateActionButtons(panelRT);
+            // Create content
+            CreateTitle(panelObj);
+            CreateInfoText(panelObj);
+            CreateActionButtons(panelObj);
 
             return panelObj;
         }
-        
-        private void CreateInfoTexts(RectTransform parentRT)
-        {
-            int positionY = 0;
 
-            var infoEntries = new List<KeyValuePair<string, string>>
+        /// <summary>
+        /// Creates the title text.
+        /// </summary>
+        private void CreateTitle(GameObject parent)
+        {
+            GameObject titleObj = new GameObject("Title");
+            titleObj.transform.SetParent(parent.transform);
+
+            Text titleText = titleObj.AddComponent<Text>();
+            titleText.text = currentElement.nameEn ?? currentElement.id;
+            titleText.fontSize = 24;
+            titleText.color = Color.white;
+            titleText.alignment = TextAnchor.MiddleCenter;
+            titleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+
+            RectTransform titleRect = titleObj.GetComponent<RectTransform>();
+            titleRect.anchorMin = new Vector2(0, 1);
+            titleRect.anchorMax = new Vector2(1, 1);
+            titleRect.sizeDelta = new Vector2(0, 60);
+            titleRect.anchoredPosition = new Vector2(0, -10);
+        }
+
+        /// <summary>
+        /// Creates the information text labels.
+        /// </summary>
+        private void CreateInfoText(GameObject parent)
+        {
+            float yPos = -40f;
+
+            AddTextRow(parent, "Symbol", currentElement.id, ref yPos);
+            AddTextRow(parent, "Name", currentElement.nameEn ?? "N/A", ref yPos);
+            AddTextRow(parent, "Category", GetCategoryDescription(currentElement), ref yPos);
+            
+            if (currentElement.properties != null)
             {
-                new KeyValuePair<string, string>("Name", _currentElement.name),
-                new KeyValuePair<string, string>("Symbol", _currentElement.symbol),
-                new KeyValuePair<string, string>("Number", _currentElement.number.ToString()),
-                new KeyValuePair<string, string>("Atomic Mass", RegexMatchForMultiChar(_currentElement.atomic_mass,"^([0-9.]+)")),
-                new KeyValuePair<string, string>("Category", GetCategory()),
-                new KeyValuePair<string, string>("Phase", _currentElement.phase),
-                new KeyValuePair<string, string>("Melting Point [K]", RegexMatchForMultiChar(_currentElement.meltingTemp,"^([0-9.]+)")),
-                new KeyValuePair<string, string>("Boiling Point [K]", RegexMatchForMultiChar(_currentElement.boilingTemp,"^([0-9.]+)")),
-                new KeyValuePair<string, string>("Density [g/l]", RegexMatchForMultiChar(_currentElement.density,"^([0-9.]+)")),
-                new KeyValuePair<string, string>("Electronegativity", RegexMatchForMultiChar(_currentElement.electronegativity,"^([0-9.]+)")),
-                new KeyValuePair<string, string>("Appearance", _currentElement.appearance),
-                new KeyValuePair<string, string>("Configuration", _currentElement.electronConfig),
-                new KeyValuePair<string, string>("Summary", Truncate(_currentElement.summary, 60))
-            };
-                
-            // Format labels and values with proper alignment
-            foreach (var entry in infoEntries)
+                AddTextRow(parent, "Melting Point", 
+                    currentElement.properties.meltingPoint + " K", ref yPos);
+            }
+            
+            // Add description
+            if (!string.IsNullOrEmpty(currentElement.descriptionEn))
             {
-                CreateUILabel(entry.Key + ":", parentRT, new Vector2(-300, positionY));
-                CreateUILabel(entry.Value, parentRT, new Vector2(-5, positionY));
-                positionY -= 40;
+                AddDescriptionText(parent, currentElement.descriptionEn, yPos - 30f);
             }
         }
-        
-        private void CreateActionButtons(RectTransform parentRT)
+
+        /// <summary>
+        /// Adds a row with label and value.
+        /// </summary>
+        private void AddTextRow(GameObject parent, string label, string value, ref float yPos)
         {
-            // "Enter Element Room" button
-            GameObject enterButton = CreateUIButton("EnterElementRoom", "Raum betreten", new Vector2(0, -150),
-                220, () => LearningWorldsApp.Go(World.ElementRoom, _currentElement.number), new Color(0.31f, 0.65f, 0.3f));
-            enterButton.transform.SetParent(parentRT);
-            
-            // "Close Panel" button
-            GameObject closeButton = CreateUIButton("ClosePanel", "Schliessen", new Vector2(0, -250),
-                220, () => ClosePanel(), new Color(0.83f, 0.24f, 0.24f));
-            closeButton.transform.SetParent(parentRT);
+            GameObject rowObj = new GameObject("Row_" + label);
+            rowObj.transform.SetParent(parent.transform);
+
+            // Label
+            GameObject labelObj = new GameObject("Label");
+            labelObj.transform.SetParent(rowObj.transform);
+            Text labelText = labelObj.AddComponent<Text>();
+            labelText.text = label + ":";
+            labelText.fontSize = 16;
+            labelText.color = Color.cyan;
+            labelText.alignment = TextAnchor.MiddleRight;
+            labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+
+            RectTransform labelRect = labelObj.GetComponent<RectTransform>();
+            labelRect.anchorMin = new Vector2(0, 0.5f);
+            labelRect.anchorMax = new Vector2(0, 0.5f);
+            labelRect.sizeDelta = new Vector2(150, 25);
+            labelRect.anchoredPosition = new Vector2(0, 0);
+
+            // Value
+            GameObject valueObj = new GameObject("Value");
+            valueObj.transform.SetParent(rowObj.transform);
+            Text valueText = valueObj.AddComponent<Text>();
+            valueText.text = value;
+            valueText.fontSize = 16;
+            valueText.color = Color.white;
+            valueText.alignment = TextAnchor.MiddleLeft;
+            valueText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+
+            RectTransform valueRect = valueObj.GetComponent<RectTransform>();
+            valueRect.anchorMin = new Vector2(0, 0.5f);
+            valueRect.anchorMax = new Vector2(0, 0.5f);
+            valueRect.sizeDelta = new Vector2(240, 25);
+            valueRect.anchoredPosition = new Vector2(160, 0);
+
+            // Row positioning
+            RectTransform rowRect = rowObj.GetComponent<RectTransform>();
+            rowRect.anchorMin = new Vector2(0.5f, 1);
+            rowRect.anchorMax = new Vector2(0.5f, 1);
+            rowRect.sizeDelta = new Vector2(380, 25);
+            rowRect.anchoredPosition = new Vector2(0, yPos);
+
+            yPos -= 30f;
         }
 
-        private GameObject CreateUIButton(string name, string text, Vector2 position, float width,
-            UnityEngine.Events.UnityAction onClick, Color color)
+        /// <summary>
+        /// Adds a longer description text.
+        /// </summary>
+        private void AddDescriptionText(GameObject parent, string text, float yPos)
         {
-            GameObject buttonObj = new GameObject(name);
+            GameObject descObj = new GameObject("Description");
+            descObj.transform.SetParent(parent.transform);
+
+            Text descText = descObj.AddComponent<Text>();
+            descText.text = text;
+            descText.fontSize = 14;
+            descText.color = Color.gray;
+            descText.alignment = TextAnchor.UpperLeft;
+            descText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+
+            RectTransform descRect = descObj.GetComponent<RectTransform>();
+            descRect.anchorMin = new Vector2(0.05f, 1);
+            descRect.anchorMax = new Vector2(0.95f, 1);
+            descRect.sizeDelta = new Vector2(0, 100);
+            descRect.anchoredPosition = new Vector2(0, yPos);
+        }
+
+        /// <summary>
+        /// Creates action buttons.
+        /// </summary>
+        private void CreateActionButtons(GameObject parent)
+        {
+            // Enter Element Room button
+            CreateButton(parent, "Enter Room", new Vector2(0, -200), new Vector2(180, 40),
+                Color.green, () => { 
+                    ElementRoom.SelectedElement = currentElement;
+                    LearningWorldsApp.Go(World.ElementRoom); 
+                });
+
+            // Close button
+            CreateButton(parent, "Close", new Vector2(0, -250), new Vector2(180, 40),
+                Color.red, Hide);
+        }
+
+        /// <summary>
+        /// Creates a button.
+        /// </summary>
+        private void CreateButton(GameObject parent, string text, Vector2 position, 
+            Vector2 size, Color color, UnityEngine.Events.UnityAction onClick)
+        {
+            GameObject buttonObj = new GameObject("Button_" + text);
+            buttonObj.transform.SetParent(parent.transform);
+
             Button button = buttonObj.AddComponent<Button>();
             Image image = buttonObj.AddComponent<Image>();
-            TextMeshProUGUI textLabel = buttonObj.AddComponent<TextMeshProUGUI>();
 
-            RectTransform rt = buttonObj.GetComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(width, 50);
-            rt.anchoredPosition = position;
+            GameObject textObj = new GameObject("Text");
+            textObj.transform.SetParent(buttonObj.transform);
+            Text textComponent = textObj.AddComponent<Text>();
+            textComponent.text = text;
+            textComponent.fontSize = 16;
+            textComponent.color = Color.white;
+            textComponent.alignment = TextAnchor.MiddleCenter;
+            textComponent.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
-            textLabel.text = text;
-            textLabel.fontSize = 18;
-            textLabel.color = Color.black;
-            textLabel.alignment = TextAlignmentOptions.Center;
+            RectTransform textRect = textObj.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.sizeDelta = new Vector2(-20, -10);
+
+            RectTransform buttonRect = buttonObj.GetComponent<RectTransform>();
+            buttonRect.anchorMin = new Vector2(0.5f, 1);
+            buttonRect.anchorMax = new Vector2(0.5f, 1);
+            buttonRect.sizeDelta = size;
+            buttonRect.anchoredPosition = position;
 
             image.color = color;
-            image.raycastTarget = true;
-
             button.onClick.AddListener(onClick);
-
-            return buttonObj;
         }
-        
-        // Update code to refactor access to element data
-        private void UpdatePanelUI()
+
+        /// <summary>
+        /// Updates panel content with current element data.
+        /// </summary>
+        private void UpdatePanelContent()
         {
-            // Clean up any existing UI
-            foreach (Transform child in infoPanelRoot?.transform)
+            // Implementation not needed as we recreate the panel
+        }
+
+        /// <summary>
+        /// Gets a human-readable category description.
+        /// </summary>
+        private string GetCategoryDescription(ElementData element)
+        {
+            if (element.properties != null && !string.IsNullOrEmpty(element.descriptionEn))
             {
-                if (child != null && child.name != "ElementInfoPanel" && child.name != "Label")
-                {
-                    GameObject.Destroy(child.gameObject);
-                }
+                return "Element"; // Simplified for now
             }
-            
-            // Rebuild UI with updated element info
-            CreateInfoTexts(infoPanelRoot.GetComponentInChildren<RectTransform>(true));
-            CreateActionButtons(infoPanelRoot.GetComponentInChildren<RectTransform>(true));
-        }
-
-        private string GetCategory()
-        {
-            if (DataStore.ElementCategories.TryGetValue(_currentElement.category, out string category)) 
-                return category;
-            return _currentElement.category;
-        }
-
-        private string RegexMatchForMultiChar(string field, string pattern)
-        {
-            var match = System.Text.RegularExpressions.Regex.Match(field, pattern);
-            return match.Success ? match.Groups[1].Value : "N/A";
-        }
-        
-        // Text truncation for UI
-        private string Truncate(string input, int maxLength = 60)
-        {
-            if (string.IsNullOrEmpty(input)) return "N/A";
-            return input.Length <= maxLength ? input : input.Substring(0, maxLength) + "...";
+            return "Chemical Element";
         }
     }
 }
